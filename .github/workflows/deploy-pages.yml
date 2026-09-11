@@ -40,6 +40,8 @@ jobs:
         env:
           VITE_BASE: "./"
           VITE_IS_DEMO: "true"
+          VITE_DEMO_API_URL: "https://world.minhnhan.in"
+          VITE_DEMO_WS_URL: "wss://world.minhnhan.in/ws"
           FRONTEND_URL: "https://longphanmn.github.io/flws-web/"
           LANDING_URL: "https://longphanmn.github.io/flws-page/"
 
