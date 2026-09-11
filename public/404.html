@@ -36,24 +36,22 @@
       var path = pathname.toLowerCase();
 
       var repoPrefix = '';
-      if (pathname.indexOf('/flatland') === 0) {
-        repoPrefix = '/flatland';
+      if (pathname.indexOf('/flws-web') === 0) {
+        repoPrefix = '/flws-web';
       }
 
       var target = origin + repoPrefix + '/';
 
       if (path.indexOf('god-laws.md') !== -1) {
-        target = origin + repoPrefix + '/demo/docs/god-laws.md' + hash;
+        target = origin + repoPrefix + '/docs/god-laws.md' + hash;
       } else if (path.indexOf('wiki') !== -1) {
-        target = origin + repoPrefix + '/demo/wiki/' + search + hash;
+        target = origin + repoPrefix + '/wiki/' + search + hash;
       } else if (path.indexOf('docs') !== -1) {
-        target = origin + repoPrefix + '/demo/docs/' + search;
+        target = origin + repoPrefix + '/docs/' + search;
       } else if (path.indexOf('openapi.json') !== -1) {
-        target = origin + repoPrefix + '/demo/openapi.json';
+        target = origin + repoPrefix + '/openapi.json';
       } else if (path.indexOf('health') !== -1) {
-        target = origin + repoPrefix + '/demo/health/' + search;
-      } else if (path.indexOf('demo') !== -1) {
-        target = origin + repoPrefix + '/demo/' + search + hash;
+        target = origin + repoPrefix + '/health/' + search;
       }
 
       window.location.replace(target);
@@ -65,7 +63,7 @@
     <h2>Redirecting…</h2>
     <p>Navigating to Flatland resource.</p>
     <p><a href="./" id="home-link">Return to Flatland Home</a></p>
-    <script>try{document.getElementById('home-link').href = (window.location.pathname.indexOf('/flatland') === 0 ? '/flatland/' : '/');}catch(e){}</script>
+    <script>try{document.getElementById('home-link').href = (window.location.pathname.indexOf('/flws-web') === 0 ? '/flws-web/' : '/');}catch(e){}</script>
   </div>
 </body>
 </html>
