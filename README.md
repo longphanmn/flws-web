@@ -26,7 +26,17 @@ Dedicated web frontend simulation client for **Flatland** (`flws`), built with R
 
 ## Quick Start
 
-### 1. Install dependencies
+### ⚡ One-Command Automatic Setup (Full Stack)
+To automatically clone, configure, and launch both the backend engine and this web client together:
+```bash
+curl -fsSL https://raw.githubusercontent.com/longphanmn/flws/main/setup.sh | bash
+```
+
+---
+
+### Manual Frontend Setup
+
+#### 1. Install dependencies
 ```bash
 npm install
 ```
