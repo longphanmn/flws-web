@@ -65,7 +65,7 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, rootDir, ['API_', 'BACKEND_', 'VITE_', 'WS_', 'FRONTEND_', 'DEMO_', 'LANDING_'])
 
   const isDemo = process.env.VITE_IS_DEMO === 'true' || env.VITE_IS_DEMO === 'true'
-  const rawApiUrl = process.env.VITE_DEMO_API_URL || process.env.API_URL || env.API_URL || env.VITE_BACKEND_URL || env.BACKEND_URL || ''
+  const rawApiUrl = process.env.VITE_DEMO_API_URL || process.env.API_URL || env.API_URL || env.VITE_BACKEND_URL || env.BACKEND_URL || (isDemo ? 'https://world.minhnhan.in' : '')
   const cleanApiUrl = rawApiUrl.replace(/\/+$/, '')
 
   const rawFrontendUrl = process.env.VITE_FRONTEND_URL || process.env.FRONTEND_URL || env.FRONTEND_URL || process.env.VITE_DEMO_URL || process.env.DEMO_URL || env.DEMO_URL || 'https://longphanmn.github.io/flws-web'
@@ -77,7 +77,7 @@ export default defineConfig(({ mode }) => {
   process.env.FRONTEND_URL = cleanFrontendUrl
   process.env.LANDING_URL = cleanLandingUrl
 
-  let rawWsUrl = (process.env.VITE_DEMO_WS_URL || process.env.WS_URL || env.WS_URL || env.VITE_WS_URL || '').replace(/\\/g, '')
+  let rawWsUrl = (process.env.VITE_DEMO_WS_URL || process.env.WS_URL || env.WS_URL || env.VITE_WS_URL || (isDemo ? 'wss://world.minhnhan.in/ws' : '')).replace(/\\/g, '')
   if (!rawWsUrl && cleanApiUrl) {
     if (cleanApiUrl.startsWith('https://')) {
       rawWsUrl = cleanApiUrl.replace(/^https:\/\//, 'wss://') + '/ws'
