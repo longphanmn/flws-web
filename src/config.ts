@@ -123,34 +123,17 @@ export function getLandingUrl(): string {
 }
 
 /**
- * Resolves user-facing documentation / page links.
- * When running in demo mode, resolves to flws-page documentation
- * so the backend domain is completely hidden and links point to valid GitHub Pages.
+ * Resolves user-facing documentation / API / wiki links.
+ * Resolves to the live backend domain (e.g. https://world.minhnhan.in/docs, /openapi.json)
+ * so flws-page remains strictly the marketing landing portal.
  */
 export function docUrl(path: string): string {
-  if (isDemoEnvironment) {
-    const landing = getLandingUrl().replace(/\/+$/, '')
-    if (path.startsWith('/wiki')) {
-      const rest = path.slice('/wiki'.length).replace(/^\/+/, '')
-      return `${landing}/wiki/${rest}`
-    }
-    if (path.startsWith('/docs')) {
-      const rest = path.slice('/docs'.length).replace(/^\/+/, '')
-      return `${landing}/docs/${rest}`
-    }
-    if (path.startsWith('/health')) {
-      const rest = path.slice('/health'.length).replace(/^\/+/, '')
-      return `${landing}/health/${rest}`
-    }
-    if (path.startsWith('/openapi.json')) {
-      return `${landing}/openapi.json`
-    }
-    if (path.startsWith('/api/wiki')) {
-      return `${landing}/wiki/`
-    }
-    return `${landing}/${path.replace(/^\/+/, '')}`
+  const backend = getBackendBaseUrl().replace(/\/+$/, '')
+  const cleanPath = path.startsWith('/') ? path : `/${path}`
+  if (backend) {
+    return `${backend}${cleanPath}`
   }
-  return path.startsWith('/') ? path : `/${path}`
+  return cleanPath
 }
 
 export function apiUrl(path: string): string {
