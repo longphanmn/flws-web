@@ -10,7 +10,7 @@ Dedicated web frontend simulation client and documentation host for **Flatland**
 
 - **Live Web App**: [https://longphanmn.github.io/flws-web/](https://longphanmn.github.io/flws-web/)
 - **Project Landing Page**: [https://longphanmn.github.io/flws-page/](https://longphanmn.github.io/flws-page/) ([Repo](https://github.com/longphanmn/flws-page))
-- **Backend Simulation Engine**: [https://github.com/longphanmn/flws](https://github.com/longphanmn/flws) ([Live API Docs](https://world.minhnhan.in/docs))
+- **Backend Simulation Engine**: [https://github.com/longphanmn/flws](https://github.com/longphanmn/flws)
 - **Living Wiki (Multilingual)**: [https://longphanmn.github.io/flws-web/wiki/](https://longphanmn.github.io/flws-web/wiki/)
 - **API Documentation**: [https://longphanmn.github.io/flws-web/docs/](https://longphanmn.github.io/flws-web/docs/)
 - **Engine Health Monitor**: [https://longphanmn.github.io/flws-web/health/](https://longphanmn.github.io/flws-web/health/)
@@ -118,8 +118,8 @@ Create a `.env` file (see `.env.example`):
 
 | Variable | Description | Default / Example |
 |---|---|---|
-| `API_URL` | Remote backend REST API endpoint | `https://world.minhnhan.in` (or `http://localhost:8000`) |
-| `WS_URL` | Remote backend WebSocket endpoint | `wss://world.minhnhan.in/ws` (or `ws://localhost:8000/ws`) |
+| `API_URL` | Remote backend REST API endpoint | `http://localhost:8000` (or `https://api.example.com`) |
+| `WS_URL` | Remote backend WebSocket endpoint | `ws://localhost:8000/ws` (or `wss://api.example.com/ws`) |
 | `FRONTEND_URL` | Canonical hosted URL of the web client | `https://longphanmn.github.io/flws-web/` |
 | `LANDING_URL` | Canonical URL of the project landing page | `https://longphanmn.github.io/flws-page/` |
 | `GTM_ID` | Optional Google Tag Manager container ID | `GTM-XXXXXX` |
