@@ -62,10 +62,10 @@ const proxyConfig = {
 
 export default defineConfig(({ mode }) => {
   const rootDir = fs.existsSync(path.resolve(__dirname, '.env')) ? __dirname : (fs.existsSync(path.resolve(__dirname, '..', '.env')) ? path.resolve(__dirname, '..') : __dirname)
-  const env = loadEnv(mode, rootDir, ['API_', 'BACKEND_', 'VITE_', 'WS_', 'FRONTEND_', 'DEMO_', 'LANDING_'])
+  const env = loadEnv(mode, rootDir, ['API_', 'BACKEND_', 'VITE_', 'WS_', 'FRONTEND_', 'DEMO_', 'LANDING_', 'REST_'])
 
   const isDemo = process.env.VITE_IS_DEMO === 'true' || env.VITE_IS_DEMO === 'true'
-  const rawApiUrl = process.env.VITE_DEMO_API_URL || process.env.API_URL || env.API_URL || env.VITE_BACKEND_URL || env.BACKEND_URL || (isDemo ? 'https://world.minhnhan.in' : '')
+  const rawApiUrl = process.env.REST_API || env.REST_API || process.env.VITE_DEMO_API_URL || process.env.API_URL || env.API_URL || env.VITE_BACKEND_URL || env.BACKEND_URL || ''
   const cleanApiUrl = rawApiUrl.replace(/\/+$/, '')
 
   const rawFrontendUrl = process.env.VITE_FRONTEND_URL || process.env.FRONTEND_URL || env.FRONTEND_URL || process.env.VITE_DEMO_URL || process.env.DEMO_URL || env.DEMO_URL || 'https://longphanmn.github.io/flws-web'
@@ -77,7 +77,7 @@ export default defineConfig(({ mode }) => {
   process.env.FRONTEND_URL = cleanFrontendUrl
   process.env.LANDING_URL = cleanLandingUrl
 
-  let rawWsUrl = (process.env.VITE_DEMO_WS_URL || process.env.WS_URL || env.WS_URL || env.VITE_WS_URL || (isDemo ? 'wss://world.minhnhan.in/ws' : '')).replace(/\\/g, '')
+  let rawWsUrl = (process.env.VITE_WS_URL || env.VITE_WS_URL || process.env.VITE_DEMO_WS_URL || process.env.WS_URL || env.WS_URL || '').replace(/\\/g, '')
   if (!rawWsUrl && cleanApiUrl) {
     if (cleanApiUrl.startsWith('https://')) {
       rawWsUrl = cleanApiUrl.replace(/^https:\/\//, 'wss://') + '/ws'
@@ -89,10 +89,10 @@ export default defineConfig(({ mode }) => {
   return {
     base: process.env.VITE_BASE || './',
     envDir: rootDir,
-    envPrefix: ['VITE_', 'API_', 'BACKEND_', 'WS_', 'FRONTEND_', 'DEMO_', 'LANDING_'],
+    envPrefix: ['VITE_', 'API_', 'BACKEND_', 'WS_', 'FRONTEND_', 'DEMO_', 'LANDING_', 'REST_'],
     define: {
-      '__ENV_API_URL__': JSON.stringify(isDemo && cleanApiUrl ? Buffer.from(cleanApiUrl).toString('base64') : cleanApiUrl),
-      '__ENV_WS_URL__': JSON.stringify(isDemo && rawWsUrl ? Buffer.from(rawWsUrl).toString('base64') : rawWsUrl),
+      '__ENV_API_URL__': JSON.stringify(cleanApiUrl ? Buffer.from(cleanApiUrl).toString('base64') : ''),
+      '__ENV_WS_URL__': JSON.stringify(rawWsUrl ? Buffer.from(rawWsUrl).toString('base64') : ''),
       '__ENV_FRONTEND_URL__': JSON.stringify(cleanFrontendUrl),
       '__ENV_DEMO_URL__': JSON.stringify(cleanFrontendUrl),
       '__ENV_LANDING_URL__': JSON.stringify(cleanLandingUrl),
@@ -114,6 +114,24 @@ export default defineConfig(({ mode }) => {
               .replaceAll('%DEMO_URL%', frontend)
               .replaceAll('%LANDING_URL%', landing)
           },
+        },
+      },
+      {
+        name: 'flatland-health-transform',
+        closeBundle() {
+          if (!cleanApiUrl) return
+          const b64 = Buffer.from(cleanApiUrl).toString('base64')
+          const targets = [
+            path.resolve(__dirname, 'dist/health.html'),
+            path.resolve(__dirname, 'dist/health/index.html')
+          ]
+          for (const target of targets) {
+            if (fs.existsSync(target)) {
+              let content = fs.readFileSync(target, 'utf-8')
+              content = content.replace('__API_URL_PLACEHOLDER__', b64)
+              fs.writeFileSync(target, content, 'utf-8')
+            }
+          }
         },
       },
     ],

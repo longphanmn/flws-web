@@ -16,6 +16,9 @@ concurrency:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: https://longphanmn.github.io/flws-web/
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,8 +38,12 @@ jobs:
         env:
           VITE_BASE: "./"
           VITE_IS_DEMO: "true"
-          VITE_DEMO_API_URL: ${{ secrets.DEMO_API_URL || 'https://world.minhnhan.in' }}
-          VITE_DEMO_WS_URL: ${{ secrets.DEMO_WS_URL || 'wss://world.minhnhan.in/ws' }}
+          REST_API: ${{ vars.REST_API || secrets.REST_API || '' }}
+          VITE_WS_URL: ${{ vars.VITE_WS_URL || secrets.VITE_WS_URL || '' }}
+          API_URL: ${{ vars.REST_API || secrets.REST_API || vars.API_URL || secrets.API_URL || '' }}
+          WS_URL: ${{ vars.VITE_WS_URL || secrets.VITE_WS_URL || vars.WS_URL || secrets.WS_URL || '' }}
+          VITE_DEMO_API_URL: ${{ vars.REST_API || secrets.REST_API || vars.VITE_DEMO_API_URL || secrets.VITE_DEMO_API_URL || '' }}
+          VITE_DEMO_WS_URL: ${{ vars.VITE_WS_URL || secrets.VITE_WS_URL || vars.VITE_DEMO_WS_URL || secrets.VITE_DEMO_WS_URL || '' }}
           FRONTEND_URL: "https://longphanmn.github.io/flws-web/"
           LANDING_URL: "https://longphanmn.github.io/flws-page/"
 

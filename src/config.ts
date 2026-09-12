@@ -29,24 +29,24 @@ function decodeEnvUrl(val: unknown): string {
   return str
 }
 
-// Configured from .env (API_URL / BACKEND_URL / VITE_BACKEND_URL) via Vite define/import.meta.env
+// Configured from .env (REST_API / API_URL / BACKEND_URL / VITE_WS_URL) via Vite define/import.meta.env
 const envApiUrl = decodeEnvUrl(
   (typeof __ENV_API_URL__ !== 'undefined' && __ENV_API_URL__) ||
-  ((import.meta as any).env?.VITE_DEMO_API_URL as string) ||
+  ((import.meta as any).env?.REST_API as string) ||
   ((import.meta as any).env?.API_URL as string) ||
+  ((import.meta as any).env?.VITE_DEMO_API_URL as string) ||
   ''
 )
 
 const envWsUrl = decodeEnvUrl(
   (typeof __ENV_WS_URL__ !== 'undefined' && __ENV_WS_URL__) ||
-  ((import.meta as any).env?.VITE_DEMO_WS_URL as string) ||
+  ((import.meta as any).env?.VITE_WS_URL as string) ||
   ((import.meta as any).env?.WS_URL as string) ||
+  ((import.meta as any).env?.VITE_DEMO_WS_URL as string) ||
   ''
 )
 
-export const DEFAULT_REMOTE_BACKEND = (
-  envApiUrl || (isDemoEnvironment ? 'https://world.minhnhan.in' : '')
-).replace(/\/+$/, '')
+export const DEFAULT_REMOTE_BACKEND = (envApiUrl || '').replace(/\/+$/, '')
 
 export const DEFAULT_REMOTE_WS = (envWsUrl && (envWsUrl.startsWith('ws://') || envWsUrl.startsWith('wss://')))
   ? envWsUrl
@@ -54,7 +54,7 @@ export const DEFAULT_REMOTE_WS = (envWsUrl && (envWsUrl.startsWith('ws://') || e
       ? (DEFAULT_REMOTE_BACKEND.startsWith('https')
           ? DEFAULT_REMOTE_BACKEND.replace(/^https/, 'wss') + '/ws'
           : DEFAULT_REMOTE_BACKEND.replace(/^http/, 'ws') + '/ws')
-      : (isDemoEnvironment ? 'wss://world.minhnhan.in/ws' : ''))
+      : '')
 
 export function getBackendBaseUrl(): string {
   if (paramBackend) return paramBackend.replace(/\/+$/, '')
