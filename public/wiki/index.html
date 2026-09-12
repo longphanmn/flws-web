@@ -602,7 +602,7 @@ tr:hover td { background: rgba(56, 139, 253, 0.05); }
       <div style="color:var(--text-muted);font-size:11px">Developed by</div>
       <strong style="color:var(--text-primary);font-size:13px">Long Phan</strong>
       <div style="margin-top:4px;font-size:11px">
-        <a href="/cdn-cgi/l/email-protection#abc7c4c5ccebc6c2c5c3c5c3cac585c2c5" style="color:var(--accent-blue)"><span class="__cf_email__" data-cfemail="e5898a8b82a5888c8b8d8b8d848bcb8c8b">[email&#160;protected]</span></a> · <a href="../" target="_blank" rel="noopener noreferrer" style="color:var(--accent-blue)">Demo</a> · <a href="../" target="_blank" rel="noopener noreferrer" style="color:var(--accent-blue)">Landing</a>
+        <a href="/cdn-cgi/l/email-protection#b8d4d7d6dff8d5d1d6d0d6d0d9d696d1d6" style="color:var(--accent-blue)"><span class="__cf_email__" data-cfemail="2d4142434a6d4044434543454c43034443">[email&#160;protected]</span></a> · <a href="../" target="_blank" rel="noopener noreferrer" style="color:var(--accent-blue)">Demo</a> · <a href="../" target="_blank" rel="noopener noreferrer" style="color:var(--accent-blue)">Landing</a>
       </div>
       <div style="color:var(--text-dim);font-size:10.5px;margin-top:4px">Built with OpenCode & Antigravity<br/>Inspired by Edwin A. Abbott</div>
     </div>
@@ -634,8 +634,8 @@ tr:hover td { background: rgba(56, 139, 253, 0.05); }
   <article class="wiki-article">
     <section id="overview" class="wiki-section"><h1 id="flatland-wiki-encyclopedia">Flatland Wiki &amp; Encyclopedia</h1>
 <p>&gt; <strong>Landing Page</strong>: <a href="../">/</a></p>
-<p>&gt; <strong>Source Code</strong>: <a href="https://github.com/longphanmn/flatland">https://github.com/longphanmn/flatland</a></p>
-<p>&gt; <strong>Developed by <a href="/cdn-cgi/l/email-protection#3b5754555c7b5652555355535a55155255">Long Phan</a></strong> (<a href="/cdn-cgi/l/email-protection#f89497969fb89591969096909996d69196"><span class="__cf_email__" data-cfemail="c8a4a7a6af88a5a1a6a0a6a0a9a6e6a1a6">[email&#160;protected]</span></a> · Demo: <a href="../">/demo/</a>)</p>
+<p>&gt; <strong>Source Repositories</strong>: <a href="https://github.com/longphanmn/flws"><code>flws</code> (Backend)</a> · <a href="https://github.com/longphanmn/flws-web"><code>flws-web</code> (Web Frontend)</a> · <a href="https://github.com/longphanmn/flws-page"><code>flws-page</code> (Landing Page)</a></p>
+<p>&gt; <strong>Developed by <a href="/cdn-cgi/l/email-protection#731f1c1d14331e1a1d1b1d1b121d5d1a1d">Long Phan</a></strong> (<a href="/cdn-cgi/l/email-protection#e28e8d8c85a28f8b8c8a8c8a838ccc8b8c"><span class="__cf_email__" data-cfemail="e28e8d8c85a28f8b8c8a8c8a838ccc8b8c">[email&#160;protected]</span></a> · Demo: <a href="../">/demo/</a>)</p>
 <p>&gt; Built and refined using <strong>OpenCode</strong> and <strong>Antigravity</strong> · Developed from the core ideas of *<em>Edwin A. Abbott&#x27;s </em>Flatland: A Romance of Many Dimensions*** (1884).</p>
 <p>Flatland is an autonomous 2D artificial life and world simulation developed from the foundational mathematical and spatial ideas of Edwin A. Abbott&#x27;s 1884 classic <em>Flatland</em>.</p>
 <h3 id="design-philosophy">Design Philosophy</h3>
@@ -889,6 +889,14 @@ tr:hover td { background: rgba(56, 139, 253, 0.05); }
 </ul></section>
 <hr/>
 <section id="codebase-map" class="wiki-section"><h1 id="codebase-map">Codebase map</h1>
+<h2 id="tri-repository-architecture-single-system-deployment-bp">Tri-Repository Architecture &amp; Single-System Deployment (§BP)</h2>
+<p>Flatland is decoupled into three dedicated GitHub repositories with unified same-system deployment:</p>
+<ul>
+<li><code>flws</code> (<code>github.com/longphanmn/flws</code>): Backend simulation engine (FastAPI, SimEngine thread, NumPy SoA, micro-Elman RNN, polar geometry SAT, TUI, SQLite WAL). Listens on host port <code>:8000</code>.</li>
+<li><code>flws-web</code> (<code>github.com/longphanmn/flws-web</code>): Standalone web frontend simulation client (React 18, Vite, TypeScript, Canvas2D/WebGL 60 FPS viewport, Macro Observatory). Deployed to GitHub Pages (<code>https://longphanmn.github.io/flws-web/</code>) and runs on <code>:5173</code> / <code>:80</code> (Nginx reverse-proxying to backend).</li>
+<li><code>flws-page</code> (<code>github.com/longphanmn/flws-page</code>): Official project landing page and showcase (interactive canvas, audio synthesizer badge, lore). Deployed to independent GitHub Pages (<code>https://longphanmn.github.io/flws-page/</code>).</li>
+<li><strong>Same-System Orchestration</strong>: <code>docker-compose.yml</code> and <code>deploy.sh</code> deploy and run both backend and frontend on the same host system.</li>
+</ul>
 <h2 id="backend-backend-app">Backend (<code>backend/app/</code>)</h2>
 <ul>
 <li><code>config.py:13</code> — <code>Config</code> dataclass: world geometry, densities, food, corpses, behaviour, life, reproduction, disease, environment, shelter, terrain, society, houses, chronicle. <code>from_env()</code> + <code>tick_interval</code>.</li>
@@ -1045,7 +1053,7 @@ cd backend &amp;&amp; uv run pytest tests/test_synergies.py -q
 <section id="roadmap" class="wiki-section"><h1 id="roadmap">Roadmap</h1>
 <p>See <code>TODO.md</code> (active) + <code>docs/roadmap-archive.md</code> (completed) — 13 sections + 213 laws + 42 routes + 7 presets. Wiki extends Guide with presets, sustainability &amp; playground.</p></section>
     <hr/>
-    <p style="font-size:12px;color:var(--text-muted)">Generated from live code — <code>Config</code> defaults + <code>GodLaws</code> + <code>app.routes</code>. Official living documentation & encyclopedia for Flatland. · Developed by <strong>Long Phan</strong> — <a href="/cdn-cgi/l/email-protection#8ae6e5e4edcae7e3e4e2e4e2ebe4a4e3e4"><span class="__cf_email__" data-cfemail="224e4d4c45624f4b4c4a4c4a434c0c4b4c">[email&#160;protected]</span></a> · Demo: <a href="../" target="_blank" rel="noopener noreferrer">Demo ↗</a> · Landing: <a href="../" target="_blank" rel="noopener noreferrer">Landing ↗</a> · <a href="https://github.com/longphanmn/flatland" target="_blank" rel="noopener noreferrer">GitHub</a> · Built with OpenCode & Antigravity</p>
+    <p style="font-size:12px;color:var(--text-muted)">Generated from live code — <code>Config</code> defaults + <code>GodLaws</code> + <code>app.routes</code>. Official living documentation & encyclopedia for Flatland. · Developed by <strong>Long Phan</strong> — <a href="/cdn-cgi/l/email-protection#8fe3e0e1e8cfe2e6e1e7e1e7eee1a1e6e1"><span class="__cf_email__" data-cfemail="5c3033323b1c3135323432343d32723532">[email&#160;protected]</span></a> · Demo: <a href="../" target="_blank" rel="noopener noreferrer">Demo ↗</a> · Landing: <a href="../" target="_blank" rel="noopener noreferrer">Landing ↗</a> · GitHub: <a href="https://github.com/longphanmn/flws" target="_blank" rel="noopener noreferrer">flws</a> / <a href="https://github.com/longphanmn/flws-web" target="_blank" rel="noopener noreferrer">flws-web</a> · Built with OpenCode & Antigravity</p>
   </article>
 </main>
 </div>
