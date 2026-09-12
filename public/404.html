@@ -40,18 +40,23 @@
         repoPrefix = '/flws-web';
       }
 
+      var landingBase = 'https://longphanmn.github.io/flws-page';
+      if (origin.indexOf('github.io') === -1) {
+        landingBase = origin;
+      }
+
       var target = origin + repoPrefix + '/';
 
       if (path.indexOf('god-laws.md') !== -1) {
-        target = origin + repoPrefix + '/docs/god-laws.md' + hash;
+        target = landingBase + '/docs/god-laws.md' + hash;
       } else if (path.indexOf('wiki') !== -1) {
-        target = origin + repoPrefix + '/wiki/' + search + hash;
+        target = landingBase + '/wiki/' + search + hash;
       } else if (path.indexOf('docs') !== -1) {
-        target = origin + repoPrefix + '/docs/' + search;
+        target = landingBase + '/docs/' + search;
       } else if (path.indexOf('openapi.json') !== -1) {
-        target = origin + repoPrefix + '/openapi.json';
+        target = landingBase + '/openapi.json';
       } else if (path.indexOf('health') !== -1) {
-        target = origin + repoPrefix + '/health/' + search;
+        target = landingBase + '/health/' + search;
       }
 
       window.location.replace(target);

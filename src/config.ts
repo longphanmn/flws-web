@@ -110,41 +110,45 @@ export function getLandingUrl(): string {
   if (envLandingUrl) return envLandingUrl.replace(/\/+$/, '') + '/'
   if (typeof window !== 'undefined') {
     const loc = window.location
+    if (loc.hostname.includes('github.io')) {
+      return 'https://longphanmn.github.io/flws-page/'
+    }
     if (loc.pathname.includes('/demo')) {
       const parent = loc.pathname.replace(/\/demo(\/.*)?$/, '') || '/'
       return `${loc.origin}${parent.endsWith('/') ? parent : parent + '/'}`
     }
     return `${loc.origin}/`
   }
-  return ''
+  return 'https://longphanmn.github.io/flws-page/'
 }
 
 /**
  * Resolves user-facing documentation / page links.
- * When running in demo mode, resolves to relative demo paths
- * so the backend domain is completely hidden and links depend on the host from .env.
+ * When running in demo mode, resolves to flws-page documentation
+ * so the backend domain is completely hidden and links point to valid GitHub Pages.
  */
 export function docUrl(path: string): string {
   if (isDemoEnvironment) {
+    const landing = getLandingUrl().replace(/\/+$/, '')
     if (path.startsWith('/wiki')) {
-      const rest = path.slice('/wiki'.length)
-      return `./wiki/${rest}`
+      const rest = path.slice('/wiki'.length).replace(/^\/+/, '')
+      return `${landing}/wiki/${rest}`
     }
     if (path.startsWith('/docs')) {
-      const rest = path.slice('/docs'.length)
-      return `./docs/${rest}`
+      const rest = path.slice('/docs'.length).replace(/^\/+/, '')
+      return `${landing}/docs/${rest}`
     }
     if (path.startsWith('/health')) {
-      const rest = path.slice('/health'.length)
-      return `./health/${rest}`
+      const rest = path.slice('/health'.length).replace(/^\/+/, '')
+      return `${landing}/health/${rest}`
     }
     if (path.startsWith('/openapi.json')) {
-      return './openapi.json'
+      return `${landing}/openapi.json`
     }
     if (path.startsWith('/api/wiki')) {
-      return './wiki/'
+      return `${landing}/wiki/`
     }
-    return `./${path.replace(/^\/+/, '')}`
+    return `${landing}/${path.replace(/^\/+/, '')}`
   }
   return path.startsWith('/') ? path : `/${path}`
 }
