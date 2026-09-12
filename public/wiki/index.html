@@ -1,18 +1,1166 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <script>
-    (function () {
-      var target = 'https://world.minhnhan.in/wiki' + (window.location.search || '') + (window.location.hash || '');
-      window.location.replace(target);
-    })();
-  </script>
-  <meta http-equiv="refresh" content="0; url=https://world.minhnhan.in/wiki">
-  <link rel="canonical" href="https://world.minhnhan.in/wiki">
-  <title>Redirecting to Flatland Living Wiki...</title>
-</head>
-<body>
-  <p>Redirecting to <a href="https://world.minhnhan.in/wiki">Flatland Living Wiki</a>...</p>
-</body>
-</html>
+<!doctype html>
+<html lang="en"><head>
+<script>(function(){var p=new URLSearchParams(window.location.search);var l=p.get("lang");if(l==="vi"||l==="vn"){window.location.replace("./wiki-vi.html"+window.location.search+window.location.hash);}else if(l==="fr"){window.location.replace("./wiki-fr.html"+window.location.search+window.location.hash);}})();</script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flatland — Living Wiki — World Simulation by Long Phan</title>
+<meta name="description" content="Official living wiki and system encyclopedia for Flatland: 2D autonomous World Simulation by Long Phan (long@minhnhan.in).">
+<meta name="keywords" content="Flatland, World Simulation, Wiki, Guide, Presets, Simulation Mechanics, Long Phan, long@minhnhan.in, Artificial Life">
+<meta name="author" content="Long Phan <long@minhnhan.in>">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="./">
+<meta property="og:title" content="Flatland — Living Wiki | World Simulation by Long Phan">
+<meta property="og:description" content="Official living wiki, presets, and mechanics documentation for Flatland World Simulation by Long Phan (long@minhnhan.in).">
+<meta property="og:url" content="/wiki?lang=en">
+<meta property="og:type" content="article">
+<style>
+:root {
+  color-scheme: dark;
+  --bg-main: #0b0f14;
+  --bg-sidebar: #0d1117;
+  --bg-card: rgba(22, 27, 34, 0.85);
+  --bg-card-hover: rgba(33, 38, 45, 0.95);
+  --border-subtle: #21262d;
+  --border-strong: #30363d;
+  --border-active: #58a6ff;
+  --text-primary: #f0f6fc;
+  --text-normal: #c9d1d9;
+  --text-muted: #8b949e;
+  --text-dim: #6e7681;
+  --accent-blue: #58a6ff;
+  --accent-green: #3fb950;
+  --accent-amber: #d29922;
+  --accent-orange: #ffa657;
+  --accent-red: #f85149;
+  --accent-purple: #d2a8ff;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-sans);
+  margin: 0;
+  color: var(--text-normal);
+  background: var(--bg-main);
+  line-height: 1.65;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar { width: 7px; height: 7px; }
+::-webkit-scrollbar-track { background: var(--bg-sidebar); }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* Layout */
+.wiki-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.wiki-sidebar {
+  width: 310px;
+  min-width: 310px;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border-subtle);
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 14px;
+  gap: 12px;
+  z-index: 20;
+}
+
+/* Header & Brand */
+.wiki-brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.wiki-brand h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.wiki-brand .version-tag {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 12px;
+  background: rgba(88, 166, 255, 0.15);
+  color: var(--accent-blue);
+  border: 1px solid rgba(88, 166, 255, 0.3);
+}
+
+/* Language Switcher */
+.lang-switcher {
+  display: flex;
+  gap: 3px;
+  background: #161b22;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  padding: 3px;
+}
+.lang-btn {
+  flex: 1;
+  text-align: center;
+  padding: 5px 6px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--text-muted);
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.lang-btn:hover { color: var(--text-primary); background: rgba(255, 255, 255, 0.06); }
+.lang-btn.active {
+  background: #1f6feb;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Search Box */
+.search-wrapper {
+  position: relative;
+  margin: 4px 0;
+}
+.search-input {
+  width: 100%;
+  padding: 8px 32px 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-strong);
+  background: #161b22;
+  color: var(--text-primary);
+  font-size: 12.5px;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+.search-input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+}
+.search-shortcut {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  color: var(--text-dim);
+  background: var(--border-subtle);
+  padding: 2px 5px;
+  border-radius: 4px;
+  border: 1px solid var(--border-strong);
+  pointer-events: none;
+}
+
+/* Navigation List */
+.nav-group-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  margin: 14px 6px 6px;
+}
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 12.5px;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+.nav-link:hover {
+  color: var(--text-primary);
+  background: rgba(110, 118, 129, 0.12);
+}
+.nav-link.active {
+  color: var(--accent-blue);
+  background: rgba(56, 139, 253, 0.12);
+  font-weight: 600;
+  border-left: 2px solid var(--accent-blue);
+  padding-left: 8px;
+}
+.nav-icon {
+  font-size: 13px;
+  width: 18px;
+  display: inline-block;
+  text-align: center;
+}
+
+/* External Link Bar */
+.external-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border-subtle);
+  margin-top: 6px;
+}
+.ext-chip {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-decoration: none;
+  background: #161b22;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 3px 8px;
+  transition: all 0.15s ease;
+}
+.ext-chip:hover {
+  color: var(--accent-blue);
+  border-color: var(--border-strong);
+}
+
+/* Presets & Author Cards */
+.sidebar-card {
+  background: rgba(22, 27, 34, 0.7);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+}
+/* Main Content Area */
+.wiki-main {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  overflow-y: auto;
+  background: var(--bg-main);
+}
+
+/* Top Sticky HUD */
+.wiki-top-hud {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(13, 17, 23, 0.82);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 8px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.hud-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.hud-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: rgba(33, 38, 45, 0.7);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-normal);
+}
+.hud-pill.live-dot::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  box-shadow: 0 0 6px rgba(63, 185, 80, 0.6);
+}
+.hud-live-link {
+  color: var(--accent-green);
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(63, 185, 80, 0.1);
+  border: 1px solid rgba(63, 185, 80, 0.25);
+  font-size: 12px;
+  transition: all 0.15s ease;
+}
+.hud-live-link:hover {
+  background: rgba(63, 185, 80, 0.2);
+  border-color: var(--accent-green);
+}
+
+/* Article Container */
+.wiki-article {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 36px 32px 80px;
+}
+.wiki-section {
+  scroll-margin-top: 70px;
+  margin-bottom: 48px;
+}
+
+/* Typography Inside Content */
+h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 18px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  letter-spacing: -0.01em;
+}
+h2 {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 28px 0 14px;
+  border-left: 3px solid var(--accent-blue);
+  padding-left: 10px;
+}
+h3 {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 20px 0 10px;
+}
+h4 {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-normal);
+  margin: 16px 0 8px;
+}
+p {
+  margin: 0 0 14px;
+  line-height: 1.68;
+  color: var(--text-normal);
+}
+blockquote {
+  margin: 16px 0;
+  padding: 12px 16px;
+  background: rgba(56, 139, 253, 0.08);
+  border-left: 3px solid var(--accent-blue);
+  border-radius: 0 8px 8px 0;
+  color: var(--text-normal);
+}
+blockquote p { margin: 0; }
+a { color: var(--accent-blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+ul, ol { padding-left: 22px; margin: 0 0 16px; }
+li { margin: 4px 0; line-height: 1.6; }
+hr { border: 0; border-top: 1px solid var(--border-subtle); margin: 32px 0; }
+
+/* Inline Code */
+code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: rgba(110, 118, 129, 0.18);
+  color: var(--accent-orange);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(240, 246, 252, 0.08);
+}
+
+/* Code Container with Copy Button */
+.code-container {
+  position: relative;
+  margin: 16px 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  background: #161b22;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+.code-container pre {
+  margin: 0;
+  padding: 16px;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--text-primary);
+  line-height: 1.55;
+  background: transparent;
+  border: none;
+}
+.code-container pre code {
+  background: transparent;
+  padding: 0;
+  border: none;
+  color: inherit;
+}
+.copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px 9px;
+  font-size: 11px;
+  font-family: var(--font-sans);
+  background: rgba(33, 38, 45, 0.85);
+  color: var(--text-muted);
+  border: 1px solid var(--border-strong);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  backdrop-filter: blur(8px);
+}
+.copy-btn:hover {
+  background: #30363d;
+  color: #fff;
+  border-color: var(--text-muted);
+}
+
+/* Tables */
+.table-wrapper {
+  margin: 16px 0;
+  overflow-x: auto;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: #0d1117;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  text-align: left;
+}
+th {
+  background: #161b22;
+  color: var(--text-primary);
+  font-weight: 600;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-strong);
+  white-space: nowrap;
+}
+td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-normal);
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(56, 139, 253, 0.05); }
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  border: 1px solid var(--border-strong);
+  background: #161b22;
+  color: var(--text-muted);
+  margin: 2px;
+}
+
+/* Toast Notifications */
+#wiki-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 100;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+}
+#wiki-toast.toast-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+#wiki-toast.toast-success {
+  background: #238636;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+#wiki-toast.toast-error {
+  background: #da3633;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Mobile Responsiveness */
+.mobile-nav-toggle {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  color: var(--text-muted);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.mobile-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 15;
+}
+@media (max-width: 860px) {
+  .wiki-layout { flex-direction: column; }
+  .wiki-sidebar {
+    position: fixed;
+    left: -320px;
+    width: 290px;
+    transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 32px rgba(0,0,0,0.8);
+  }
+  .wiki-sidebar.sidebar-open { left: 0; }
+  .mobile-overlay.overlay-open { display: block; }
+  .mobile-nav-toggle { display: inline-flex; align-items: center; justify-content: center; }
+  .wiki-article { padding: 20px 16px 60px; }
+  .wiki-top-hud { padding: 8px 16px; }
+}
+</style></head><body>
+<div class="wiki-layout">
+<div id="mobileOverlay" class="mobile-overlay" onclick="toggleSidebar()"></div>
+
+<nav class="wiki-sidebar" id="wikiSidebar">
+  <div class="wiki-brand">
+    <div>
+      <h2>📖 📖 Flatland Wiki &amp; Guide</h2>
+      <div style="font-size:10.5px;color:var(--text-muted);margin-top:2px">Flatland Guide &amp; Living Encyclopedia</div>
+    </div>
+    <span class="version-tag">v0.1.6</span>
+  </div>
+
+  <div class="lang-switcher">
+    <a href="./" class="lang-btn active">🇬🇧 EN</a>
+    <a href="./wiki-vi.html" class="lang-btn ">🇻🇳 VI</a>
+    <a href="./wiki-fr.html" class="lang-btn ">🇫🇷 FR</a>
+  </div>
+
+  <div class="search-wrapper">
+    <input id="q" class="search-input" placeholder="Search laws, routes, docs… ( / )" oninput="filterWiki(this.value)">
+    <span class="search-shortcut">/</span>
+  </div>
+
+  <div style="overflow-y:auto;flex:1;margin-right:-4px;padding-right:4px">
+    <ul class="nav-list">
+      <li class="nav-group-title">Core Knowledge</li>
+<li><a href="#overview" class="nav-link" data-section="overview"><span class="nav-icon">📖</span> <span>Overview</span></a></li>
+<li><a href="#book-comparison" class="nav-link" data-section="book-comparison"><span class="nav-icon">📐</span> <span>Flatland Book vs Simulation</span></a></li>
+<li><a href="#quickstart" class="nav-link" data-section="quickstart"><span class="nav-icon">⚡</span> <span>Quickstart</span></a></li>
+<li><a href="#how-the-world-works" class="nav-link" data-section="how-the-world-works"><span class="nav-icon">⚙️</span> <span>How the world works</span></a></li>
+<li class="nav-group-title">Systems &amp; Balance</li>
+<li><a href="#sustainability" class="nav-link" data-section="sustainability"><span class="nav-icon">🌿</span> <span>Sustainability</span></a></li>
+<li><a href="#performance" class="nav-link" data-section="performance"><span class="nav-icon">🚀</span> <span>Performance &amp; Scale</span></a></li>
+<li><a href="#codebase-map" class="nav-link" data-section="codebase-map"><span class="nav-icon">🗺️</span> <span>Codebase map</span></a></li>
+<li><a href="#data-model-protocol" class="nav-link" data-section="data-model-protocol"><span class="nav-icon">💾</span> <span>Data model &amp; protocol</span></a></li>
+<li class="nav-group-title">Rules &amp; Reference</li>
+<li><a href="#god-laws" class="nav-link" data-section="god-laws"><span class="nav-icon">⚖️</span> <span>Laws of the Sphere</span></a></li>
+<li><a href="#presets" class="nav-link" data-section="presets"><span class="nav-icon">🎯</span> <span>Presets</span></a></li>
+<li><a href="#api-reference" class="nav-link" data-section="api-reference"><span class="nav-icon">🔌</span> <span>API reference</span></a></li>
+<li><a href="#configuration-ops" class="nav-link" data-section="configuration-ops"><span class="nav-icon">🛠️</span> <span>Configuration &amp; ops</span></a></li>
+<li><a href="#roadmap" class="nav-link" data-section="roadmap"><span class="nav-icon">🗺️</span> <span>Roadmap</span></a></li>
+    </ul>
+
+    <div class="external-links">
+      <a href="../" target="_blank" rel="noopener noreferrer" class="ext-chip">🌐 Landing Page ↗</a>
+      <a href="../docs/" class="ext-chip">📄 Swagger /docs</a>
+      <a href="../openapi.json" class="ext-chip">🌐 OpenAPI</a>
+      <a href="../openapi.json" class="ext-chip">📦 JSON</a>
+    </div>
+
+    <div class="sidebar-card" style="margin-top:10px;border-color:rgba(88,166,255,0.3)">
+      <div style="color:var(--text-muted);font-size:11px">Developed by</div>
+      <strong style="color:var(--text-primary);font-size:13px">Long Phan</strong>
+      <div style="margin-top:4px;font-size:11px">
+        <a href="/cdn-cgi/l/email-protection#abc7c4c5ccebc6c2c5c3c5c3cac585c2c5" style="color:var(--accent-blue)"><span class="__cf_email__" data-cfemail="e5898a8b82a5888c8b8d8b8d848bcb8c8b">[email&#160;protected]</span></a> · <a href="../" target="_blank" rel="noopener noreferrer" style="color:var(--accent-blue)">Demo</a> · <a href="../" target="_blank" rel="noopener noreferrer" style="color:var(--accent-blue)">Landing</a>
+      </div>
+      <div style="color:var(--text-dim);font-size:10.5px;margin-top:4px">Built with OpenCode & Antigravity<br/>Inspired by Edwin A. Abbott</div>
+    </div>
+  </div>
+</nav>
+
+<main class="wiki-main">
+  <header class="wiki-top-hud">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="mobile-nav-toggle" onclick="toggleSidebar()" aria-label="Toggle menu">☰</button>
+      <div class="hud-pill live-dot"><span>FLATLAND</span></div>
+      <div class="hud-stats">
+        <span class="hud-pill">⚖️ 213 laws</span>
+        <span class="hud-pill">🌐 42 routes</span>
+        <span class="hud-pill">🎯 7 presets</span>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:12px;color:var(--text-muted)">The Sphere sets laws, never a life</span>
+      <a href="../" target="_blank" rel="noopener noreferrer" class="hud-pill" style="text-decoration:none;color:var(--accent-blue)">🌐 Landing Page ↗</a>
+      <a href="../docs/" class="hud-pill" style="text-decoration:none;color:var(--accent-blue)">📄 Swagger /docs</a>
+      <a href="../" class="hud-live-link">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent-green);box-shadow:0 0 6px var(--accent-green)"></span>
+        ← Demo
+      </a>
+    </div>
+  </header>
+
+  <article class="wiki-article">
+    <section id="overview" class="wiki-section"><h1 id="flatland-wiki-encyclopedia">Flatland Wiki &amp; Encyclopedia</h1>
+<p>&gt; <strong>Landing Page</strong>: <a href="../">/</a></p>
+<p>&gt; <strong>Source Code</strong>: <a href="https://github.com/longphanmn/flatland">https://github.com/longphanmn/flatland</a></p>
+<p>&gt; <strong>Developed by <a href="/cdn-cgi/l/email-protection#3b5754555c7b5652555355535a55155255">Long Phan</a></strong> (<a href="/cdn-cgi/l/email-protection#f89497969fb89591969096909996d69196"><span class="__cf_email__" data-cfemail="c8a4a7a6af88a5a1a6a0a6a0a9a6e6a1a6">[email&#160;protected]</span></a> · Demo: <a href="../">/demo/</a>)</p>
+<p>&gt; Built and refined using <strong>OpenCode</strong> and <strong>Antigravity</strong> · Developed from the core ideas of *<em>Edwin A. Abbott&#x27;s </em>Flatland: A Romance of Many Dimensions*** (1884).</p>
+<p>Flatland is an autonomous 2D artificial life and world simulation developed from the foundational mathematical and spatial ideas of Edwin A. Abbott&#x27;s 1884 classic <em>Flatland</em>.</p>
+<h3 id="design-philosophy">Design Philosophy</h3>
+<p>This project is <strong>developed from the Flatland idea rather than mimicking the book literally</strong>. It adopts Abbott&#x27;s core premises — 2D planar constraints, geometric vertex hierarchies, atmospheric perception, and higher-dimensional observation — as a foundation to create a <strong>living, evolutionary artificial life ecosystem that organically changes and expands over time</strong>.</p>
+<h3 id="core-architecture-systems">Core Architecture &amp; Systems</h3>
+<ul>
+<li><strong>The Sphere (God Model)</strong>: The Sphere (God) sets global <strong>laws of nature</strong> (carrying capacity, food growth, metabolism, disease, climate) from Spaceland, never intervening in individual lives. Configured via a dedicated <strong>🎯 Presets</strong> selector and 6 streamlined <strong>⚖️ Macro Domains</strong> with live search and dual sliders. Organisms navigate continuously via 16-sensor raycasts and Micro-RNN neural actuators.</li>
+<li><strong>Botanical Ecology &amp; Functional Nutrition</strong>: 6 diverse plant species (<code>grass</code>, <code>grain</code>, <code>berry</code>, <code>medicinal_herb</code>, <code>mushroom</code>, <code>poisonous</code>) with distinct caloric densities, decay clocks, infection remedy effects, and targeted health-based foraging preferences.</li>
+<li><strong>Cognitive Agency &amp; Clan Social Intelligence</strong>: Multi-objective utility AI replaces rigid if/else trees (evaluating survival, duty, traits, and kin needs); spatial waypoint mental maps; tactical soldier phalanxes, line kiting maneuvers, interpersonal trust-based buddy pairing, autonomous clan task boards (dynamic labor division), governance archetypes (Monarchy, Theocracy, Junta, Republic), adaptive bylaws (winter rationing, martial law), calculated Casus Belli, inter-clan trade caravans, and annual autumn harvest festivals.</li>
+<li><strong>Autonomous Evolution &amp; Culture</strong>: 6 heritable personality archetypes (<code>brave</code>, <code>cautious</code>, <code>altruistic</code>, <code>greedy</code>, <code>explorer</code>, <code>builder</code>), craftable tools (spears, baskets, herb poultices, chieftain crowns), 4 mastery skills (Farming 🌾, Combat ⚔️, Foraging 🦴, Healing 🌿), earned dynamic titles, oral lore passed from elders to youth in houses, and live thought bubbles.</li>
+<li><strong>Realistic Energy &amp; Metabolism</strong>: Infant low metabolism ($0.45\times$ energy decay), combat stamina expenditure, and autonomous field food reserve management via baskets.</li>
+<li><strong>Settlements &amp; Diplomacy</strong>: Walled houses with creature-sized doors, multi-house clan territories, settlement food larders, mutual coalitions, tributary pacts, and schisms.</li>
+<li><strong>Geometric Physics &amp; Morphological Evolution (K∈[3,24])</strong>: Polar genomes $(r_i,\phi_i)$ $K\in[3,24]$ (<code>KMAX 24</code>, <code>morphology_engine.py</code>) with SoA <code>physical_traits</code> trait baking ($A,P,I_{zz},\theta_{\min},asym,D_{mult}$) and SAT narrowphase (broadphase $r_{\max}$ + circle fallback $K\ge24$ &amp; $asym&lt;0.05$ + edge normals); annealing $\lambda(g)$ blends Abbott templates → free evolution, energetic asymmetry, neural courtship, and extinction safeguards ($\eta(N)$, Tier1/2/3 genesis, mercy).</li>
+<li><strong>Evolutionary Genome Mirror</strong> <span id="genome-mirror"></span>: Dynamic visual phenotype rendering where each creature&#x27;s body, corolla aura, and chromatic luminescence directly mirror its living genome, generational depth (Gen 0 → 2000+), and physical mutations across millennia.</li>
+<li><strong>Real-Time Synchronization</strong>: Deterministic fixed-rate engine loop streaming state over WebSocket (<code>/ws</code>) at ~30–60 FPS with durable SQLite historical chronicle storage.</li>
+</ul></section>
+<hr/>
+<section id="book-comparison" class="wiki-section"><h1 id="flatland-the-novella-vs-the-simulation">Flatland: The Novella vs. The Simulation</h1>
+<p>A comparative study between *<em>Edwin A. Abbott’s 1884 satirical classic </em>Flatland: A Romance of Many Dimensions*** and this autonomous artificial life simulation.</p>
+<p>---</p>
+<h2 id="1-caste-geometry-social-hierarchy">1. Caste, Geometry &amp; Social Hierarchy</h2>
+<p>| Dimension | Abbott’s Book (<em>Flatland</em>, 1884) | Our Application (<em>Flatland Simulator</em>) |</p>
+<p>| :--- | :--- | :--- |</p>
+<p>| <strong>Hierarchy Principle</strong> | <em>&quot;Configuration makes the man.&quot;</em> Social status is strictly determined by the number of sides and regularity of angles. | Entities inherit exact geometric castes based on vertex count (N-gons) and regularity. |</p>
+<p>| <strong>Women (Lines)</strong> | Straight lines with no angular width. Because they are practically invisible head-on and razor-sharp, they are legally required to make a continuous &quot;peace cry&quot; and use dedicated side doors. | Rendered as 1D segments (<code>shape: &#x27;line&#x27;</code>). Distinct agility, movement, and domestic shelter dynamics. |</p>
+<p>| <strong>Working Class / Soldiers</strong> | Isosceles triangles with narrow, sharp vertex angles (dangerous, volatile, prone to rebellions). | <strong>Soldiers</strong> (<code>#ff7b72</code>): Sharp combatants with boosted attack, military discipline, and perimeter defense behavior. |</p>
+<p>| <strong>Artisans &amp; Middle Class</strong> | Equilateral triangles (3 equal sides) — stable and respectable tradespeople. | <strong>Artisans</strong> (3–4 sides, <code>#f2cc60</code>): Farmers, foragers, and builders responsible for harvesting and maintaining houses. |</p>
+<p>| <strong>Gentlemen &amp; Professionals</strong> | Squares (4 sides) and Pentagons (5 sides) — the middle/upper administrative classes. | <strong>Gentlemen</strong> (4 sides, <code>#ffa657</code>) and <strong>Professionals</strong> (5 sides, <code>#d2a8ff</code>): Administrative and specialized roles. |</p>
+<p>| <strong>Nobility</strong> | Hexagons (6 sides) and higher polygons — aristocrats and statesmen. | <strong>Nobles</strong> (6–8 sides, <code>#79c0ff</code>): High influence and lineage priority. |</p>
+<p>| <strong>Priesthood (Circles)</strong> | Polygons with so many sides (≥ 24 to hundreds) that their vertices are imperceptible, forming smooth circles. They govern religion, law, and morality. | <strong>Priests</strong> (≥ 24 sides, <code>#e6edf3</code>): Emit soothing auras, heal injured or infected clanmates, and resist disease. |</p>
+<p>---</p>
+<h2 id="2-the-law-of-nature-generational-ascent">2. The &quot;Law of Nature&quot; &amp; Generational Ascent</h2>
+<ul>
+<li><strong>In the Book</strong>:</li>
+<p>  - Abbott establishes the <strong>&quot;Law of Upward Development&quot;</strong>: A male child of a regular polygon almost always inherits <strong>one more side</strong> than his father (e.g., a Square fathers a Pentagon, whose son becomes a Hexagon), lifting the lineage toward circular Priesthood over generations.</p>
+<p>  - Rare <strong>&quot;Irregulars&quot;</strong> (whose sides/angles do not match) are viewed as societal threats and sent to state institutions or executed.</p>
+<li><strong>In the App</strong>:</li>
+<p>  - <strong>Generational Evolution</strong>: Offspring inherit ancestral traits with a probabilistic side increment (<code>sides += 1</code>), simulating the gradual generational ascent toward circular perfection.</p>
+<p>  - <strong>Irregularity &amp; Demotion</strong>: Entities that develop genetic irregularity or undergo trauma have their irregularity tracked and are judged/demoted or marked with distinct visual indicators.</p>
+<p>  - <strong>Dynastic Lineage</strong>: The Family Tree tracks mother, father, and generational pedigree across decades of world history.</p>
+</ul>
+<p>---</p>
+<h2 id="3-sight-recognition-weather-perception">3. Sight Recognition, Weather &amp; Perception</h2>
+<ul>
+<li><strong>In the Book</strong>:</li>
+<p>  - In a 2D world, all inhabitants look like flat lines from the edge!</p>
+<p>  - In the <strong>Foggy South</strong>, Flatlanders rely on <strong>&quot;Sight Recognition&quot;</strong> — judging the angle and distance of an approaching polygon by how quickly its edges fade into the atmospheric fog.</p>
+<p>  - In the <strong>Clear North</strong>, they must rely on <strong>&quot;Feeling&quot;</strong> (touching vertices with fingertips).</p>
+<li><strong>In the App</strong>:</li>
+<p>  - <strong>Dynamic Weather Engine</strong>: Simulates <strong>Clear</strong>, <strong>Fog</strong>, <strong>Rain</strong>, and <strong>Storm</strong> states.</p>
+<p>  - <strong>Atmospheric Vision</strong>: Fog and storms dynamically restrict creature vision radii (<code>sight_radius</code>), forcing entities to rely on local spatial queries and nearby auditory alarms (<code>signals</code>).</p>
+<p>  - <strong>Day/Night &amp; Lighting</strong>: The ambient illuminance curves shift through dawn, noon, dusk, and pitch-black night, restricting wandering and driving creatures into their shelters.</p>
+</ul>
+<p>---</p>
+<h2 id="4-housing-settlements-territorial-architecture">4. Housing, Settlements &amp; Territorial Architecture</h2>
+<ul>
+<li><strong>In the Book</strong>:</li>
+<p>  - Houses are strictly pentagonal or hexagonal, with specific entrances: a smaller rear entrance for lines (women) and a main entrance for polygons.</p>
+<li><strong>In the App</strong>:</li>
+<p>  - <strong>Settlement Economy</strong>: Houses are physical 2D structures with precise interior boundaries, oriented doors (<code>north</code>, <code>east</code>, <code>south</code>, <code>west</code>), and bed capacities.</p>
+<p>  - <strong>Single Main House Invariant</strong>: Each clan establishes exactly <strong>one Main House / HQ</strong> (the Leader&#x27;s residence) with surrounding outpost shelters.</p>
+<p>  - <strong>Shelter Dynamics</strong>: Creatures seek refuge inside houses to sleep at night, protect against winter frostbite, heal from chills, and educate infant offspring.</p>
+<p>  - <strong>Doorway Entry &amp; Exit Navigation</strong>: Creatures calculate vector standoff waypoints to transition smoothly through doorway openings when entering shelter at dusk or exiting to forage and explore at dawn, preventing indoor wall trapping.</p>
+</ul>
+<p>---</p>
+<h2 id="5-clan-diplomacy-totems-autonomous-society">5. Clan Diplomacy, Totems &amp; Autonomous Society</h2>
+<p>While Abbott’s book portrays a centralized Victorian government, our app layers an <strong>evolutionary social simulation</strong>:</p>
+<ul>
+<li><strong>Sacred Avatars &amp; Specialization</strong>: Each clan bears one of the 8 Sacred Avatars of the Sphere (⭕ Radiant Circle, ⚡ Celestial Strike, 👁️ All-Seeing Vertex, 🛡️ Indomitable Monolith, 🌿 Sacred Spiral, ⚖️ Cosmic Scales, 🌀 Dimensional Rift, 🕯️ Eternal Hearth), each granting a distinct divine buff and biasing the clan&#x27;s balance of warriors, farmers, and scavengers.</li>
+<li><strong>Diplomacy, Tributes &amp; War</strong>: Dynamic clan relations with wars, peace treaties, tribute subjugation, and schisms.</li>
+<li><strong>Personal Autonomy &amp; Inventory</strong>: Independent personality archetypes (Brave, Cautious, Altruistic, Greedy, Explorer, Builder) with personal foraging baskets, tools (spears, crowns, herb poultices), and emergency self-preservation eating.</li>
+</ul>
+<p>---</p>
+<h2 id="6-the-higher-dimension-the-user-as-the-sphere">6. The Higher Dimension: The User as &quot;The Sphere&quot;</h2>
+<p>The most profound connection between the app and the book is the <strong>role of the user</strong>:</p>
+<ul>
+<li>In <em>Flatland</em>, the protagonist <strong>A Square</strong> is visited by <strong>A Sphere</strong> from the 3D <em>Spaceland</em>, who can look down from the Z-axis, see into locked rooms, view internal organs, and manipulate the 2D world with god-like omnipresence.</li>
+<li><strong>In our App</strong>:</li>
+<p>  - <strong>You are the Sphere (God)</strong>: As the observer on your screen, you look down on Flatland from Spaceland (the third dimension).</p>
+<p>  - <strong>The Sphere Panel</strong>: You hold the power of The Sphere to alter the &quot;Laws of Nature&quot; in real-time — toggling famine, changing food growth multipliers, curing or spreading plagues, introducing winter freezes, or blessing clans with prosperity.</p>
+</ul></section>
+<hr/>
+<section id="quickstart" class="wiki-section"><h1 id="configuration-ops">Configuration &amp; ops</h1>
+<h2 id="env-vars-flatworld">Env vars (<code>FLATWORLD_*</code>)</h2>
+<p>| Variable | Default | Description |</p>
+<p>|---|---|---|</p>
+<p>| <code>FLATWORLD_WIDTH</code> | <code>400</code> | World width (grid units) |</p>
+<p>| <code>FLATWORLD_HEIGHT</code> | <code>300</code> | World height |</p>
+<p>| <code>FLATWORLD_BOUNDARY</code> | <code>wrap</code> | <code>wrap</code> or <code>clamp</code> |</p>
+<p>| <code>FLATWORLD_SEED</code> | <code>42</code> | RNG seed |</p>
+<p>| <code>FLATWORLD_TICK_RATE</code> | <code>10</code> | Ticks per second |</p>
+<p>| <code>FLATWORLD_DB</code> | <code>backend/flatworld.db</code> | SQLite path |</p>
+<p>| <code>FLATWORLD_GOD_KEY</code> | — | Seed/override the god passkey at boot |</p>
+<h2 id="god-passkey-auth">God passkey (auth)</h2>
+<p><code>POST /api/laws</code>, <code>POST /api/presets/{name}</code>, <code>POST /api/control</code> and WebSocket control messages need the god passkey (<code>X-God-Key</code> header, <code>key</code> field on the socket). No credential yet → any god call answers <code>409</code> and the web UI asks to create one (<code>POST /api/auth/setup</code>). Lost it? Recover on the server only: <code>cd backend &amp;&amp; uv run python -m app.godkey reset &lt;new&gt;</code> (or <code>clear</code>). The TUI takes no prompt: <code>./run.sh tui ws://host/ws &lt;passkey&gt;</code> or export <code>FLATWORLD_GOD_KEY</code>. Only a PBKDF2 hash is stored.</p>
+<h2 id="persistence-db-py-20">Persistence (<code>db.py:20</code>)</h2>
+<p>SQLite <code>flatworld.db</code> (WAL, thread lock). Tables:</p>
+<ul>
+<li><code>worlds(id, seed, width, height, boundary, started_at, ended_at)</code></li>
+<li><code>events(id, world_id, tick, type, entity_id, caste, cause, x, y, payload, created_at)</code></li>
+<li><code>law_changes(id, world_id, tick, name, value, created_at)</code></li>
+<li><code>creatures(id, world_id, entity_id, caste, clan_id, generation, mother_id, father_id, born_tick, died_tick)</code></li>
+<li><code>snapshots(id, world_id, tick, payload, created_at)</code></li>
+</ul>
+<p>History survives restarts; <code>reset</code> closes old world row and opens new.</p>
+<h2 id="concurrency-stance-simengine">Concurrency stance &amp; SimEngine</h2>
+<p>The simulation core is <strong>strictly deterministic</strong> (one seeded RNG stream, one fixed tick order). Run uvicorn with <strong>1 worker</strong> (more workers = several disconnected worlds, not a faster one). Under <code>SimEngine</code> (<code>main.py:446</code>), simulation advancement runs on its own dedicated background OS thread. State stepping occurs under <code>RT.lock</code> while JSON snapshot serialization runs outside the lock (<code>advance_world_lockless</code>), so heavy state dumps and WebSocket broadcasts never block REST endpoints or hold the GIL. Key operational &amp; diagnostic endpoints:</p>
+<ul>
+<li><code>GET /healthz</code> — Live server health, current TPS, memory usage, uptime, and active WebSocket client count.</li>
+<li><code>GET /api/perf/telemetry</code> — Rolling telemetry rings: tick duration, lock wait time, and broadcast latencies.</li>
+<li><code>GET /api/analytics/summary</code> — High-level macro demographics, biomass, and trophic distribution.</li>
+</ul></section>
+<hr/>
+<section id="how-the-world-works" class="wiki-section"><h1 id="how-the-world-works">How the world works</h1>
+<p><strong>The Sphere (God model):</strong> The Sphere (God) sets <em>laws</em> from Spaceland, never touches individual creatures. Everything else emerges.</p>
+<h2 id="the-deterministic-tick">The deterministic tick</h2>
+<p><code>s = Simulation(Config(seed))</code> → <code>s.step()</code> is fully deterministic (one <code>random.Random</code> per world). Same seed ⇒ same world. Tick loop (<code>backend/app/simulation/core.py</code> <code>Simulation.step()</code>) order: weather → plants → rebuild index → creatures → disease → war → reproduce → relations → food law → corpses → settlements → tick+=1. Simulation advances on a dedicated OS thread (<code>SimEngine</code>) with lockless serialization, streaming snapshots over WebSocket <code>state</code> every tick.</p>
+<h2 id="life-cycle-stages-a">Life cycle &amp; stages (§A)</h2>
+<p>Creature.age ticks + caste-based lifespan (Woman 4800 → Priest 9000). Stage by <code>age/lifespan</code>: infant &lt;15%, juvenile &lt;30%, adult &lt;75%, else elder. Stage scales speed &amp; sight (infant 0.6×, elder 0.85×) and fertility (elder ×0.5). Death causes: <code>starvation</code>, <code>old_age</code>, <code>euthanasia</code>, <code>disease</code>.</p>
+<h2 id="health-core-at-4-h-0">Health core (§AT-4 H-0)</h2>
+<p>Health is a resource, not a constant. Regeneration demands an energy surplus: below 40% of <code>energy_max</code> (<code>HEALTH_REGEN_MIN_ENERGY</code>) wounds stop closing — awake or asleep; sheltered rest heals at <code>0.15×rest_recovery_mult</code>, waking regen is <code>0.1/tick</code> (+Indomitable Monolith defense). Below 20% energy the body cannibalizes itself: <code>−0.05</code> health/tick (<code>HEALTH_SELF_DRAIN_*</code>) until death by <code>starvation</code> — famine now kills twice. Weakness slows every stride (<code>HEALTH_SPEED_TIERS</code>): health &lt;80 ×0.95, &lt;60 ×0.85, &lt;40 ×0.70, &lt;20 ×0.50. Sickly bodies cannot beget children: mating requires <code>health ≥ REPRO_MIN_HEALTH</code> (50), so a plague suppresses births without touching birth laws.</p>
+<h2 id="damage-variety-healing-economy-at-4-h-1">Damage variety &amp; healing economy (§AT-4 H-1)</h2>
+<p>Chronic hunger gnaws: below 20% energy for more than <code>EXHAUSTION_TICKS</code> 30 ticks drains <code>EXHAUSTION_DRAIN</code> 0.08 health/tick (death cause <code>exhaustion</code>). Age withers: elders lose <code>ELDER_DECAY_RATE</code> 0.02/tick passively. Sickness dims the eyes (<code>HEALTH_SIGHT_TIERS</code>: &lt;60 ×0.90, &lt;30 ×0.75) and blunts the harvest (<code>_forage_mult</code>: −20% under 60 HP, −50% under 30) so decline feeds on itself. The badly wounded (&lt;30 HP) or grievously wounded never start a duel, though they can still be attacked; blows above <code>WOUND_MIN_DAMAGE</code> 15 leave a lingering wound (50–100 ticks, severity 1–2 by damage ≥40) that halves or quarters regen and hobbles speed (×0.85/×0.70). Where a body stands decides how fast it mends: waking regen runs at ×0.5 outdoors (<code>REGEN_OUTDOOR_MULT</code>) vs ×0.8 sheltered-awake vs full strength asleep indoors. And supper keeps working: berries set +0.3 health/tick for 20 ticks, grain +0.2×30, medicinal herbs +0.8×40 (<code>FOOD_HEAL_BONUS</code>) — a hurt creature even seeks herbs on a full stomach (herb targeting ignores the sated gate under 60 HP). Bodies differ in depth, too (<code>CASTE_MAX_HP</code>): Soldiers/Artisans pool 130 HP, Nobles/Predators 120, Women 110, Gentlemen/Herbivores 100, Professionals/Priests a delicate 90 — regeneration and healing cap at each body&#x27;s own pool.</p>
+<h2 id="physics-axioms-aq-ph-0">Physics axioms (§AQ PH-0)</h2>
+<p>Energy is the universal currency. Sunlight is the world&#x27;s only income: <code>_sun_factor()</code> follows the day cycle — zero through the night, full strength at noon — and gates both plant growth and seed spread, so nothing grows for free in the dark (winter&#x27;s bite remains the season table). Every body pays upkeep by its geometric complexity (<code>METABOLIC_COST</code>): triangles 1.0×, squares 1.1×, pentagons 1.2×, hexagons/nobles 1.3×, women and priests 1.5× (a priest burns energy maintaining the aura) — applied to the per-tick decay on top of stage/lifestyle multipliers. And mending is a conversion, not a miracle: each point of regenerated health costs <code>HEALING_ENERGY_COST</code> 0.5 energy (charged only when healing actually happens).</p>
+<h2 id="thermodynamics-heat-aq-ph-1">Thermodynamics &amp; heat (§AQ PH-1)</h2>
+<p>A coarse ambient heat field (<code>TEMP_CELL</code> 25-unit cells, <code>_update_temperature</code>) relaxes toward a target each tick: the seasonal base (<code>SEASON_BASE_TEMP</code> spring 12° / summer 24° / autumn 8° / winter −4°) swept across the map from an edge — cold fronts enter from the west, warm fronts from the east — plus the day cycle (<code>DAY_HEAT_AMPLITUDE</code> ±5°), weather (rain −2°, storm −3°, fog −1°) and open flame (<code>FIRE_HEAT</code> 60° within 8 units). Every creature carries <code>body_temp</code> (on the wire) that drifts toward the local ambient at <code>BODY_TEMP_DRIFT</code>; standing indoors replaces ambient with <code>indoor_ambient()</code>, where the house material insulates (<code>INSULATION_BY_MATERIAL</code>: straw 0.15 &lt; wood 0.35 &lt; stone 0.55) toward <code>HOUSE_COMFORT_TEMP</code> 18°, and larger floors shed heat faster (<code>HOUSE_REF_SIDE/size</code>). Extreme heat is always physics: past <code>HYPERTHERMIA_TEMP</code> 36° health drains with the excess (<code>HYPERTHERMIA_DRAIN</code>) until death by <code>hyperthermia</code>. Extreme cold feeds §R chill below <code>HYPOTHERMIA_TEMP</code> 2° when the weather-sickness law is on.</p>
+<h2 id="wind-aq-ph-2">Wind (§AQ PH-2)</h2>
+<p>The sky has a breath: a wind vector (<code>wind_angle</code>/<code>wind_speed</code>, on every snapshot payload) whose strength follows the weather — calm 0.25, rain 0.55, storm howls at 1.0 (<code>WIND_*_SPEED</code>, relaxed each tick) — and whose direction re-rolls near the season&#x27;s prevailing bearing whenever the weather turns (<code>WIND_SEASON_BIAS</code>). Fire obeys it: both random ignition and plant-to-plant spread multiply by a tailwind factor (<code>WIND_FIRE_MULT</code> × speed × alignment), so flame races downwind while upwind groves stand longer.</p>
+<h2 id="nature-s-law-inheritance-b">Nature&#x27;s Law inheritance (§B)</h2>
+<p>Sex: polygons male, lines female (<code>entities.py:137</code>). Sons <code>sides = father.sides+1</code> capped at <code>max_sides</code> (<code>24→Priest</code> per new spec; <code>K∈[3,24]</code>); daughters lines. Mutation <code>mutation_rate</code> ±1 side → <code>irregularity</code> 0.3–1.0. Isosceles triangles: <code>iso_angle+0.5°</code> per generation, <code>≥60°</code> promotes Soldier→Artisan. Fertility: per-caste table × crowding <code>carrying_capacity</code>/<code>max_population</code>. When <code>morphology_annealing_enabled</code> (morphology_engine), polar $(r_i,\phi_i)$ annealing supersedes side-count: $\lambda(g)$ blends Abbott template $K\in[3,24]$ with parental noisy genome, topo $p\cdot(1-\lambda)$.</p>
+<h2 id="geometric-physics-morphology-engine-k-3-24">Geometric Physics (Morphology Engine, K∈[3,24])</h2>
+<p>Polar genomes $K\in[3,24]$ SoA <code>morph_radii/morph_angles/morph_k/physical_traits (A,P,I_{zz},\theta_{\min},asym,Dmult)</code> — vectorized <code>morphology_engine.py</code> <code>KMAX 24</code> (<code>morphology.py</code> shim). $\lambda(g)=morph\_lambda\_override ?? clamp(1-(g-g_{start})/g_{decay})$ (<code>g_start 50</code> <code>g_decay 150</code>, <code>override -1.0</code> = auto). Baking $E_{\max}\cdot clamp(A/A_{ref},0.5,2.5)$ $decay\cdot clamp(P/P_{ref},0.7,2.0)$ $steer\Delta\theta$ $D_{mult}$ $asym$→$irregularity$ with <code>safeguard_morph_mercy</code> ($\eta&gt;0.3$ suspends euthanasia), SAT broadphase $r_{\max}$ + circle fallback ($K\ge24$ &amp; $asym&lt;0.05$) + edge normals + $D_{mult}$ impulse. Telemetry <code>/api/metrics/morphology</code> and <code>/api/metrics/safeguards</code> (<code>N,\eta,tier,miracles,mercy</code>) live.</p>
+<h2 id="world-history-chronicle-ai-storytelling-bm">World History, Chronicle &amp; AI Storytelling (§BM)</h2>
+<p>Flatland features an end-to-end multi-era historiography, timeline analytics, and AI storytelling suite:</p>
+<ul>
+<li><strong>Major Moments &amp; Chronicle Jumps</strong>: Top dramatic days (casualties, conquests, schisms) are automatically highlighted as jump chips above the chronicle feed. Users can jump directly to any specific tick timestamp.</li>
+<li><strong>Epoch Bar &amp; Population Sparkline</strong>: Interactive temporal navigation with color-coded world epochs (Genesis, Age of Tribes, Feudal Era, Classical Zenith, Era of Ruin) and population curves overlaid with war and plague crisis markers.</li>
+<li><strong>Records &amp; Legends Leaderboard</strong>: Hall of fame for Sovereign of War, Deadliest Single Day, Greatest Realm, Divine Architects, Largest Schism, and Hero/Villain notables.</li>
+<li><strong>History Analytics</strong>: Clan Rivalry Heatmap Matrix, Mortality Breakdown (combat, famine, disease, age) across 10-day eras, and Faith Devotion Index over time.</li>
+<li><strong>In-App AI Story Generator</strong>: Integrated browser-based LLM narrative generator using Google Gemini 1.5 Flash or OpenAI GPT-4o-mini with client-side API keys in localStorage. Supports 4 narrative styles (Saga, Chronicle, Mythos, Tragedy) in EN, VI, and FR.</li>
+<li><strong>Deep Linking</strong>: Shareable URLs with <code>?history=42</code> to auto-open specific world days or <code>?clan=7</code> to auto-open clan biographies.</li>
+</ul>
+<h2 id="irregularity-caste-c">Irregularity &amp; caste (§C)</h2>
+<p>Mutated children&#x27;s <code>irregularity</code> judged at <code>adult_age</code>: <code>≥euthanasia_threshold</code> → consumed (<code>euthanasia</code>), else demoted to Soldier. <code>CASTE_TRAITS</code> (<code>entities.py:39</code>) gives lifespan/speed/sight_mult/fertility. BC maps $asymmetry$ → $irregularity$ for same gate.</p>
+<h2 id="disease-d">Disease (§D)</h2>
+<p><code>disease_enabled</code>, <code>disease_outbreak_rate</code> starts new <code>disease_id</code>, spreads within <code>disease_radius</code> at <code>disease_rate</code> (winter ×1.5), drains <code>disease_energy_drain</code> + health <code>2×disease_lethality</code>, recovers <code>recovery_rate</code>. Disabling freezes instantly.</p>
+<h2 id="environment-e">Environment (§E)</h2>
+<p>Clock from tick: <code>time_of_day</code> (<code>day_length</code> cycle, starts sunrise), <code>day</code>, <code>season</code> (<code>season_length</code>). Night <code>night_sight_mult</code>, fog <code>fog_sight_mult</code> stack. <code>SEASON_FOOD_MULT</code> spring 1.0/summer 1.2/autumn 1.0/winter 0.5; spring ×1.25 birth, winter ×1.5 disease. Weather FSM clear/rain/fog/storm at <code>weather_change_rate</code>: rain/storm <code>rain_speed_mult</code>, storm <code>storm_wander_bonus</code>.</p>
+<h2 id="clans-social-order-c-i-p-v">Clans &amp; social order (§C/I/P/V)</h2>
+<p>Settlements seed clans (§V): every non-ruin house founds a clan led by the founding creature nearest its centre, and every founding creature joins its nearest house&#x27;s clan — soldiers, women, nobles and priests mix inside one settlement (<code>simulation/settlement.py</code> <code>_found_founding_clans</code>, deterministic given the seed). God law <code>max_clans</code> caps society granularity: <code>-1</code> = one clan per house; <code>N ≥ 1</code> clusters the founders into N spatial clans (greedy k-centre) instead — a pinned value applies at world creation. A clan&#x27;s settlement IS its anchor house: claims match the clustering (<code>_assign_house_claims</code>/<code>_claim_house_for_clan</code> pick the free house nearest a clan&#x27;s people, never round-robin), and territory/totem/crest anchor there. Children inherit mother&#x27;s <code>clan_id</code>; orphans found new clans that settle at the nearest free house (or build one, §L). Procedural name (<code>CLAN_ADJECTIVES/NOUNS</code>) + Sacred Avatar of the Sphere (§AP: ⭕ Radiant Circle, ⚡ Celestial Strike, 👁️ All-Seeing Vertex, 🛡️ Indomitable Monolith, 🌿 Sacred Spiral, ⚖️ Cosmic Scales, 🌀 Dimensional Rift, 🕯️ Eternal Hearth — emoji on the map) if <code>totems_enabled</code> (<code>config.py:59</code>, <code>simulation/theology.py</code> <code>AVATARS</code>/<code>TOTEM_BUFF</code>, <code>renderCore.tsx</code> pole + shrine). Clan crest color on snapshot, totem pole + glowing shrine beside the main house, <code>StateMessage.clans</code> carries <code>name</code>/<code>totem</code>/<code>faith</code>/<code>shrine_level</code>/<code>leader_id</code>/<code>color</code>. Clan stats &amp; history (§P): <code>GET /api/clans</code> roster with <code>leader_id</code>/<code>population</code>/<code>house</code>/<code>war_wins</code>/<code>losses</code>/<code>territory_radius</code>, polled by <code>ClanPanel.tsx</code> under trophic chart. Relations −100..+100 drift <code>relation_drift_rate</code> →0, threshold <code>alliance_threshold</code>/<code>rivalry_threshold</code> → <code>alliance</code>/<code>rivalry</code> events; shared feeding within <code>flock_radius</code> <code>+2</code>. Boids <code>cohesion_weight</code>/<code>alignment_weight</code>/<code>separation_weight</code> blended after food-seeking; social yielding <code>YIELD_RADIUS</code> 2.5. Territory (§P): each settlement anchors a <code>territory_radius</code> 14 circle (<code>config.py:49</code>, <code>simulation/society.py</code> <code>_update_territory</code>, <code>CanvasRenderer.tsx:514</code>) — members steer home when outside (<code>0.35×steer</code>), trespass inside a rival&#x27;s circle sours relations <code>trespass_decay</code> (<code>protocol.py:127</code>) via <code>_bump_relation</code>. Totem buffs (§AP): eight Sacred Avatars with divine aspects — ⭕ <code>Radiant Circle</code> +30% harvest/+20% fertility, ⚡ <code>Celestial Strike</code> +25% warrior damage, 👁️ <code>All-Seeing Vertex</code> +40% sight + nocturnal clarity, 🛡️ <code>Indomitable Monolith</code> −30% damage/cold immunity, 🌿 <code>Sacred Spiral</code> herbs ×2/plague recovery/composting, ⚖️ <code>Cosmic Scales</code> reliable peace/refuses kin-eating, 🌀 <code>Dimensional Rift</code> faster promotion/adaptive mutation/elder lore, 🕯️ <code>Eternal Hearth</code> nocturnal calm. Theology (§AP): settled clans consecrate a shrine beside the main house (<code>_update_faith</code>); the devout tithe <code>tithe_rate</code> at dawn &amp; dusk into the clan faith pool; the aura mends the faithful; faith overflowing at a season turn works a <code>miracle</code> (bloom + mending); <code>temple_faith_cost</code> raises a Temple whose aura covers all territory (<code>temple</code> event); when God sets laws every shrine chimes and priests preach doctrinal <code>sermons</code> (<code>on_law_change</code> from <code>POST /api/laws</code>); same/complementary-avatar clans sympathise (+1 relation, holy alliances); crisis ages convene the Great <code>synod</code> (+relations, sacred truce); and rarely an elder priest receives the 3D <code>epiphany</code> — all strife stills (<code>truce_ticks</code>). Leadership (§P): founder is <code>leader_id</code> (<code>simulation/society.py</code>), death triggers succession to oldest living member → <code>succession</code> event (<code>protocol.py:129</code>, <code>simulation/lifecycle.py</code>) if <code>succession_enabled</code> (<code>config.py:54</code>).</p>
+<h2 id="food-economy-h-n-o">Food economy (§H/N/O)</h2>
+<p><code>Food</code> is a living plant <code>growth</code> 0.15→1.0 (<code>plant_growth_rate</code>), spreads <code>plant_spread_rate</code> within <code>SPREAD_RADIUS</code> 6.0 if below seasonal bounty <code>food_count×SEASON_FOOD_MULT</code>. Winter die-back removes youngest first. A meal whose straight path is blocked by a rock circle or a house wall is abandoned for <code>food_giveup_ticks</code> — the hungry give up and seek food somewhere else instead of grinding against the obstacle until they starve; eating anything clears the grudge, 0 disables giving up (<code>_segment_hits_circle</code>, <code>_give_up_on</code>). Death leaves <code>Corpse</code> (<code>corpse_ttl</code>, <code>corpse_energy</code>) edible like food; decay boosts nearby plants <code>NUTRIENT_BOOST×nutrient_cycle_rate</code> within <code>NUTRIENT_RADIUS</code>. §O biodiversity: <code>Food.variant</code> grass/berry/mushroom/poisonous (<code>entities.py:169</code>) — <code>plant_variants_enabled</code>/<code>poison_rate</code> (<code>config.py:44</code>), <code>VARIANT_ENERGY</code> grass 32/berry 48/mushroom 24/poison 8 and <code>VARIANT_HEALTH</code> berry +1/poison -30 (<code>simulation/constants.py</code>), growth <code>VARIANT_GROWTH_MULT</code>×<code>VARIANT_SEASON_MULT</code> (<code>simulation/ecology.py</code>), spawn picks berry burst in autumn / mushroom on corpses/rocks (<code>simulation/ecology.py</code>), <code>poisonous</code> mutates via <code>poison_rate</code>; <code>bloom</code> carries <code>variant</code> (<code>simulation/ecology.py</code>). Wild herbivores (§O): <code>Herbivore</code> clanless grazers (<code>entities.py:40</code>, <code>is_herbivore</code>) spawn <code>area×density×beast_ratio</code> (<code>config.py:46</code>, <code>simulation/lifecycle.py</code>), graze plants and are hunted by predators (plants → herbivores → predators); <code>beast_ratio</code>/<code>diet_strictness</code> GodLaws (<code>protocol.py:123</code>). Diet &amp; preference (§O): <code>diet_strictness</code> (<code>config.py:46</code>) filters perceived meals (<code>simulation/creature_update.py</code>) — herbivore ignores <code>corpse</code> when strict, predator ignores <code>food</code>, higher castes skip low-energy <code>grass</code> when strict (<code>berry</code> preferred), herbivore avoids <code>poisonous</code>; <code>test_synergies.py:test_diet_preference_respects_strictness</code> verifies.</p>
+<h2 id="communication-knowledge-q-x">Communication &amp; knowledge (§Q/X)</h2>
+<p>Signals (§Q): food calls and alarm calls ripple within <code>signal_radius</code>; clan-mates respond strongly, strangers weakly. Knowledge (§X): creatures learn typed facts from experience — <code>food</code> spots seen/eaten, <code>danger</code> at predator sightings, <code>safe</code> roofs while sheltered, <code>enemy</code> clans that struck them (<code>Creature.facts</code>, decay after <code>knowledge_ttl</code>). Teaching: <code>knowledge_share_rate</code> chance/tick to broadcast the freshest fact to clan-mates; heard facts land at half confidence — retold knowledge is vaguer than firsthand sighting, only better news overwrites. Mobbing: an attacked creature emits a help call; clan-mates within <code>help_radius</code> converge on the attacker (warriors first via caste rank, the peaceful lag behind, high castes only when bold), and every defender inside earshot softens the attacker&#x27;s blows by <code>defense_weight</code>. Clan memory: <code>/api/clans</code> surfaces each clan&#x27;s remembered enemies/danger zones/food spots (<code>clan_knowledge()</code>), and clans that remember each other as enemies plot wars faster (§S foreshadowing). Full history (§AT-1): <code>GET /api/clans/{id}/history?page=&amp;size=</code> paginates the clan&#x27;s entire filtered event stream (newest first, <code>total</code>/<code>has_more</code>) alongside the internal milestone log; the durable chronicle filters by clan at the SQL level — <code>GET /api/history?clan_id=N</code> matches any clan-bearing payload key (<code>a</code>/<code>b</code>/<code>clan_id</code>/conquest/schism/takeover pairs) so events stay queryable after rolling off the in-memory deque; ClanDetails renders a lazy &quot;Full History&quot; panel with <code>load older</code>. Senses interact (§AR S-0): sleeping bodies are fully deaf — a sleeper never processes signals and never counts as a mob defender (<code>_mob_defenders</code> skips the asleep), so predators may stalk a silent village. Ripe plants smell through the dark: a hungry or starving creature with no visual target catches the scent of any mature plant (<code>growth 1.0</code>) within <code>FOOD_SCENT_RADIUS</code> 8.0 at night — blind starvation is cured by the nose. And starvation dulls fear: <code>_effective_fear_radius</code> halves <code>fear_radius</code> for the starving (traits paranoid +4 / bold −2.5 still apply first), so the desperate walk toward death chasing scented food.</p>
+<h2 id="politics-ab">Politics (§AB)</h2>
+<p>Coalitions: a leader folds friendly unaligned clans (relation ≥ <code>coalition_threshold</code>) into a named bloc (<code>coalition_formed</code>/<code>coalition_joined</code>); soured or shrunken blocs dissolve (<code>coalition_dissolved</code>). Mutual defence — strike one member and every mate&#x27;s relations with the attacker sour −12, dragging them into the war. Leader agency: leaders act on their heritable trait — bold declares war on a remembered enemy (§X), peaceful sues for peace when weakened (<code>peace</code> event), paranoid betrays an ally (<code>betrayal</code> event + treason: false enemy knowledge seeded into nearby third clans). Strong clans demand tribute: vassals pay from their larder every 240 ticks (<code>tribute</code> events). Resource sharing: each settlement keeps a larder capped by <code>larder_capacity</code> — well-fed members deposit surplus, starving members withdraw; full-bellied allies top up starving allies at <code>aid_rate</code>. Defection: unhappy members (starving or homeless) walk to the healthiest nearby banner, even a rival&#x27;s (<code>defection</code> events). <code>/api/clans</code> exposes <code>coalition_id</code>, <code>larder</code>, <code>tribute_to</code>; ClanPanel shows 🤝 pact / 🛡️ vassal / 🏺 larder chips. The leader is leverage (§AS L-0): kin within <code>LEADER_AURA_RADIUS</code> 15 of the living leader gain +10% sight (<code>LEADER_SIGHT_BONUS</code>), −5% energy burn (<code>LEADER_DECAY_MULT</code>) and a calmer hand (fear radius −1); with no living leader the whole clan glooms — sight −10%, burn +5% (<code>LEADERLESS_DECAY_MULT</code>), food gain ×0.85 (<code>LEADERLESS_GAIN_MULT</code>), bylaws and task boards pause, war declarations stop, and members drift <code>cautious</code> at <code>LEADERLESS_CAUTIOUS_CHANCE</code>. The death itself shocks: every member instantly loses 10 energy (<code>LEADER_SHOCK_ENERGY</code>), panics for 20 ticks (+0.3 flee urge), the larder loses 20% to looting, and a grey grief ripple marks the spot.</p>
+<h2 id="desperation-cannibalism-ac">Desperation cannibalism (§AC)</h2>
+<p>Only the desperate eat the living: below <code>cannibalism_hunger_ratio</code> energy a creature perceives eligible prey — enemy-clan members (negative relation) and the weak (starving, elder, wounded) of any clan; never predators, wild beasts, infants or indoor refugees. On contact within <code>eat_radius</code> the prey dies (cause <code>cannibalism</code>), the eater gains <code>cannibalism_energy</code> and leaves a partial corpse, and a cooldown separates kills. Kin-eating carries a terrible price (<code>eat_kin_enabled</code>): the kin-slayer is exiled (<code>exile_on_kin_eat</code>) to found a one-being outcast band, witnesses remember the band as an enemy (§X), and relations between former clan and band sink by <code>kin_stigma</code> — rivalry, plots, war.</p>
+<h2 id="food-decay-ae">Food decay (§AE)</h2>
+<p>Nothing lasts forever: a mature plant lives <code>food_lifespan_ticks</code> × its variant&#x27;s pace (mushroom 0.4×, grass ×1, berry 1.5×, poisonous 3×) before it withers — sprouts and growing plants never rot. Withered plants fade brown in the renderer, release half a corpse&#x27;s nutrient boost to nearby plants (§H death feeds life), then vanish (<code>wither</code> events stay in-memory like blooms, never the DB). The bounty law respawns replacement growth, so plant counts now churn instead of freezing.</p>
+<h2 id="shelter-settlements-l-n">Shelter &amp; Settlements (§L/N)</h2>
+<p>Houses (<code>entities.py:184</code>) squares with doorway; walls block except door — doorway too small for Carnivore predators (§L refuge) so houses are safe havens. Exposure <code>exposure_drain</code> outdoors in rain/storm or night unless <code>indoors</code>. Beds scale with floor area: <code>house_capacity</code> counts beds in an average 8×8 hall (<code>HOUSE_REF_AREA</code>), small huts have fewer beds, and large houses are strictly capped at 16 beds max (<code>HOUSE_MAX_BEDS</code>). Clans can settle across multiple houses, with the leader residing in the primary <strong>Main House</strong> marked with a golden crown. Abandoned houses decay to ruins (<code>is_ruin</code>). One house, one clan (§AT-2/AT-3): a creature sleeps only under its own clan&#x27;s roof or an unclaimed one — <code>_house_for()</code> never returns a foreign house, so rival bodies cannot poison occupancy caps. A growing clan with no free roof may <strong>take over</strong> a weak rival&#x27;s spare house (non-main, nobody sleeping there tonight, rival population under half its bed count — <code>_try_house_takeover</code>): the invader claims it outright, relations sour −25 and a <code>takeover</code> event hits the chronicle with an expanding crest-ring flash on the map; conquest-by-war transfers houses too (winner repoints the loser&#x27;s seat). An audit pass each settlement tick (<code>_audit_house_claims</code>) clears claims whose clan died so no house ends a tick owned by a ghost.</p>
+<h2 id="autonomous-evolution-tools-ag">Autonomous Evolution &amp; Tools (§AG)</h2>
+<p>Evolution emerges 100% autonomously without god interventions:</p>
+<ul>
+<li><strong>Personality Archetypes</strong>: <code>brave</code>, <code>cautious</code>, <code>altruistic</code>, <code>greedy</code>, <code>explorer</code>, <code>builder</code> (65% heritability). Altruistic creatures feed starving kin with basket food.</li>
+<li><strong>Dynamic Equipment &amp; Tools</strong>: Soldiers/Predators wield Spears (+20% combat damage &amp; reach); Farmers/Artisans/Herbivores carry Baskets (haul up to 3 food units for field snacks or clan larder deposits); Priests carry Herb Poultices (+25 HP healing &amp; infection cure); Chieftains wear the golden Crown.</li>
+<li><strong>Skill Mastery &amp; Dynamic Titles</strong>: 4 skills (Farming 🌾, Combat ⚔️, Foraging 🦴, Healing 🌿) progress from Novice to Master, unlocking titles (<em>the Slayer</em>, <em>the Fearless Champion</em>, <em>the Grand Harvester</em>, <em>the Wise Shaman</em>, <em>the Pathfinder</em>).</li>
+<li><strong>Oral Lore</strong>: Elders sleeping in houses transmit their highest skill mastery XP to resting youth.</li>
+<li><strong>Floating Emote Thoughts</strong>: Real-time mood balloons (<code>🍖</code>, <code>❤️</code>, <code>⚔️</code>, <code>🌿</code>, <code>🏆</code>, <code>💤</code>, <code>🧺</code>, <code>😱</code>) above creature heads.</li>
+</ul>
+<h2 id="energy-dynamics-stage-metabolism-ah">Energy Dynamics &amp; Stage Metabolism (§AH)</h2>
+<ul>
+<li><strong>Stage-Aware Metabolism</strong>: Born infants burn 55% less energy per tick (<code>0.45x</code>), juveniles burn 25% less (<code>0.75x</code>), adults standard (<code>1.0x</code>), elders <code>0.85x</code>.</li>
+<li><strong>Combat Stamina</strong>: Duels and war clashes expend energy (winner -6, loser -10); low energy (&lt;20%) causes an exhaustion penalty (30% less damage).</li>
+<li><strong>Food Reserves &amp; Field Eating</strong>: Roaming creatures with &lt;45 energy autonomously eat carried food from their basket. Full creatures (&gt;85% energy) never eat or destroy food plants.</li>
+</ul>
+<h2 id="cognitive-agency-clan-social-intelligence-al">Cognitive Agency &amp; Clan Social Intelligence (§AL)</h2>
+<ul>
+<li><strong>Multi-Objective Utility AI Engine</strong>: Dynamic utility scoring evaluating survival energy, caste duty, personality weights, and kin emergency signals.</li>
+<li><strong>Mental Map &amp; Purposeful Waypoints</strong>: Coordinates for <code>home</code>, <code>rich_food</code>, <code>danger</code>, and <code>patrol</code> enable purposeful foraging and perimeter circuits over random Brownian noise.</li>
+<li><strong>Tactical Combat Formations</strong>: Allied Soldiers in combat align into disciplined phalanxes; 1D lines (women) execute evasive tangential kiting; outnumbered creatures execute organized retreats to shelter.</li>
+<li><strong>Interpersonal Trust Matrix</strong>: Pairs develop affinity from healing (+15) and feeding (+20), forming loyal buddy pairs for shared foraging.</li>
+<li><strong>Clan Division of Labor &amp; Task Board</strong>: Dynamic macro priorities (<code>balanced</code>, <code>food_security</code>, <code>defense</code>, <code>quarantine_healing</code>) boost harvester (2.0×) and guard (2.5×) action weights.</li>
+<li><strong>Governance Archetypes</strong>: Distinct institutional succession models (<code>Monarchy</code> royal dynasty, <code>Theocracy</code> priest succession, <code>Junta</code> combat mastery, <code>Republic</code> council of elders).</li>
+<li><strong>Dynamic Bylaws</strong>: Automated policies including winter food rationing (&lt;35 energy threshold) and wartime martial law curfews.</li>
+<li><strong>Macro Geopolitics &amp; Casus Belli</strong>: Intentional war declarations based on famine food raids, blood feuds, and territorial friction with documented Casus Belli.</li>
+<li><strong>Inter-Clan Trade Caravans</strong>: Economic specialization barter transferring surplus grain from agrarian clans to martial clans in exchange for combat training and diplomatic goodwill (+12 relations).</li>
+<li><strong>Tribal Traditions &amp; Harvest Festivals</strong>: Annual autumn celebrations at clan Main Houses boosting energy (+25), mood emotes, leader trust (+10), and oral lore transmission (+2.0 skill XP).</li>
+</ul>
+<h2 id="food-botanical-ecology-am">Food &amp; Botanical Ecology (§AM)</h2>
+<ul>
+<li><strong>Crop Diversity &amp; Botanical Variants</strong>: 6 distinct flora species (<code>grass</code>, <code>grain</code>, <code>berry</code>, <code>medicinal_herb</code>, <code>mushroom</code>, <code>poisonous</code>).</li>
+<li><strong>Functional Nutrition</strong>:</li>
+<p>  - <em>Golden Grain</em>: Dense calorie staple (+45 Energy), slow decay rate ($2.5\times$ lifespan), foundational for settlement security.</p>
+<p>  - <em>Sun Berry</em>: Energy burst (+48 Energy) and +15% movement speed surge.</p>
+<p>  - <em>Medicinal Herb</em>: Healing remedy (+18 Energy, $+30\text{ HP}$), cures infections, grants heal emotes.</p>
+<p>  - <em>Fungi / Mushroom</em>: Decomposer thriving near corpses, rocks, and during winter (+24 Energy).</p>
+<li><strong>Targeted Dietary Selection</strong>: Injured and infected creatures actively seek medicinal herbs (0.2× effective distance weighting); starving creatures seek golden grain (0.4× distance weighting).</li>
+</ul>
+<h2 id="terminal-user-interface-ai">Terminal User Interface (§AI)</h2>
+<p>A complete Textual terminal interface (<code>backend/tui/</code>) attaches to running worlds with:</p>
+<ul>
+<li>Camera follow mode (<code>w</code>) tracking moving creatures.</li>
+<li>Category-filtered Chronicle (<code>t</code>) (All, Birth, Death, War, Politics, Settlement).</li>
+<li>Full creature dossier inspector (<code>enter</code> / <code>i</code>) and clan details modal (<code>c</code>).</li>
+<li>God laws manager (<code>g</code>) and ASCII/half-block renderer (<code>a</code> / <code>f</code>).</li>
+</ul>
+<h2 id="micro-neural-network-evolutionary-engine-ba">Micro-Neural Network &amp; Evolutionary Engine (BA)</h2>
+<p>Every creature carries a <strong>micro Elman RNN</strong> (<code>16 → 12 → 7</code>, 295 <code>float32</code> weights, fixed) evolved by selection — always on. Sensors (16): vitals, three raycasts ±35°, audio, scent, collision, slope and hidden state. Outputs (7): <code>thrust</code>/<code>steer</code> (movement + energy drain), <code>interact</code> (consume/attack), <code>social</code> (mating readiness replaces §B gating), <code>vocal_amp</code>/<code>vocal_freq</code>, <code>recurrent_out</code> (writes <code>hidden_state</code>). Physics 60 Hz, inference at <code>nn_inference_hz</code> (default 15 Hz, every 4th tick latched, zero-alloc <code>inputs_buf</code>/<code>outputs_buf</code>). Genomes init <code>N(0,0.5)</code> clipped <code>[-4,4]</code>; mating via spatial query when <code>energy &gt; mate_energy_min</code> and <code>social &gt; 0.5</code>; uniform crossover 50/50 + Gaussian mutation <code>N(0,0.08²)</code> <code>p=0.03</code> (<code>mutation_sigma</code>/<code>crossover_rate</code> laws). Always-on 295. See <code>backend/app/agent_soa.py</code>, <code>neural_engine.py</code>, <code>agent_pipeline.py</code>, <code>evolution.py</code>, <code>sim_loop.py</code>, <code>spatial_grid.py</code>.</p></section>
+<hr/>
+<section id="sustainability" class="wiki-section"><h1 id="sustainability-multi-generational-balance">Sustainability — Multi-Generational Balance</h1>
+<p>The world self-balances across hundreds of days and multi-generational dynastic flourishing under tuned ecological and social equilibrium.</p>
+<h2 id="curated-presets">Curated Presets</h2>
+<ul>
+<li><strong>balance</strong> ⚖️ (Default) — Goldilocks harmony tuned for <strong>200–350 inhabitants</strong> with 380 food, carrying capacity 400 (max 500), gentle wars, rare predation, agriculture, density damping ($\xi$), extinction safeguards ($\eta$), and flourishing multi-generational clans.</li>
+<li><strong>sustainable</strong> 🌿 — 1000-day prosperous peace: abundant food (550), carrying capacity 550 (max 600), rich granaries, harvest festivals, banquets, and gentle damping.</li>
+<li><strong>theocracy</strong> 🔮 — Age of the Sphere: sacred avatars, glowing temples, avatar miracles, 3D epiphanies, holy synods, and divine tithes.</li>
+<li><strong>warlords</strong> ⚔️ — Clash of clans: imperial conquests, granary raids, house takeovers, territorial expansion, and defensive coalitions.</li>
+<li><strong>chaos</strong> 🔥 — High predator ratio, lethal wars, wildfires, earthquakes, frequent plagues, and fast seasonal turnover.</li>
+<li><strong>extinction</strong> 💀 — Severe famine (120 food), harsh winter (0.30×), high exposure decay, testing societal resilience under collapse.</li>
+<li><strong>boom</strong> 🚀 — High reproduction, 440 food, carrying capacity 800 (max 850) for monumental metropolis testing.</li>
+</ul>
+<p>Use: <code>curl -X POST localhost:8000/api/presets/balance?reset=true</code> or use The Sphere (God Panel) preset selector.</p>
+<h2 id="dynamic-homeostasis-extinction-prevention">Dynamic Homeostasis &amp; Extinction Prevention</h2>
+<p>Flatland includes two complementary closed-loop homeostatic feedback engines:</p>
+<h3 id="1-density-dependent-soft-cap-damping-xi">1. Density-Dependent Soft-Cap Damping ($\xi$)</h3>
+<p>When population $N$ exceeds carrying capacity $K_{cap}$, the overshoot ratio $\xi = (N - K_{cap}) / K_{cap}$ acts as a non-linear brake:</p>
+<ul>
+<li><strong>Birth Suppression</strong>: $R_{birth} = R_0 / (1 + \text{damping\_steepness} \cdot \xi^2)$</li>
+<li><strong>Crowding Metabolic Stress</strong>: $M_{decay} = M_0 \cdot (1 + \text{crowding\_stress\_mult} \cdot \xi)$</li>
+<li><strong>Resource Strain</strong>: Plant growth and spread slow down proportionally to ecosystem saturation.</li>
+</ul>
+<h3 id="2-extinction-safeguards-genesis-miracles-eta">2. Extinction Safeguards &amp; Genesis Miracles ($\eta$)</h3>
+<p>When population drops below $K_{safe} = K_{cap} \times \text{safeguard\_relief\_ratio}$, emergency relief kicks in:</p>
+<ul>
+<li><strong>Tier 1 ($\eta \le 0.5$)</strong>: Famine relief, metabolic energy discount up to 40%, plant growth acceleration up to 60%.</li>
+<li><strong>Tier 2 ($\eta &gt; 0.5$)</strong>: Critical relief, reproduction cooldown halved, infant euthanasia suspended (<code>safeguard_morph_mercy</code>).</li>
+<li><strong>Tier 3 ($N \le K_{crit}$)</strong>: The Sphere intervenes with a Genesis Miracle, creating <code>safeguard_genesis_batch</code> pristine regular beings to ensure species survival.</li>
+</ul></section>
+<hr/>
+<section id="performance" class="wiki-section"><h1 id="performance-scale-1000-head-60-fps">Performance &amp; Scale — 1000+ head @ 60 FPS</h1>
+<ul>
+<li><strong>Zero-Allocation Spatial Hash</strong>: Pre-allocated 1D bucket list in <code>world.py</code> eliminates tuple allocations and dictionary re-hashing per tick; <code>query_radius</code> uses squared-distance early-exit without <code>math.hypot</code>.</li>
+<li><strong>Fast Mate Discovery</strong>: Spatial index queries nearby partners in $O(1)$ instead of $O(N^2)$ nested roster scans.</li>
+<li><strong>Snapshot Caching</strong>: Static terrain and obstacles are pre-cached, eliminating redundant dictionary list copies on every broadcast frame.</li>
+<li><strong>Batched Canvas 2D Rendering</strong>: Batches drawing passes by caste, plant variant, and house primitives with inline trigonometric vertex transforms, completely eliminating per-creature <code>ctx.save()</code> / <code>ctx.restore()</code> overhead (draw calls reduced from 20,000+ to ~30-50).</li>
+<li><strong>Dynamic Level of Detail (LOD)</strong>: Zoom-dependent rendering skips fine-grained glyph text and ripples when zoomed out, maintaining 60 FPS even with dense populations.</li>
+<li><strong>Decoupled React State</strong>: High-frequency simulation snapshots stream directly into mutable refs at 60 FPS for canvas rendering, while React virtual DOM reconciliation (HUD stats, charts) is throttled to ~6 Hz to keep the main browser thread light and responsive.</li>
+</ul></section>
+<hr/>
+<section id="codebase-map" class="wiki-section"><h1 id="codebase-map">Codebase map</h1>
+<h2 id="backend-backend-app">Backend (<code>backend/app/</code>)</h2>
+<ul>
+<li><code>config.py:13</code> — <code>Config</code> dataclass: world geometry, densities, food, corpses, behaviour, life, reproduction, disease, environment, shelter, terrain, society, houses, chronicle. <code>from_env()</code> + <code>tick_interval</code>.</li>
+<li><code>entities.py:1</code> — <code>CasteTraits</code>, <code>CASTE_TRAITS</code>, <code>YIELD_RANK</code>, <code>caste_name()</code>, <code>Creature</code> (shape/sides/caste/age/lifespan/health/infected/clan_id/sleeping...), <code>Food</code> (growth), <code>Corpse</code>, <code>House</code> (size/door/clan).</li>
+<li><code>world.py:32</code> — <code>World</code> registry + uniform spatial hash (<code>cell_size</code>, <code>rebuild_index</code>), <code>delta</code>/<code>distance</code> wrap-aware, <code>query_radius</code>.</li>
+<li><code>simulation/</code> — Modular simulation package (§BI, replacing legacy <code>simulation.py:335</code>):</li>
+<p>  - <code>core.py</code> — <code>Simulation</code> class, deterministic step loop, SoA slot sync, and cache refreshes.</p>
+<p>  - <code>creature_update.py</code> — Decomposed 7-phase agent loop (<code>_creature_movement</code>, <code>_creature_feeding</code>, etc.).</p>
+<p>  - <code>settlement.py</code> — Housing economy, construction, claims, takeovers, and wall collision.</p>
+<p>  - <code>lifecycle.py</code> — Spawning, reproduction, birth, death, skill titles, and disease propagation.</p>
+<p>  - <code>ecology.py</code> — Flora lifecycle, farming, banquets, corpse decomposition, and nutrient cycling.</p>
+<p>  - <code>theology.py</code> — Faith pools, Sacred Avatars, shrines, miracles, synods, and epiphanies.</p>
+<p>  - <code>society.py</code> — Clans, diplomacy, war, coalitions, larders, trade caravans, and cannibalism.</p>
+<p>  - <code>serialization.py</code> — Wire snapshot and delta payload generation.</p>
+<p>  - <code>environment.py</code> — Weather FSM, wind, temperature grid, elevation, and wildfires.</p>
+<p>  - <code>constants.py</code> — Lookups, multipliers, names, and avatar configurations.</p>
+<li><code>agent_soa.py</code> — SoA buffers (pos/vel/genomes + morph_radii/angles/k/traits) vectorized.</li>
+<li><code>agent_pipeline.py</code> — Vectorized batch sensory raycasting and movement physics.</li>
+<li><code>neural_engine.py</code> — Micro-Elman RNN forward inference (16→12→7, 295 weights).</li>
+<li><code>morphology_engine.py</code> — Polar geometry SAT collision &amp; physical trait baking.</li>
+<li><code>evolution_manager.py</code> — Annealing λ(g), Abbott templates K3..64, polar crossover.</li>
+<li><code>spatial_grid.py</code> — Vectorized spatial grid for fast proximity queries.</li>
+<li><code>analytics.py</code> — TelemetryRing, macro metrics, demography, biodiversity, timeseries.</li>
+<li><code>safeguard_engine.py</code> — Extinction safeguards &amp; Genesis miracles.</li>
+<li><code>density_damping.py</code> — Soft-cap density damping (ξ).</li>
+<li><code>auth.py:1</code> — <code>require_god</code> FastAPI dependency for God passkey PBKDF2 verification (<code>X-God-Key</code>).</li>
+<li><code>protocol.py:7</code> — Pydantic wire schemas: <code>ControlAction</code>, <code>ControlMessage</code>, <code>EntityState</code>, <code>StateMessage</code>, <code>HistoryEvent</code>, <code>HelloMessage</code>, <code>GodLaws</code>.</li>
+<li><code>db.py:1</code> — SQLite WAL persistence for worlds, events, lineage, and snapshots with write buffer.</li>
+<li><code>main.py:1</code> — FastAPI <code>app</code>, <code>SimEngine</code> dedicated tick thread, <code>Hub</code> broadcaster, REST &amp; WebSocket routes.</li>
+</ul>
+<h2 id="frontend-frontend-src">Frontend (<code>frontend/src/</code>)</h2>
+<ul>
+<li><code>App.tsx</code> — Main application layout, HUD, WebSocket synchronization, mobile drawer tabs.</li>
+<li><code>analytics/</code> — Macro Analytics Engine &amp; Observatory:</li>
+<p>  - <code>Observatory.tsx</code> — Full-screen macro dashboard container with tabbed views.</p>
+<p>  - <code>MacroOverview.tsx</code> — Demographics, vital health, biomass &amp; speed sparklines.</p>
+<p>  - <code>SociologyTab.tsx</code> — Clan hegemony, trade caravans, wars &amp; succession tracking.</p>
+<p>  - <code>EcologyTab.tsx</code> — Botanical diversity, soil health &amp; trophic pyramid.</p>
+<p>  - <code>CrisisTab.tsx</code> — Epidemic spread, starvation alerts &amp; disaster log.</p>
+<p>  - <code>MutationLab.tsx</code> — Morphological phylogeny tree &amp; 2D morphospace scatterplot.</p>
+<p>  - <code>MetricCard.tsx</code> / <code>Sparkline.tsx</code> — Lightweight SVG time-series visualizers.</p>
+<li><code>render/CanvasRenderer.tsx</code> — High-performance 60 FPS batched HTML5 Canvas renderer.</li>
+<li><code>render/ClanPanel.tsx</code> — Live clan settlements, totems, and war records.</li>
+<li><code>render/ChronicleFeed.tsx</code> — Filterable, scrollable real-time event log.</li>
+<li><code>render/PlotsPanel.tsx</code> — Multi-metric population, caste, and trophic sparklines.</li>
+<li><code>clan/ClanDetails.tsx</code> — Clan profile, leader residence, founded day &amp; casualty tracking.</li>
+<li><code>history/WorldHistoryModal.tsx</code> — Daily chronicle digest, major wars, and AI Story export.</li>
+<li><code>god/GodPanel.tsx</code> — Interactive Laws of Nature drawer across 6 macro domains.</li>
+<li><code>god/auth.tsx</code> — God passkey modal dialog and authenticated fetch wrapper (<code>godFetch</code>).</li>
+<li><code>inspect/Inspector.tsx</code> — Creature dossier, polar morphology radar, vitals &amp; family tree.</li>
+<li><code>wiki/Wiki.tsx</code> — In-app interactive wiki &amp; API playground.</li>
+<li><code>types.ts</code> — TypeScript definitions mirroring backend protocol schemas.</li>
+<li><code>websocket.ts</code> — Auto-reconnecting WebSocket client.</li>
+</ul>
+<h2 id="data-flow">Data flow</h2>
+<p><code>SimEngine</code> (dedicated thread) → <code>sim.step()</code> → <code>sim.snapshot()</code> (lockless serialization) → <code>HUB.broadcast</code> → <code>ws</code> → <code>CanvasRenderer</code> + <code>App</code> state. Client → <code>ControlMessage</code> → <code>apply_control</code> → <code>RT.config</code>/<code>RT.sim</code> → DB law_changes. Events → <code>DB.add_events</code> + genealogy.</p></section>
+<hr/>
+<section id="data-model-protocol" class="wiki-section"><h1 id="data-model-protocol">Data model &amp; protocol</h1>
+<h2 id="entities-in-memory">Entities (in-memory)</h2>
+<ul>
+<li><code>Creature</code> (<code>entities.py:95</code>): <code>id</code>, <code>x</code>, <code>y</code>, <code>angle</code>, <code>shape</code> polygon|line, <code>sides</code>, <code>caste</code>, <code>radius</code>, <code>age</code>, <code>lifespan</code>, <code>stage</code> infant|juvenile|adult|elder, <code>irregularity</code>, <code>health</code> 0–100, <code>infected</code>, <code>sex</code> male|female, <code>mother_id</code>/<code>father_id</code>, <code>clan_id</code>/<code>clan_color</code>, <code>sleeping</code>/<code>indoors</code>, <code>generation</code>, <code>born_tick</code>, <code>energy</code>, <code>status</code> hungry/starving, <code>meals</code>.</li>
+<li><code>Food</code> (<code>entities.py:158</code>): <code>x</code>, <code>y</code>, <code>growth</code> 0–1.</li>
+<li><code>Corpse</code> (<code>entities.py:170</code>): <code>x</code>, <code>y</code>, <code>ttl</code>, <code>energy</code>.</li>
+<li><code>House</code> (<code>entities.py:184</code>): <code>x</code>, <code>y</code>, <code>size</code>, <code>door_width</code>/<code>door_side</code>/<code>door_offset</code>, <code>clan_id</code>/<code>clan_color</code> (settlement), <code>is_ruin</code>/<code>abandoned_ticks</code>, <code>takeover_tick</code> (last hostile takeover, §AT-3 render flash); ruin after <code>house_decay_ticks</code> (<code>config.py:113</code>), <code>settlement</code>/<code>ruin</code>/<code>takeover</code> events.</li>
+<li>Terrain: <code>fertile: [{x,y,r}]</code>, <code>rocks: [{x,y,r}]</code> in snapshot.</li>
+</ul>
+<h2 id="wire-schemas-protocol-py">Wire schemas (<code>protocol.py</code>)</h2>
+<ul>
+<li><code>EntityState</code> (<code>protocol.py:27</code>): <code>id</code>, <code>kind</code> creature|food|house|corpse, <code>x</code>/<code>y</code>/<code>angle</code>, plus optional fields above.</li>
+<li><code>StateMessage</code> (<code>protocol.py:62</code>): <code>tick</code>, <code>seed</code>, <code>width</code>/<code>height</code>/<code>boundary</code>, <code>population</code>, <code>entities</code>, <code>clans</code>, <code>creatures_alive</code>/<code>creatures_dead</code>/<code>dead_by_cause</code>, <code>infected_count</code>, <code>time_of_day</code>/<code>day</code>/<code>season</code>/<code>weather</code>, <code>terrain_fertile</code>/<code>terrain_rocks</code>, <code>relations</code>, <code>events</code>, plus periodic 1 Hz <code>analytics</code> frame (coalesced macro metrics).</li>
+<li><code>HistoryEvent</code> (<code>protocol.py:86</code>): <code>type</code> death|birth|promotion|demotion|outbreak|recovery|bloom|alliance|rivalry|predation|war|ruin|settlement, <code>tick</code>, <code>entity_id</code>, <code>caste</code>, <code>cause</code>, <code>x</code>/<code>y</code>, <code>payload</code> (parents/sides/generation/clan_id etc).</li>
+<li><code>HelloMessage</code> (<code>protocol.py:99</code>): <code>seed</code>, <code>tick_rate</code>, <code>width</code>/<code>height</code>/<code>boundary</code>.</li>
+<li><code>ControlMessage</code> (<code>protocol.py:22</code>): <code>action</code> pause|resume|step|reset|set_speed + <code>value</code>.</li>
+</ul>
+<h2 id="websocket-flow">WebSocket flow</h2>
+<p>Server → client: <code>{&quot;type&quot;:&quot;hello&quot;, ...}</code> then <code>{&quot;type&quot;:&quot;state&quot;, ...}</code> each tick (with coalesced 1 Hz analytics frames for the Observatory). Client → server: <code>{&quot;action&quot;:&quot;pause&quot;|&quot;resume&quot;|&quot;step&quot;|&quot;reset&quot;|&quot;set_speed&quot;, &quot;value&quot;:...}</code> (<code>main.py</code>).</p></section>
+<hr/>
+<section id="god-laws" class="wiki-section"><h1 id="laws-of-the-sphere">Laws of the Sphere</h1>
+<p>Every law in <code>GodLaws</code> (<code>protocol.py:108</code>) with type/range/default. Set via <code>POST /api/laws</code> or presets.</p><div class="table-wrapper"><table><thead><tr><th>Law</th><th>Type</th><th>Range</th><th>Default</th><th>Hint + docs</th></tr></thead><tbody><tr><td><code>boundary</code></td><td>typing.typing.Literal&#x27;wrap&#x27;, &#x27;clamp&#x27;</td><td>—</td><td>wrap</td><td><small style="color:var(--text-muted)">World border topology: wrap (seamless toroidal loop) vs clamp (solid collision walls).</small> <a href="../docs/god-laws.md#boundary" style="font-size:10px">md</a></td></tr><tr><td><code>food_count</code></td><td>typing.int</td><td>≥0, ≤2000</td><td>210</td><td><small style="color:var(--text-muted)">Living food plants maintained across the world (summer ×1.2, winter ×0.5).</small> <a href="../docs/god-laws.md#food_count" style="font-size:10px">md</a></td></tr><tr><td><code>energy_max</code></td><td>typing.float</td><td>&gt;1, ≤10000</td><td>100.0</td><td><small style="color:var(--text-muted)">Maximum metabolic energy capacity an organism can store (10–500).</small> <a href="../docs/god-laws.md#energy_max" style="font-size:10px">md</a></td></tr><tr><td><code>energy_decay_per_tick</code></td><td>typing.float</td><td>≥0, ≤2</td><td>0.025</td><td><small style="color:var(--text-muted)">Baseline metabolic burn rate per tick without food (0.025).</small> <a href="../docs/god-laws.md#energy_decay_per_tick" style="font-size:10px">md</a></td></tr><tr><td><code>energy_from_food</code></td><td>typing.float</td><td>≥0, ≤1000</td><td>32.0</td><td><small style="color:var(--text-muted)">Base energy yield from harvesting a mature plant (berry 48, grass 32, mushroom 24, poison 8).</small> <a href="../docs/god-laws.md#energy_from_food" style="font-size:10px">md</a></td></tr><tr><td><code>plant_variants_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Master switch enabling botanical biodiversity across 6 distinct functional plant species.</small> <a href="../docs/god-laws.md#plant_variants_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>plant_growth_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.05</td><td><small style="color:var(--text-muted)">How fast sprouted plants mature into harvestable food (0.045).</small> <a href="../docs/god-laws.md#plant_growth_rate" style="font-size:10px">md</a></td></tr><tr><td><code>plant_spread_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.006</td><td><small style="color:var(--text-muted)">Probability per tick that a mature plant drops seeds into adjacent fertile ground (0.006).</small> <a href="../docs/god-laws.md#plant_spread_rate" style="font-size:10px">md</a></td></tr><tr><td><code>nutrient_cycle_rate</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.65</td><td><small style="color:var(--text-muted)">Acceleration of plant growth near decomposing corpses (0.65) — death nourishes new life.</small> <a href="../docs/god-laws.md#nutrient_cycle_rate" style="font-size:10px">md</a></td></tr><tr><td><code>poison_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.01</td><td><small style="color:var(--text-muted)">Probability a new wild sprout is poisonous (-30 HP damage on ingestion).</small> <a href="../docs/god-laws.md#poison_rate" style="font-size:10px">md</a></td></tr><tr><td><code>food_decay_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Enables mature plants to naturally wither over time and fertilize the living soil.</small> <a href="../docs/god-laws.md#food_decay_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>food_lifespan_ticks</code></td><td>typing.int</td><td>≥100, ≤1000000</td><td>9000</td><td><small style="color:var(--text-muted)">Ticks a mature plant lives before naturally withering into the living soil grid (8000).</small> <a href="../docs/god-laws.md#food_lifespan_ticks" style="font-size:10px">md</a></td></tr><tr><td><code>agriculture_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Enables seed gathering, cultivated farm plots (2× growth, 2.5× yield), irrigation furrows, and tending.</small> <a href="../docs/god-laws.md#agriculture_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>granaries_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Enables communal settlement granaries to stockpile grain and berries against winter.</small> <a href="../docs/god-laws.md#granaries_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>granary_capacity</code></td><td>typing.float</td><td>≥0, ≤100000</td><td>400.0</td><td><small style="color:var(--text-muted)">Units of food a settlement granary can store (400) — feasts fire at ≥80% capacity.</small> <a href="../docs/god-laws.md#granary_capacity" style="font-size:10px">md</a></td></tr><tr><td><code>perceive_radius</code></td><td>typing.float</td><td>&gt;0.5, ≤60</td><td>20.0</td><td><small style="color:var(--text-muted)">Base perception sight radius (16) — scaled by caste (Woman 0.8×, Priest 1.35×), night (0.6×), and fog (0.6×).</small> <a href="../docs/god-laws.md#perceive_radius" style="font-size:10px">md</a></td></tr><tr><td><code>eat_radius</code></td><td>typing.float</td><td>&gt;0.1, ≤10</td><td>1.4</td><td><small style="color:var(--text-muted)">Physical contact distance required to consume a plant, corpse, or prey item (1.4).</small> <a href="../docs/god-laws.md#eat_radius" style="font-size:10px">md</a></td></tr><tr><td><code>hungry_ratio</code></td><td>typing.float</td><td>&gt;0, ≤1</td><td>0.35</td><td><small style="color:var(--text-muted)">Energy threshold (≤35%) feeding normalized energy into neural network input slot 0 to trigger foraging.</small> <a href="../docs/god-laws.md#hungry_ratio" style="font-size:10px">md</a></td></tr><tr><td><code>starving_ratio</code></td><td>typing.float</td><td>&gt;0, ≤1</td><td>0.15</td><td><small style="color:var(--text-muted)">Severe energy threshold (≤15%) triggering desperation sprint and pulsing survival distress.</small> <a href="../docs/god-laws.md#starving_ratio" style="font-size:10px">md</a></td></tr><tr><td><code>steer_turn</code></td><td>typing.float</td><td>≥0, ≤3.2</td><td>0.45</td><td><small style="color:var(--text-muted)">Maximum heading angular turn agility per tick, scaled by creature moment of inertia Izz.</small> <a href="../docs/god-laws.md#steer_turn" style="font-size:10px">md</a></td></tr><tr><td><code>birth_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Master switch enabling reproduction, mating, and generational ascendance.</small> <a href="../docs/god-laws.md#birth_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>lifespan_mult</code></td><td>typing.float</td><td>≥0.01, ≤100</td><td>1.0</td><td><small style="color:var(--text-muted)">Multiplier scaling all caste lifespans (Woman: 4,800 ticks → Priest: 9,000 ticks).</small> <a href="../docs/god-laws.md#lifespan_mult" style="font-size:10px">md</a></td></tr><tr><td><code>adult_age</code></td><td>typing.float</td><td>≥0, ≤100000</td><td>600.0</td><td><small style="color:var(--text-muted)">Ticks required for an infant/juvenile to mature into a sexually fertile adult (220).</small> <a href="../docs/god-laws.md#adult_age" style="font-size:10px">md</a></td></tr><tr><td><code>birth_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.05</td><td><small style="color:var(--text-muted)">Base reproduction probability per eligible adult mating pair per tick (0.28).</small> <a href="../docs/god-laws.md#birth_rate" style="font-size:10px">md</a></td></tr><tr><td><code>carrying_capacity</code></td><td>typing.int</td><td>≥-1, ≤10000</td><td>-1</td><td><small style="color:var(--text-muted)">Population density threshold above which fertility gradually fades (-1 = auto).</small> <a href="../docs/god-laws.md#carrying_capacity" style="font-size:10px">md</a></td></tr><tr><td><code>max_population</code></td><td>typing.int</td><td>≥-1, ≤15000</td><td>-1</td><td><small style="color:var(--text-muted)">Hard global population cap preventing any new births until density declines (-1 = auto).</small> <a href="../docs/god-laws.md#max_population" style="font-size:10px">md</a></td></tr><tr><td><code>mutation_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.05</td><td><small style="color:var(--text-muted)">Probability a newborn son deviates ±1 side from classical caste inheritance (0.05).</small> <a href="../docs/god-laws.md#mutation_rate" style="font-size:10px">md</a></td></tr><tr><td><code>mutation_heritability</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.35</td><td>—</td></tr><tr><td><code>sex_ratio</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.5</td><td><small style="color:var(--text-muted)">Probability a newborn child is a son (ascending polygon) vs daughter (agile line) (0.50).</small> <a href="../docs/god-laws.md#sex_ratio" style="font-size:10px">md</a></td></tr><tr><td><code>max_sides</code></td><td>typing.int</td><td>≥3, ≤64</td><td>24</td><td><small style="color:var(--text-muted)">Upper limit on regular polygon vertex ascendance (up to Priest / Circle status) (24).</small> <a href="../docs/god-laws.md#max_sides" style="font-size:10px">md</a></td></tr><tr><td><code>euthanasia_threshold</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.7</td><td><small style="color:var(--text-muted)">Irregularity threshold; deformed infants exceeding this are consumed at adulthood (0.70).</small> <a href="../docs/god-laws.md#euthanasia_threshold" style="font-size:10px">md</a></td></tr><tr><td><code>mutation_sigma</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.08</td><td><small style="color:var(--text-muted)">Gaussian mutation standard deviation (σ) applied to genome weights during crossover (0.08).</small> <a href="../docs/god-laws.md#mutation_sigma" style="font-size:10px">md</a></td></tr><tr><td><code>crossover_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.5</td><td><small style="color:var(--text-muted)">Probability of uniform 50/50 parental genome blending during sexual reproduction (0.50).</small> <a href="../docs/god-laws.md#crossover_rate" style="font-size:10px">md</a></td></tr><tr><td><code>morphology_annealing_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Master switch for geometric physics — polar (r,φ) annealing, SAT polygon collision, and trait baking.</small> <a href="../docs/god-laws.md#morphology_annealing_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>annealing_start_generation</code></td><td>typing.int</td><td>≥0, ≤1000</td><td>15</td><td>—</td></tr><tr><td><code>annealing_decay_generations</code></td><td>typing.int</td><td>≥1, ≤5000</td><td>250</td><td><small style="color:var(--text-muted)">Generations over which polar morphology annealing decays from Abbott templates to free evolution (150).</small> <a href="../docs/god-laws.md#annealing_decay_generations" style="font-size:10px">md</a></td></tr><tr><td><code>morph_lambda_override</code></td><td>typing.float</td><td>≥-1.0, ≤1.0</td><td>None</td><td>—</td></tr><tr><td><code>vertex_mutation_std</code></td><td>typing.float</td><td>≥0, ≤0.5</td><td>0.025</td><td>—</td></tr><tr><td><code>angle_mutation_std</code></td><td>typing.float</td><td>≥0, ≤0.5</td><td>0.012</td><td>—</td></tr><tr><td><code>topological_mutation_rate</code></td><td>typing.float</td><td>≥0, ≤0.2</td><td>0.008</td><td>—</td></tr><tr><td><code>safeguard_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>safeguard_critical_pop</code></td><td>typing.int</td><td>≥2, ≤50</td><td>12</td><td>—</td></tr><tr><td><code>safeguard_relief_ratio</code></td><td>typing.float</td><td>≥0.05, ≤0.5</td><td>0.3</td><td>—</td></tr><tr><td><code>safeguard_genesis_batch</code></td><td>typing.int</td><td>≥1, ≤20</td><td>6</td><td>—</td></tr><tr><td><code>safeguard_morph_mercy</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>safeguard_max_miracles</code></td><td>typing.int</td><td>≥1</td><td>1</td><td>—</td></tr><tr><td><code>soft_cap_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>damping_steepness</code></td><td>typing.float</td><td>≥1.0, ≤20.0</td><td>12.0</td><td>—</td></tr><tr><td><code>crowding_stress_mult</code></td><td>typing.float</td><td>≥0.0, ≤1.0</td><td>1.0</td><td>—</td></tr><tr><td><code>resource_strain_mult</code></td><td>typing.float</td><td>≥0.0, ≤2.0</td><td>2.0</td><td>—</td></tr><tr><td><code>boom_ramp_days</code></td><td>typing.float</td><td>≥0, ≤100</td><td>1.2</td><td>—</td></tr><tr><td><code>boom_birth_floor</code></td><td>typing.float</td><td>≥0, ≤1.0</td><td>0.4</td><td>—</td></tr><tr><td><code>boom_cooldown_mult</code></td><td>typing.float</td><td>≥1.0, ≤10.0</td><td>1.0</td><td>—</td></tr><tr><td><code>boom_energy_mult</code></td><td>typing.float</td><td>≥1.0, ≤10.0</td><td>1.0</td><td>—</td></tr><tr><td><code>initial_season_offset</code></td><td>typing.int</td><td>≥0, ≤3</td><td>0</td><td>—</td></tr><tr><td><code>disease_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Master switch for infectious pathogen outbreaks and contagion transmission.</small> <a href="../docs/god-laws.md#disease_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>disease_outbreak_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>6e-05</td><td><small style="color:var(--text-muted)">Spontaneous plague outbreak probability per tick during crowded conditions (0.00006).</small> <a href="../docs/god-laws.md#disease_outbreak_rate" style="font-size:10px">md</a></td></tr><tr><td><code>disease_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.035</td><td><small style="color:var(--text-muted)">Contagion transmission probability per tick within contact range (0.035).</small> <a href="../docs/god-laws.md#disease_rate" style="font-size:10px">md</a></td></tr><tr><td><code>disease_energy_drain</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.05</td><td><small style="color:var(--text-muted)">Metabolic energy drained per tick from actively infected creatures (0.05).</small> <a href="../docs/god-laws.md#disease_energy_drain" style="font-size:10px">md</a></td></tr><tr><td><code>disease_lethality</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.18</td><td><small style="color:var(--text-muted)">Direct health (HP) damage dealt per tick to actively diseased creatures (0.18).</small> <a href="../docs/god-laws.md#disease_lethality" style="font-size:10px">md</a></td></tr><tr><td><code>weather_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Master switch for dynamic meteorological cycles (sun, rain, fog, storms).</small> <a href="../docs/god-laws.md#weather_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>sleep_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Enables diurnal sleep cycles, house resting, and oral lore transfer after dark.</small> <a href="../docs/god-laws.md#sleep_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>day_length</code></td><td>typing.int</td><td>≥2, ≤200000</td><td>1200</td><td><small style="color:var(--text-muted)">Total duration in ticks of a single diurnal day/night cycle (1200).</small> <a href="../docs/god-laws.md#day_length" style="font-size:10px">md</a></td></tr><tr><td><code>season_length</code></td><td>typing.int</td><td>≥2, ≤1000000</td><td>14400</td><td><small style="color:var(--text-muted)">Duration in ticks of each season (Spring, Summer, Autumn, Winter) (12000).</small> <a href="../docs/god-laws.md#season_length" style="font-size:10px">md</a></td></tr><tr><td><code>winter_food_mult</code></td><td>typing.float</td><td>≥0.1, ≤2</td><td>0.5</td><td><small style="color:var(--text-muted)">Winter seasonal food abundance multiplier (0.70 gentle, 0.50 harsh, 0.30 extinction).</small> <a href="../docs/god-laws.md#winter_food_mult" style="font-size:10px">md</a></td></tr><tr><td><code>night_sight_mult</code></td><td>typing.float</td><td>≥0.05, ≤2</td><td>0.6</td><td><small style="color:var(--text-muted)">Perception radius multiplier during night ticks for non-nocturnal castes (0.60).</small> <a href="../docs/god-laws.md#night_sight_mult" style="font-size:10px">md</a></td></tr><tr><td><code>weather_change_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.002</td><td><small style="color:var(--text-muted)">Frequency of meteorological transitions between clear, rain, fog, and storm (0.002).</small> <a href="../docs/god-laws.md#weather_change_rate" style="font-size:10px">md</a></td></tr><tr><td><code>weather_sickness_enabled</code></td><td>typing.bool</td><td>—</td><td>False</td><td><small style="color:var(--text-muted)">Enables exposure chill and hypothermia when caught unsheltered in wet or freezing weather.</small> <a href="../docs/god-laws.md#weather_sickness_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>chill_drain</code></td><td>typing.float</td><td>≥0, ≤5</td><td>0.18</td><td><small style="color:var(--text-muted)">Direct health drain per tick when chilled outdoors without shelter (0.18).</small> <a href="../docs/god-laws.md#chill_drain" style="font-size:10px">md</a></td></tr><tr><td><code>shelter_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Master switch for house claiming, door navigation, and roof protection.</small> <a href="../docs/god-laws.md#shelter_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>exposure_drain</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.03</td><td><small style="color:var(--text-muted)">Health and energy drain per tick when outdoors during harsh weather (0.025).</small> <a href="../docs/god-laws.md#exposure_drain" style="font-size:10px">md</a></td></tr><tr><td><code>house_capacity</code></td><td>typing.int</td><td>≥1, ≤64</td><td>12</td><td><small style="color:var(--text-muted)">Bed capacity inside a settlement hall (12); excess members sleep outdoors.</small> <a href="../docs/god-laws.md#house_capacity" style="font-size:10px">md</a></td></tr><tr><td><code>house_decay_ticks</code></td><td>typing.int</td><td>≥100, ≤100000</td><td>2400</td><td><small style="color:var(--text-muted)">Ticks before an abandoned, roofless house crumbles into ruins (10000).</small> <a href="../docs/god-laws.md#house_decay_ticks" style="font-size:10px">md</a></td></tr><tr><td><code>rest_recovery_mult</code></td><td>typing.float</td><td>≥0, ≤10</td><td>2.0</td><td><small style="color:var(--text-muted)">Health regeneration multiplier when sleeping indoors under a roof (2.0).</small> <a href="../docs/god-laws.md#rest_recovery_mult" style="font-size:10px">md</a></td></tr><tr><td><code>territory_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Enables clan boundary markings, territory defence, and trespass penalties.</small> <a href="../docs/god-laws.md#territory_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>territory_radius</code></td><td>typing.float</td><td>≥1, ≤50</td><td>14.0</td><td><small style="color:var(--text-muted)">Radius of clan territorial influence around settlement houses (16).</small> <a href="../docs/god-laws.md#territory_radius" style="font-size:10px">md</a></td></tr><tr><td><code>trespass_decay</code></td><td>typing.float</td><td>≥0, ≤5</td><td>0.25</td><td><small style="color:var(--text-muted)">Diplomatic relation points lost per tick when a rival clan enters marked territory (0.15).</small> <a href="../docs/god-laws.md#trespass_decay" style="font-size:10px">md</a></td></tr><tr><td><code>max_clans</code></td><td>typing.int</td><td>≥-1, ≤64</td><td>-1</td><td><small style="color:var(--text-muted)">Maximum number of sovereign clans spawned during world initialization (-1 = auto).</small> <a href="../docs/god-laws.md#max_clans" style="font-size:10px">md</a></td></tr><tr><td><code>totems_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Enables Sacred Avatar totem blessings for each clan settlement.</small> <a href="../docs/god-laws.md#totems_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>succession_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Enables dynamic governance leadership transfers on chieftain death.</small> <a href="../docs/god-laws.md#succession_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>communication_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Enables vocalizations, alarm chirps, peace hums, and emotional thought bubbles.</small> <a href="../docs/god-laws.md#communication_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>knowledge_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Enables spatial memory, waypoint mapping, and rumor broadcasting among kin.</small> <a href="../docs/god-laws.md#knowledge_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>schism_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Enables internal clan fractures when members starve or lack shelter.</small> <a href="../docs/god-laws.md#schism_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>schism_threshold</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.5</td><td><small style="color:var(--text-muted)">Dissatisfaction fraction (hunger, homelessness) triggering a factional clan schism (0.40).</small> <a href="../docs/god-laws.md#schism_threshold" style="font-size:10px">md</a></td></tr><tr><td><code>war_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Enables inter-clan warfare, tactical raids, and territorial conquest.</small> <a href="../docs/god-laws.md#war_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>attack_damage</code></td><td>typing.float</td><td>≥0, ≤1000</td><td>30.0</td><td><small style="color:var(--text-muted)">Base damage dealt by soldiers and warriors in inter-clan battles (32.0).</small> <a href="../docs/god-laws.md#attack_damage" style="font-size:10px">md</a></td></tr><tr><td><code>predation_enabled</code></td><td>typing.bool</td><td>—</td><td>False</td><td><small style="color:var(--text-muted)">Enables carnivorous predator-prey ecology and hunting dynamics.</small> <a href="../docs/god-laws.md#predation_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>predator_ratio</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.0</td><td><small style="color:var(--text-muted)">Fraction of population spawned as predatory carnivores hunting prey (0.02).</small> <a href="../docs/god-laws.md#predator_ratio" style="font-size:10px">md</a></td></tr><tr><td><code>hunt_radius</code></td><td>typing.float</td><td>≥1, ≤40</td><td>8.0</td><td><small style="color:var(--text-muted)">Aggro detection radius within which carnivores and war parties acquire targets (16.0).</small> <a href="../docs/god-laws.md#hunt_radius" style="font-size:10px">md</a></td></tr><tr><td><code>bite_damage</code></td><td>typing.float</td><td>≥0, ≤1000</td><td>28.0</td><td><small style="color:var(--text-muted)">Combat damage dealt per carnivore attack or predatory strike (28.0).</small> <a href="../docs/god-laws.md#bite_damage" style="font-size:10px">md</a></td></tr><tr><td><code>energy_from_prey</code></td><td>typing.float</td><td>≥0, ≤1000</td><td>40.0</td><td><small style="color:var(--text-muted)">Caloric energy extracted from slaying and eating a prey creature (45.0).</small> <a href="../docs/god-laws.md#energy_from_prey" style="font-size:10px">md</a></td></tr><tr><td><code>fear_radius</code></td><td>typing.float</td><td>≥1, ≤40</td><td>12.0</td><td><small style="color:var(--text-muted)">Distance at which herbivores and vulnerable castes detect threats and execute evasion (12.0).</small> <a href="../docs/god-laws.md#fear_radius" style="font-size:10px">md</a></td></tr><tr><td><code>coalitions_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Enables mutual defensive alliances and diplomatic treaties between friendly clans.</small> <a href="../docs/god-laws.md#coalitions_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>coalition_threshold</code></td><td>typing.int</td><td>≥-100, ≤100</td><td>40</td><td><small style="color:var(--text-muted)">Diplomatic trust score required for two friendly clans to form a defensive coalition (40).</small> <a href="../docs/god-laws.md#coalition_threshold" style="font-size:10px">md</a></td></tr><tr><td><code>leader_decisions_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Enables chieftain governance bylaws (rationing, martial law, war declarations).</small> <a href="../docs/god-laws.md#leader_decisions_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>resource_sharing_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Enables communal settlement larders and altruistic basket food sharing.</small> <a href="../docs/god-laws.md#resource_sharing_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>larder_capacity</code></td><td>typing.float</td><td>≥0, ≤5000</td><td>300.0</td><td><small style="color:var(--text-muted)">Energy capacity of settlement communal food stores where surplus is shared (300).</small> <a href="../docs/god-laws.md#larder_capacity" style="font-size:10px">md</a></td></tr><tr><td><code>cannibalism_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Enables desperate consumption of the living during extreme starvation.</small> <a href="../docs/god-laws.md#cannibalism_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>eat_kin_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Allows consumption of deceased or weak clanmates at the cost of tribal exile and feuds.</small> <a href="../docs/god-laws.md#eat_kin_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>cannibalism_energy</code></td><td>typing.float</td><td>≥0, ≤1000</td><td>35.0</td><td><small style="color:var(--text-muted)">Energy gained by starving creatures resorting to eating fallen kin or rivals (45.0).</small> <a href="../docs/god-laws.md#cannibalism_energy" style="font-size:10px">md</a></td></tr><tr><td><code>theology_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Enables the 8 Sacred Avatars, shrines, temples, miracles, and divine tithes.</small> <a href="../docs/god-laws.md#theology_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>tithe_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.04</td><td><small style="color:var(--text-muted)">Fraction of energy devout worshippers offer at shrines each dawn &amp; dusk to build clan faith (0.04).</small> <a href="../docs/god-laws.md#tithe_rate" style="font-size:10px">md</a></td></tr><tr><td><code>temple_faith_cost</code></td><td>typing.float</td><td>≥0, ≤100000</td><td>400.0</td><td><small style="color:var(--text-muted)">Faith points required to consecrate a glowing Temple of the Sphere (400.0).</small> <a href="../docs/god-laws.md#temple_faith_cost" style="font-size:10px">md</a></td></tr><tr><td><code>age_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Enables historical epoch progression (Golden Age, Ice Age, Age of Chaos, Age of Plague).</small> <a href="../docs/god-laws.md#age_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>age_length</code></td><td>typing.int</td><td>≥100, ≤1000000</td><td>12000</td><td><small style="color:var(--text-muted)">Duration in ticks per world historical epoch (50000).</small> <a href="../docs/god-laws.md#age_length" style="font-size:10px">md</a></td></tr><tr><td><code>culture_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Enables traditions, governance archetypes, and cultural diffusion.</small> <a href="../docs/god-laws.md#culture_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>culture_spread_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.005</td><td><small style="color:var(--text-muted)">Rate at which allied clans sharing borders adopt common cultural traits and beliefs (0.0005).</small> <a href="../docs/god-laws.md#culture_spread_rate" style="font-size:10px">md</a></td></tr><tr><td><code>rivers_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Enables water channels, fords, water currents, bridges, and dams.</small> <a href="../docs/god-laws.md#rivers_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>river_count</code></td><td>typing.int</td><td>≥0, ≤8</td><td>2</td><td><small style="color:var(--text-muted)">Number of procedural river channels carved across the terrain at world generation (2).</small> <a href="../docs/god-laws.md#river_count" style="font-size:10px">md</a></td></tr><tr><td><code>relief_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Enables topographical elevation, slope inertia, cliffs, and road packing.</small> <a href="../docs/god-laws.md#relief_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>structural_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Enables weather wear on buildings, builder repairs, and roof collapse into rubble.</small> <a href="../docs/god-laws.md#structural_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>earthquake_enabled</code></td><td>typing.bool</td><td>—</td><td>False</td><td><small style="color:var(--text-muted)">Enables seismic tremors that shake terrain and damage weakened structures.</small> <a href="../docs/god-laws.md#earthquake_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>earthquake_rate</code></td><td>typing.float</td><td>≥0, ≤0.01</td><td>8e-05</td><td><small style="color:var(--text-muted)">Frequency of seismic quakes that crack buildings and shake terrain (0.00008).</small> <a href="../docs/god-laws.md#earthquake_rate" style="font-size:10px">md</a></td></tr><tr><td><code>lightning_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Enables real lightning strikes during storms that ignite fires and damage creatures.</small> <a href="../docs/god-laws.md#lightning_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>lightning_strike_rate</code></td><td>typing.float</td><td>≥0, ≤0.05</td><td>0.0015</td><td><small style="color:var(--text-muted)">Frequency of deadly electrical arc strikes during thunder storms (0.0015).</small> <a href="../docs/god-laws.md#lightning_strike_rate" style="font-size:10px">md</a></td></tr><tr><td><code>wildfire_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Enables combustive flame propagation across dense vegetation and forests.</small> <a href="../docs/god-laws.md#wildfire_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>fire_rate</code></td><td>typing.float</td><td>≥0, ≤0.05</td><td>8e-05</td><td><small style="color:var(--text-muted)">Probability per tick that a mature plant ignites during dry spells or lightning strikes (0.00008).</small> <a href="../docs/god-laws.md#fire_rate" style="font-size:10px">md</a></td></tr><tr><td><code>disaster_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Enables cataclysmic meteors, floods, and natural world disturbances.</small> <a href="../docs/god-laws.md#disaster_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>disaster_rate</code></td><td>typing.float</td><td>≥0, ≤0.05</td><td>4e-05</td><td><small style="color:var(--text-muted)">Stochastic probability of catastrophic environmental disasters (0.0003).</small> <a href="../docs/god-laws.md#disaster_rate" style="font-size:10px">md</a></td></tr><tr><td><code>anomaly_count</code></td><td>typing.int</td><td>≥0, ≤8</td><td>3</td><td><small style="color:var(--text-muted)">Number of mysterious spatial anomaly zones altering local physics (3).</small> <a href="../docs/god-laws.md#anomaly_count" style="font-size:10px">md</a></td></tr><tr><td><code>door_clearance</code></td><td>typing.float</td><td>≥1, ≤5</td><td>1.5</td><td><small style="color:var(--text-muted)">Width multiplier for house doorways relative to the largest creature size (1.5).</small> <a href="../docs/god-laws.md#door_clearance" style="font-size:10px">md</a></td></tr><tr><td><code>house_min_size</code></td><td>typing.float</td><td>≥3, ≤60</td><td>5.5</td><td>—</td></tr><tr><td><code>house_max_size</code></td><td>typing.float</td><td>≥3, ≤80</td><td>8.0</td><td>—</td></tr><tr><td><code>aid_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.05</td><td>—</td></tr><tr><td><code>alarm_call_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.12</td><td>—</td></tr><tr><td><code>alignment_weight</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.0</td><td>—</td></tr><tr><td><code>alliance_threshold</code></td><td>typing.int</td><td>≥-100, ≤100</td><td>50</td><td>—</td></tr><tr><td><code>attack_radius</code></td><td>typing.float</td><td>≥0, ≤10</td><td>1.8</td><td>—</td></tr><tr><td><code>banquets_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>beast_ratio</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.0</td><td>—</td></tr><tr><td><code>betrayal_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>birth_energy_cost</code></td><td>typing.float</td><td>≥0, ≤1000</td><td>20.0</td><td>—</td></tr><tr><td><code>bite_cooldown</code></td><td>typing.int</td><td>≥0, ≤1000</td><td>15</td><td>—</td></tr><tr><td><code>cannibalism_hunger_ratio</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.08</td><td>—</td></tr><tr><td><code>chill_rate</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.04</td><td>—</td></tr><tr><td><code>chill_threshold</code></td><td>typing.float</td><td>≥0, ≤1000</td><td>12.0</td><td>—</td></tr><tr><td><code>coalition_min_size</code></td><td>typing.int</td><td>≥1, ≤100</td><td>2</td><td>—</td></tr><tr><td><code>cohesion_weight</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.0</td><td>—</td></tr><tr><td><code>corpse_energy</code></td><td>typing.float</td><td>≥0, ≤1000</td><td>25.0</td><td>—</td></tr><tr><td><code>corpse_ttl</code></td><td>typing.int</td><td>≥0, ≤100000</td><td>600</td><td>—</td></tr><tr><td><code>corpses_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>creature_density</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.0013</td><td>—</td></tr><tr><td><code>defection_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>defense_weight</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.5</td><td>—</td></tr><tr><td><code>desperate_perceive_mult</code></td><td>typing.float</td><td>≥1, ≤10</td><td>1.6</td><td>—</td></tr><tr><td><code>desperate_speed_mult</code></td><td>typing.float</td><td>≥1, ≤10</td><td>1.35</td><td>—</td></tr><tr><td><code>dialect_drift_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>diet_strictness</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.0</td><td>—</td></tr><tr><td><code>disease_radius</code></td><td>typing.float</td><td>≥0, ≤100</td><td>3.0</td><td>—</td></tr><tr><td><code>eat_enemy_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>energy_start</code></td><td>typing.float</td><td>≥0, ≤1000</td><td>85.0</td><td>—</td></tr><tr><td><code>envoys_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>exile_on_kin_eat</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>fertile_food_bias</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.7</td><td>—</td></tr><tr><td><code>fertile_patches</code></td><td>typing.int</td><td>≥-1, ≤1000</td><td>-1</td><td>—</td></tr><tr><td><code>fire_spread_rate</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.035</td><td>—</td></tr><tr><td><code>flock_radius</code></td><td>typing.float</td><td>≥0, ≤100</td><td>6.0</td><td>—</td></tr><tr><td><code>fog_mushroom_mult</code></td><td>typing.float</td><td>≥0, ≤10</td><td>1.35</td><td>—</td></tr><tr><td><code>fog_sight_mult</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.6</td><td>—</td></tr><tr><td><code>food_call_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.08</td><td>—</td></tr><tr><td><code>food_giveup_ticks</code></td><td>typing.int</td><td>≥0, ≤100000</td><td>240</td><td>—</td></tr><tr><td><code>hearths_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>height</code></td><td>typing.float</td><td>≥10, ≤10000</td><td>300.0</td><td>—</td></tr><tr><td><code>help_call_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>help_radius</code></td><td>typing.float</td><td>≥0, ≤100</td><td>12.0</td><td>—</td></tr><tr><td><code>history_max</code></td><td>typing.int</td><td>≥0, ≤1000000</td><td>200</td><td>—</td></tr><tr><td><code>house_claim_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>house_density</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.00065</td><td>—</td></tr><tr><td><code>house_gap</code></td><td>typing.float</td><td>≥0, ≤100</td><td>6.0</td><td>—</td></tr><tr><td><code>hungry_perceive_mult</code></td><td>typing.float</td><td>≥1, ≤10</td><td>1.3</td><td>—</td></tr><tr><td><code>kin_stigma</code></td><td>typing.float</td><td>≥0, ≤1000</td><td>40</td><td>—</td></tr><tr><td><code>knowledge_share_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.05</td><td>—</td></tr><tr><td><code>knowledge_ttl</code></td><td>typing.int</td><td>≥0, ≤1000000</td><td>600</td><td>—</td></tr><tr><td><code>markets_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>mate_energy_min</code></td><td>typing.float</td><td>≥0, ≤1000</td><td>30.0</td><td>—</td></tr><tr><td><code>mate_radius</code></td><td>typing.float</td><td>≥0, ≤100</td><td>10.0</td><td>—</td></tr><tr><td><code>nn_inference_hz</code></td><td>typing.int</td><td>≥1, ≤1000</td><td>15</td><td>—</td></tr><tr><td><code>num_hexagons</code></td><td>typing.int</td><td>≥-1, ≤100</td><td>-1</td><td>—</td></tr><tr><td><code>num_houses</code></td><td>typing.int</td><td>≥-1, ≤100</td><td>-1</td><td>—</td></tr><tr><td><code>num_pentagons</code></td><td>typing.int</td><td>≥-1, ≤100</td><td>-1</td><td>—</td></tr><tr><td><code>num_priests</code></td><td>typing.int</td><td>≥-1, ≤100</td><td>-1</td><td>—</td></tr><tr><td><code>num_squares</code></td><td>typing.int</td><td>≥-1, ≤100</td><td>-1</td><td>—</td></tr><tr><td><code>num_triangles</code></td><td>typing.int</td><td>≥-1, ≤100</td><td>-1</td><td>—</td></tr><tr><td><code>num_women</code></td><td>typing.int</td><td>≥-1, ≤100</td><td>-1</td><td>—</td></tr><tr><td><code>omens_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>omp_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>omp_threshold</code></td><td>typing.int</td><td>≥0, ≤10000</td><td>100</td><td>—</td></tr><tr><td><code>rain_growth_mult</code></td><td>typing.float</td><td>≥0, ≤10</td><td>1.25</td><td>—</td></tr><tr><td><code>rain_speed_mult</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.85</td><td>—</td></tr><tr><td><code>recovery_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.03</td><td>—</td></tr><tr><td><code>relation_drift_rate</code></td><td>typing.float</td><td>≥0, ≤10</td><td>2.2</td><td>—</td></tr><tr><td><code>reproduction_cooldown</code></td><td>typing.int</td><td>≥0, ≤100000</td><td>600</td><td>—</td></tr><tr><td><code>rivalry_threshold</code></td><td>typing.int</td><td>≥-100, ≤100</td><td>-75</td><td>—</td></tr><tr><td><code>rock_count</code></td><td>typing.int</td><td>≥-1, ≤1000</td><td>-1</td><td>—</td></tr><tr><td><code>rubble_blocking_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>scent_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>schism_min_pop</code></td><td>typing.int</td><td>≥1, ≤1000</td><td>6</td><td>—</td></tr><tr><td><code>seed</code></td><td>typing.int</td><td>≥0</td><td>42</td><td>—</td></tr><tr><td><code>separation_weight</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.0</td><td>—</td></tr><tr><td><code>signal_radius</code></td><td>typing.float</td><td>≥0, ≤100</td><td>12.0</td><td>—</td></tr><tr><td><code>signal_speed</code></td><td>typing.float</td><td>≥0, ≤100</td><td>8.0</td><td>—</td></tr><tr><td><code>sleep_energy_mult</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.5</td><td>—</td></tr><tr><td><code>soil_depletion_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>spawn_variance</code></td><td>typing.float</td><td>≥0, ≤100</td><td>0.25</td><td>—</td></tr><tr><td><code>storm_plant_damage</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.02</td><td>—</td></tr><tr><td><code>storm_wander_bonus</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.35</td><td>—</td></tr><tr><td><code>tick_rate</code></td><td>typing.float</td><td>≥0.1, ≤1000</td><td>10.0</td><td>—</td></tr><tr><td><code>trait_mutation_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.02</td><td>—</td></tr><tr><td><code>tribute_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>vocalizations_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>wander_turn</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.35</td><td>—</td></tr><tr><td><code>wet_disease_mult</code></td><td>typing.float</td><td>≥0, ≤10</td><td>1.5</td><td>—</td></tr><tr><td><code>width</code></td><td>typing.float</td><td>≥10, ≤10000</td><td>400.0</td><td>—</td></tr></tbody></table></div></section>
+<hr/>
+<section id="presets" class="wiki-section"><h1 id="presets-one-click-worlds">Presets — one-click worlds</h1>
+<p>Sustainable is the 1000-day gentle world. Apply via The Sphere panel or <code>POST /api/presets/{name}?reset</code>.</p><div class="table-wrapper"><table><thead><tr><th>Preset</th><th>Key laws</th><th>Apply</th></tr></thead><tbody><tr style="background:rgba(35,134,54,0.08);"><td><code>balance</code> <span class="badge" style="background:#238636;color:#fff;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:700;">ACTIVE</span></td><td><small style="color:var(--text-muted)">boundary=wrap, door_clearance=1.5, food_count=380, plant_growth_rate=0.065, plant_spread_rate=0.008, nutrient_cycle_rate=0.65 … +179 more</small></td><td><span style="color:var(--text-muted);font-size:11px;">Via the app UI or TUI</span></td></tr><tr><td><code>sustainable</code></td><td><small style="color:var(--text-muted)">boundary=wrap, door_clearance=1.5, food_count=550, plant_growth_rate=0.08, plant_spread_rate=0.01, nutrient_cycle_rate=0.85 … +179 more</small></td><td><span style="color:var(--text-muted);font-size:11px;">Via the app UI or TUI</span></td></tr><tr><td><code>chaos</code></td><td><small style="color:var(--text-muted)">boundary=wrap, door_clearance=1.5, food_count=320, plant_growth_rate=0.045, plant_spread_rate=0.006, nutrient_cycle_rate=0.65 … +179 more</small></td><td><span style="color:var(--text-muted);font-size:11px;">Via the app UI or TUI</span></td></tr><tr><td><code>extinction</code></td><td><small style="color:var(--text-muted)">boundary=wrap, door_clearance=1.5, food_count=120, plant_growth_rate=0.025, plant_spread_rate=0.003, nutrient_cycle_rate=0.5 … +179 more</small></td><td><span style="color:var(--text-muted);font-size:11px;">Via the app UI or TUI</span></td></tr><tr><td><code>boom</code></td><td><small style="color:var(--text-muted)">boundary=wrap, door_clearance=1.5, food_count=440, plant_growth_rate=0.06, plant_spread_rate=0.012, nutrient_cycle_rate=0.85 … +179 more</small></td><td><span style="color:var(--text-muted);font-size:11px;">Via the app UI or TUI</span></td></tr><tr><td><code>theocracy</code></td><td><small style="color:var(--text-muted)">boundary=wrap, door_clearance=1.5, food_count=400, plant_growth_rate=0.055, plant_spread_rate=0.007, nutrient_cycle_rate=0.7 … +179 more</small></td><td><span style="color:var(--text-muted);font-size:11px;">Via the app UI or TUI</span></td></tr><tr><td><code>warlords</code></td><td><small style="color:var(--text-muted)">boundary=wrap, door_clearance=1.5, food_count=340, plant_growth_rate=0.05, plant_spread_rate=0.006, nutrient_cycle_rate=0.65 … +179 more</small></td><td><span style="color:var(--text-muted);font-size:11px;">Via the app UI or TUI</span></td></tr></tbody></table></div></section>
+<hr/>
+<section id="api-reference" class="wiki-section"><h1 id="api-reference">API reference</h1>
+<p>Live routes from <code>app.routes</code> + Swagger at <a href="../docs/">/docs</a>. Try <code>curl</code> examples below.</p><div class="table-wrapper"><table><thead><tr><th>Route</th><th>Name</th></tr></thead><tbody><tr><td><code>/ws</code></td><td></td></tr><tr><td><code>GET /api/analytics/hegemony</code></td><td>get_analytics_hegemony</td></tr><tr><td><code>GET /api/analytics/summary</code></td><td>get_analytics_summary</td></tr><tr><td><code>GET /api/analytics/timeseries</code></td><td>get_analytics_timeseries</td></tr><tr><td><code>GET /api/analytics/trophic</code></td><td>get_analytics_trophic</td></tr><tr><td><code>GET /api/analytics/warnings</code></td><td>get_analytics_warnings</td></tr><tr><td><code>GET /api/annals</code></td><td>get_annals</td></tr><tr><td><code>GET /api/auth/status</code></td><td>auth_status</td></tr><tr><td><code>GET /api/clan/{clan_id}/biography</code></td><td>get_clan_biography</td></tr><tr><td><code>GET /api/clans/{clan_id}/history</code></td><td>get_clan_history</td></tr><tr><td><code>GET /api/clans/{clan_id}</code></td><td>get_clan</td></tr><tr><td><code>GET /api/clans</code></td><td>get_clans</td></tr><tr><td><code>GET /api/config</code></td><td>get_config</td></tr><tr><td><code>GET /api/creature/{creature_id}</code></td><td>get_creature</td></tr><tr><td><code>GET /api/history/summary</code></td><td>get_history_summary</td></tr><tr><td><code>GET /api/history</code></td><td>get_history</td></tr><tr><td><code>GET /api/laws</code></td><td>read_laws</td></tr><tr><td><code>GET /api/metrics/damping</code></td><td>get_damping_metrics</td></tr><tr><td><code>GET /api/metrics/morphology</code></td><td>get_morphology_metrics</td></tr><tr><td><code>GET /api/metrics/safeguards</code></td><td>get_safeguards_metrics</td></tr><tr><td><code>GET /api/perf/telemetry</code></td><td>get_telemetry</td></tr><tr><td><code>GET /api/presets</code></td><td>list_presets</td></tr><tr><td><code>GET /api/state</code></td><td>get_state</td></tr><tr><td><code>GET /api/version</code></td><td>get_version</td></tr><tr><td><code>GET /api/wiki</code></td><td>get_wiki_json</td></tr><tr><td><code>GET /api/worlds</code></td><td>get_worlds</td></tr><tr><td><code>GET /guide</code></td><td>get_guide</td></tr><tr><td><code>GET /health.html</code></td><td>health_dashboard</td></tr><tr><td><code>GET /health</code></td><td>health_dashboard</td></tr><tr><td><code>GET /healthz</code></td><td>healthz</td></tr><tr><td><code>GET /robots.txt</code></td><td>get_robots_txt</td></tr><tr><td><code>GET /sitemap.xml</code></td><td>get_sitemap_xml</td></tr><tr><td><code>GET /wiki</code></td><td>get_wiki</td></tr><tr><td><code>POST /api/auth/setup</code></td><td>auth_setup</td></tr><tr><td><code>POST /api/control</code></td><td>post_control</td></tr><tr><td><code>POST /api/laws</code></td><td>write_laws</td></tr><tr><td><code>POST /api/presets/{name}</code></td><td>apply_preset</td></tr></tbody></table></div><h2 id="curl-playground">Curl playground</h2>
+<pre><code>
+# laws
+curl localhost:8000/api/laws
+curl -X POST localhost:8000/api/laws -H &#x27;content-type: application/json&#x27; -d &#x27;{&quot;food_count&quot;: 90}&#x27;
+
+# presets (1000-day one click)
+curl -X POST localhost:8000/api/presets/sustainable?reset=true
+curl -X POST localhost:8000/api/presets/chaos
+curl -X POST localhost:8000/api/presets/extinction?reset=true
+
+# state &amp; history
+curl localhost:8000/api/state | jq .tick
+curl localhost:8000/api/history?limit=5 | jq
+curl localhost:8000/api/worlds | jq
+curl localhost:8000/api/clans | jq
+
+# control
+curl -X POST localhost:8000/api/control -H &#x27;content-type: application/json&#x27; -d &#x27;{&quot;action&quot;:&quot;pause&quot;}&#x27;
+curl -X POST localhost:8000/api/control -d &#x27;{&quot;action&quot;:&quot;reset&quot;}&#x27;
+
+# websocket (live)
+# ws://localhost:8000/ws  → {&quot;type&quot;:&quot;hello&quot;} then {&quot;type&quot;:&quot;state&quot;} throttled ~30Hz
+# send {&quot;action&quot;:&quot;pause&quot;} / {&quot;action&quot;:&quot;set_speed&quot;,&quot;value&quot;:20}
+</pre></section>
+<hr/>
+<section id="configuration-ops" class="wiki-section"><h1 id="configuration-ops">Configuration &amp; ops</h1>
+<h2 id="env-vars-flatworld">Env vars (<code>FLATWORLD_*</code>)</h2>
+<p>| Variable | Default | Description |</p>
+<p>|---|---|---|</p>
+<p>| <code>FLATWORLD_WIDTH</code> | <code>400</code> | World width (grid units) |</p>
+<p>| <code>FLATWORLD_HEIGHT</code> | <code>300</code> | World height |</p>
+<p>| <code>FLATWORLD_BOUNDARY</code> | <code>wrap</code> | <code>wrap</code> or <code>clamp</code> |</p>
+<p>| <code>FLATWORLD_SEED</code> | <code>42</code> | RNG seed |</p>
+<p>| <code>FLATWORLD_TICK_RATE</code> | <code>10</code> | Ticks per second |</p>
+<p>| <code>FLATWORLD_DB</code> | <code>backend/flatworld.db</code> | SQLite path |</p>
+<p>| <code>FLATWORLD_GOD_KEY</code> | — | Seed/override the god passkey at boot |</p>
+<h2 id="god-passkey-auth">God passkey (auth)</h2>
+<p><code>POST /api/laws</code>, <code>POST /api/presets/{name}</code>, <code>POST /api/control</code> and WebSocket control messages need the god passkey (<code>X-God-Key</code> header, <code>key</code> field on the socket). No credential yet → any god call answers <code>409</code> and the web UI asks to create one (<code>POST /api/auth/setup</code>). Lost it? Recover on the server only: <code>cd backend &amp;&amp; uv run python -m app.godkey reset &lt;new&gt;</code> (or <code>clear</code>). The TUI takes no prompt: <code>./run.sh tui ws://host/ws &lt;passkey&gt;</code> or export <code>FLATWORLD_GOD_KEY</code>. Only a PBKDF2 hash is stored.</p>
+<h2 id="persistence-db-py-20">Persistence (<code>db.py:20</code>)</h2>
+<p>SQLite <code>flatworld.db</code> (WAL, thread lock). Tables:</p>
+<ul>
+<li><code>worlds(id, seed, width, height, boundary, started_at, ended_at)</code></li>
+<li><code>events(id, world_id, tick, type, entity_id, caste, cause, x, y, payload, created_at)</code></li>
+<li><code>law_changes(id, world_id, tick, name, value, created_at)</code></li>
+<li><code>creatures(id, world_id, entity_id, caste, clan_id, generation, mother_id, father_id, born_tick, died_tick)</code></li>
+<li><code>snapshots(id, world_id, tick, payload, created_at)</code></li>
+</ul>
+<p>History survives restarts; <code>reset</code> closes old world row and opens new.</p>
+<h2 id="concurrency-stance-simengine">Concurrency stance &amp; SimEngine</h2>
+<p>The simulation core is <strong>strictly deterministic</strong> (one seeded RNG stream, one fixed tick order). Run uvicorn with <strong>1 worker</strong> (more workers = several disconnected worlds, not a faster one). Under <code>SimEngine</code> (<code>main.py:446</code>), simulation advancement runs on its own dedicated background OS thread. State stepping occurs under <code>RT.lock</code> while JSON snapshot serialization runs outside the lock (<code>advance_world_lockless</code>), so heavy state dumps and WebSocket broadcasts never block REST endpoints or hold the GIL. Key operational &amp; diagnostic endpoints:</p>
+<ul>
+<li><code>GET /healthz</code> — Live server health, current TPS, memory usage, uptime, and active WebSocket client count.</li>
+<li><code>GET /api/perf/telemetry</code> — Rolling telemetry rings: tick duration, lock wait time, and broadcast latencies.</li>
+<li><code>GET /api/analytics/summary</code> — High-level macro demographics, biomass, and trophic distribution.</li>
+</ul>
+<h2 id="run-deploy">Run &amp; deploy</h2>
+<pre><code>
+./run.sh
+# or
+cd backend &amp;&amp; uv run uvicorn app.main:app --reload --port 8000
+cd frontend &amp;&amp; npm run dev
+</pre>
+<h2 id="tests">Tests</h2>
+<pre><code>
+cd backend &amp;&amp; uv run pytest -q
+cd backend &amp;&amp; uv run pytest tests/test_synergies.py -q
+</pre></section>
+<hr/>
+<section id="roadmap" class="wiki-section"><h1 id="roadmap">Roadmap</h1>
+<p>See <code>TODO.md</code> (active) + <code>docs/roadmap-archive.md</code> (completed) — 13 sections + 213 laws + 42 routes + 7 presets. Wiki extends Guide with presets, sustainability &amp; playground.</p></section>
+    <hr/>
+    <p style="font-size:12px;color:var(--text-muted)">Generated from live code — <code>Config</code> defaults + <code>GodLaws</code> + <code>app.routes</code>. Official living documentation & encyclopedia for Flatland. · Developed by <strong>Long Phan</strong> — <a href="/cdn-cgi/l/email-protection#8ae6e5e4edcae7e3e4e2e4e2ebe4a4e3e4"><span class="__cf_email__" data-cfemail="224e4d4c45624f4b4c4a4c4a434c0c4b4c">[email&#160;protected]</span></a> · Demo: <a href="../" target="_blank" rel="noopener noreferrer">Demo ↗</a> · Landing: <a href="../" target="_blank" rel="noopener noreferrer">Landing ↗</a> · <a href="https://github.com/longphanmn/flatland" target="_blank" rel="noopener noreferrer">GitHub</a> · Built with OpenCode & Antigravity</p>
+  </article>
+</main>
+</div>
+
+<div id="wiki-toast"></div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// Mobile Sidebar Toggle
+function toggleSidebar() {
+  const sidebar = document.getElementById('wikiSidebar');
+  const overlay = document.getElementById('mobileOverlay');
+  sidebar.classList.toggle('sidebar-open');
+  overlay.classList.toggle('overlay-open');
+}
+
+// Search filter
+function filterWiki(q){
+  q = q.toLowerCase();
+  document.querySelectorAll('.wiki-section, h1, h2, table tr, p, li').forEach(el => {
+    if (!q) { el.style.display = ''; return; }
+    const txt = (el.textContent || '').toLowerCase();
+    if (el.tagName === 'TR' || el.tagName === 'LI' || el.tagName === 'P') {
+      el.style.display = txt.includes(q) ? '' : 'none';
+    }
+  });
+  document.querySelectorAll('.wiki-section').forEach(sec => {
+    const vis = [...sec.querySelectorAll('tr, li, p')].some(e => e.style.display !== 'none');
+    const title = (sec.querySelector('h1, h2')?.textContent || '').toLowerCase();
+    sec.style.display = (vis || title.includes(q) || !q) ? '' : 'none';
+  });
+}
+
+// Keyboard shortcut '/' to search & Escape to clear
+document.addEventListener('keydown', e => {
+  if (e.key === '/' && document.activeElement?.tagName !== 'INPUT') {
+    e.preventDefault();
+    document.getElementById('q')?.focus();
+  } else if (e.key === 'Escape' && document.activeElement?.id === 'q') {
+    document.getElementById('q').value = '';
+    filterWiki('');
+    document.getElementById('q').blur();
+  }
+});
+
+// Toast notification
+function showToast(msg, isError = false) {
+  const toast = document.getElementById('wiki-toast');
+  if (!toast) return;
+  toast.innerText = msg;
+  toast.className = 'toast-visible ' + (isError ? 'toast-error' : 'toast-success');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(() => {
+    toast.className = '';
+  }, 3200);
+}
+
+// Preset changes are reserved for the app UI and TUI — /wiki is read-only.
+// Kept as a guidance stub so older cached pages degrade gracefully.
+async function applyPreset(name) {
+  showToast('Presets can only be changed in the app UI or TUI', true);
+}
+
+// Enhance code blocks with copy buttons
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('pre').forEach(pre => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'code-container';
+    pre.parentNode.insertBefore(wrapper, pre);
+    wrapper.appendChild(pre);
+
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'copy-btn';
+    copyBtn.innerText = 'Copy';
+    copyBtn.onclick = () => {
+      navigator.clipboard.writeText(pre.innerText).then(() => {
+        copyBtn.innerText = '✓ Copied';
+        copyBtn.style.color = '#3fb950';
+        setTimeout(() => { copyBtn.innerText = 'Copy'; copyBtn.style.color = ''; }, 1600);
+      });
+    };
+    wrapper.appendChild(copyBtn);
+  });
+
+  // Wrap tables without .table-wrapper
+  document.querySelectorAll('table').forEach(tbl => {
+    if (!tbl.closest('.table-wrapper')) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'table-wrapper';
+      tbl.parentNode.insertBefore(wrapper, tbl);
+      wrapper.appendChild(tbl);
+    }
+  });
+
+  // Scroll spy with IntersectionObserver
+  const sections = document.querySelectorAll('.wiki-section');
+  const navLinks = document.querySelectorAll('.nav-link');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach(link => {
+          if (link.getAttribute('data-section') === id) {
+            link.classList.add('active');
+          } else {
+            link.classList.remove('active');
+          }
+        });
+      }
+    });
+  }, { rootMargin: '-15% 0px -70% 0px' });
+
+  sections.forEach(sec => observer.observe(sec));
+});
+
+try { localStorage.setItem('flatland_lang', 'en'); } catch(e){}
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"423f0669d3ab442083bf6504dee20e1e","r":1,"spa":2}' crossorigin="anonymous"></script>
+</body></html>

@@ -1,0 +1,1128 @@
+<!doctype html>
+<html lang="vi"><head>
+<script>(function(){var p=new URLSearchParams(window.location.search);var l=p.get("lang");if(l==="en"){window.location.replace("./"+window.location.search+window.location.hash);}else if(l==="fr"){window.location.replace("./wiki-fr.html"+window.location.search+window.location.hash);}})();</script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flatland — Bách khoa toàn thư &amp; Wiki — Mô phỏng Thế giới bởi Long Phan</title>
+<meta name="description" content="Tài liệu bách khoa toàn thư và wiki sống chính thức của Flatland: Mô phỏng thế giới 2D tự hành phát triển bởi Long Phan (long@minhnhan.in).">
+<meta name="keywords" content="Flatland, World Simulation, Wiki, Guide, Presets, Simulation Mechanics, Long Phan, long@minhnhan.in, Artificial Life">
+<meta name="author" content="Long Phan <long@minhnhan.in>">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="./wiki-vi.html">
+<meta property="og:title" content="Flatland — Living Wiki | Hệ thống Mô phỏng Thế giới bởi Long Phan">
+<meta property="og:description" content="Tài liệu chính thức về cơ chế mô phỏng, thiết lập mẫu và thiên luật tự nhiên của Flatland bởi Long Phan (long@minhnhan.in).">
+<meta property="og:url" content="/wiki?lang=vi">
+<meta property="og:type" content="article">
+<style>
+:root {
+  color-scheme: dark;
+  --bg-main: #0b0f14;
+  --bg-sidebar: #0d1117;
+  --bg-card: rgba(22, 27, 34, 0.85);
+  --bg-card-hover: rgba(33, 38, 45, 0.95);
+  --border-subtle: #21262d;
+  --border-strong: #30363d;
+  --border-active: #58a6ff;
+  --text-primary: #f0f6fc;
+  --text-normal: #c9d1d9;
+  --text-muted: #8b949e;
+  --text-dim: #6e7681;
+  --accent-blue: #58a6ff;
+  --accent-green: #3fb950;
+  --accent-amber: #d29922;
+  --accent-orange: #ffa657;
+  --accent-red: #f85149;
+  --accent-purple: #d2a8ff;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-sans);
+  margin: 0;
+  color: var(--text-normal);
+  background: var(--bg-main);
+  line-height: 1.65;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar { width: 7px; height: 7px; }
+::-webkit-scrollbar-track { background: var(--bg-sidebar); }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* Layout */
+.wiki-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.wiki-sidebar {
+  width: 310px;
+  min-width: 310px;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border-subtle);
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 14px;
+  gap: 12px;
+  z-index: 20;
+}
+
+/* Header & Brand */
+.wiki-brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.wiki-brand h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.wiki-brand .version-tag {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 12px;
+  background: rgba(88, 166, 255, 0.15);
+  color: var(--accent-blue);
+  border: 1px solid rgba(88, 166, 255, 0.3);
+}
+
+/* Language Switcher */
+.lang-switcher {
+  display: flex;
+  gap: 3px;
+  background: #161b22;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  padding: 3px;
+}
+.lang-btn {
+  flex: 1;
+  text-align: center;
+  padding: 5px 6px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--text-muted);
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.lang-btn:hover { color: var(--text-primary); background: rgba(255, 255, 255, 0.06); }
+.lang-btn.active {
+  background: #1f6feb;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Search Box */
+.search-wrapper {
+  position: relative;
+  margin: 4px 0;
+}
+.search-input {
+  width: 100%;
+  padding: 8px 32px 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-strong);
+  background: #161b22;
+  color: var(--text-primary);
+  font-size: 12.5px;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+.search-input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+}
+.search-shortcut {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  color: var(--text-dim);
+  background: var(--border-subtle);
+  padding: 2px 5px;
+  border-radius: 4px;
+  border: 1px solid var(--border-strong);
+  pointer-events: none;
+}
+
+/* Navigation List */
+.nav-group-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  margin: 14px 6px 6px;
+}
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 12.5px;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+.nav-link:hover {
+  color: var(--text-primary);
+  background: rgba(110, 118, 129, 0.12);
+}
+.nav-link.active {
+  color: var(--accent-blue);
+  background: rgba(56, 139, 253, 0.12);
+  font-weight: 600;
+  border-left: 2px solid var(--accent-blue);
+  padding-left: 8px;
+}
+.nav-icon {
+  font-size: 13px;
+  width: 18px;
+  display: inline-block;
+  text-align: center;
+}
+
+/* External Link Bar */
+.external-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border-subtle);
+  margin-top: 6px;
+}
+.ext-chip {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-decoration: none;
+  background: #161b22;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 3px 8px;
+  transition: all 0.15s ease;
+}
+.ext-chip:hover {
+  color: var(--accent-blue);
+  border-color: var(--border-strong);
+}
+
+/* Presets & Author Cards */
+.sidebar-card {
+  background: rgba(22, 27, 34, 0.7);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+}
+/* Main Content Area */
+.wiki-main {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  overflow-y: auto;
+  background: var(--bg-main);
+}
+
+/* Top Sticky HUD */
+.wiki-top-hud {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(13, 17, 23, 0.82);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 8px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.hud-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.hud-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: rgba(33, 38, 45, 0.7);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-normal);
+}
+.hud-pill.live-dot::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  box-shadow: 0 0 6px rgba(63, 185, 80, 0.6);
+}
+.hud-live-link {
+  color: var(--accent-green);
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(63, 185, 80, 0.1);
+  border: 1px solid rgba(63, 185, 80, 0.25);
+  font-size: 12px;
+  transition: all 0.15s ease;
+}
+.hud-live-link:hover {
+  background: rgba(63, 185, 80, 0.2);
+  border-color: var(--accent-green);
+}
+
+/* Article Container */
+.wiki-article {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 36px 32px 80px;
+}
+.wiki-section {
+  scroll-margin-top: 70px;
+  margin-bottom: 48px;
+}
+
+/* Typography Inside Content */
+h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 18px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  letter-spacing: -0.01em;
+}
+h2 {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 28px 0 14px;
+  border-left: 3px solid var(--accent-blue);
+  padding-left: 10px;
+}
+h3 {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 20px 0 10px;
+}
+h4 {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-normal);
+  margin: 16px 0 8px;
+}
+p {
+  margin: 0 0 14px;
+  line-height: 1.68;
+  color: var(--text-normal);
+}
+blockquote {
+  margin: 16px 0;
+  padding: 12px 16px;
+  background: rgba(56, 139, 253, 0.08);
+  border-left: 3px solid var(--accent-blue);
+  border-radius: 0 8px 8px 0;
+  color: var(--text-normal);
+}
+blockquote p { margin: 0; }
+a { color: var(--accent-blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+ul, ol { padding-left: 22px; margin: 0 0 16px; }
+li { margin: 4px 0; line-height: 1.6; }
+hr { border: 0; border-top: 1px solid var(--border-subtle); margin: 32px 0; }
+
+/* Inline Code */
+code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: rgba(110, 118, 129, 0.18);
+  color: var(--accent-orange);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(240, 246, 252, 0.08);
+}
+
+/* Code Container with Copy Button */
+.code-container {
+  position: relative;
+  margin: 16px 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  background: #161b22;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+.code-container pre {
+  margin: 0;
+  padding: 16px;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--text-primary);
+  line-height: 1.55;
+  background: transparent;
+  border: none;
+}
+.code-container pre code {
+  background: transparent;
+  padding: 0;
+  border: none;
+  color: inherit;
+}
+.copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px 9px;
+  font-size: 11px;
+  font-family: var(--font-sans);
+  background: rgba(33, 38, 45, 0.85);
+  color: var(--text-muted);
+  border: 1px solid var(--border-strong);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  backdrop-filter: blur(8px);
+}
+.copy-btn:hover {
+  background: #30363d;
+  color: #fff;
+  border-color: var(--text-muted);
+}
+
+/* Tables */
+.table-wrapper {
+  margin: 16px 0;
+  overflow-x: auto;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: #0d1117;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  text-align: left;
+}
+th {
+  background: #161b22;
+  color: var(--text-primary);
+  font-weight: 600;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-strong);
+  white-space: nowrap;
+}
+td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-normal);
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(56, 139, 253, 0.05); }
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  border: 1px solid var(--border-strong);
+  background: #161b22;
+  color: var(--text-muted);
+  margin: 2px;
+}
+
+/* Toast Notifications */
+#wiki-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 100;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+}
+#wiki-toast.toast-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+#wiki-toast.toast-success {
+  background: #238636;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+#wiki-toast.toast-error {
+  background: #da3633;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Mobile Responsiveness */
+.mobile-nav-toggle {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  color: var(--text-muted);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.mobile-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 15;
+}
+@media (max-width: 860px) {
+  .wiki-layout { flex-direction: column; }
+  .wiki-sidebar {
+    position: fixed;
+    left: -320px;
+    width: 290px;
+    transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 32px rgba(0,0,0,0.8);
+  }
+  .wiki-sidebar.sidebar-open { left: 0; }
+  .mobile-overlay.overlay-open { display: block; }
+  .mobile-nav-toggle { display: inline-flex; align-items: center; justify-content: center; }
+  .wiki-article { padding: 20px 16px 60px; }
+  .wiki-top-hud { padding: 8px 16px; }
+}
+</style></head><body>
+<div class="wiki-layout">
+<div id="mobileOverlay" class="mobile-overlay" onclick="toggleSidebar()"></div>
+
+<nav class="wiki-sidebar" id="wikiSidebar">
+  <div class="wiki-brand">
+    <div>
+      <h2>📖 📖 Bách khoa toàn thư Flatland</h2>
+      <div style="font-size:10.5px;color:var(--text-muted);margin-top:2px">Flatland Guide &amp; Living Encyclopedia</div>
+    </div>
+    <span class="version-tag">v0.1.6</span>
+  </div>
+
+  <div class="lang-switcher">
+    <a href="./" class="lang-btn ">🇬🇧 EN</a>
+    <a href="./wiki-vi.html" class="lang-btn active">🇻🇳 VI</a>
+    <a href="./wiki-fr.html" class="lang-btn ">🇫🇷 FR</a>
+  </div>
+
+  <div class="search-wrapper">
+    <input id="q" class="search-input" placeholder="Tìm kiếm thiên luật, endpoint, tài liệu… ( / )" oninput="filterWiki(this.value)">
+    <span class="search-shortcut">/</span>
+  </div>
+
+  <div style="overflow-y:auto;flex:1;margin-right:-4px;padding-right:4px">
+    <ul class="nav-list">
+      <li class="nav-group-title">Tri thức Cốt lõi</li>
+<li><a href="#overview" class="nav-link" data-section="overview"><span class="nav-icon">📖</span> <span>Tổng quan</span></a></li>
+<li><a href="#book-comparison" class="nav-link" data-section="book-comparison"><span class="nav-icon">📐</span> <span>Tiểu thuyết Abbott vs Mô phỏng</span></a></li>
+<li><a href="#quickstart" class="nav-link" data-section="quickstart"><span class="nav-icon">⚡</span> <span>Bắt đầu nhanh</span></a></li>
+<li><a href="#how-the-world-works" class="nav-link" data-section="how-the-world-works"><span class="nav-icon">⚙️</span> <span>Nguyên lý vận hành</span></a></li>
+<li class="nav-group-title">Hệ thống &amp; Cân bằng</li>
+<li><a href="#sustainability" class="nav-link" data-section="sustainability"><span class="nav-icon">🌿</span> <span>Tính bền vững &amp; Cân bằng</span></a></li>
+<li><a href="#performance" class="nav-link" data-section="performance"><span class="nav-icon">🚀</span> <span>Hiệu năng &amp; Quy mô</span></a></li>
+<li><a href="#codebase-map" class="nav-link" data-section="codebase-map"><span class="nav-icon">🗺️</span> <span>Kiến trúc mã nguồn</span></a></li>
+<li><a href="#data-model-protocol" class="nav-link" data-section="data-model-protocol"><span class="nav-icon">💾</span> <span>Mô hình dữ liệu &amp; Giao thức</span></a></li>
+<li class="nav-group-title">Thiên luật &amp; Tham chiếu</li>
+<li><a href="#god-laws" class="nav-link" data-section="god-laws"><span class="nav-icon">⚖️</span> <span>Thiên luật Khối Cầu</span></a></li>
+<li><a href="#presets" class="nav-link" data-section="presets"><span class="nav-icon">🎯</span> <span>Thiết lập mẫu</span></a></li>
+<li><a href="#api-reference" class="nav-link" data-section="api-reference"><span class="nav-icon">🔌</span> <span>Tham chiếu API</span></a></li>
+<li><a href="#configuration-ops" class="nav-link" data-section="configuration-ops"><span class="nav-icon">🛠️</span> <span>Cấu hình &amp; Vận hành</span></a></li>
+<li><a href="#roadmap" class="nav-link" data-section="roadmap"><span class="nav-icon">🗺️</span> <span>Lộ trình phát triển</span></a></li>
+    </ul>
+
+    <div class="external-links">
+      <a href="../" target="_blank" rel="noopener noreferrer" class="ext-chip">🌐 Trang chủ ↗</a>
+      <a href="../docs/" class="ext-chip">📄 Tài liệu Swagger /docs</a>
+      <a href="../openapi.json" class="ext-chip">🌐 OpenAPI</a>
+      <a href="../openapi.json" class="ext-chip">📦 Dữ liệu JSON</a>
+    </div>
+
+    <div class="sidebar-card" style="margin-top:10px;border-color:rgba(88,166,255,0.3)">
+      <div style="color:var(--text-muted);font-size:11px">Phát triển bởi</div>
+      <strong style="color:var(--text-primary);font-size:13px">Long Phan</strong>
+      <div style="margin-top:4px;font-size:11px">
+        <a href="/cdn-cgi/l/email-protection#e5898a8b82a5888c8b8d8b8d848bcb8c8b" style="color:var(--accent-blue)"><span class="__cf_email__" data-cfemail="197576777e597470777177717877377077">[email&#160;protected]</span></a> · <a href="../" target="_blank" rel="noopener noreferrer" style="color:var(--accent-blue)">Demo</a> · <a href="../" target="_blank" rel="noopener noreferrer" style="color:var(--accent-blue)">Landing</a>
+      </div>
+      <div style="color:var(--text-dim);font-size:10.5px;margin-top:4px">Xây dựng với OpenCode & Antigravity<br/>Lấy cảm hứng từ Edwin A. Abbott</div>
+    </div>
+  </div>
+</nav>
+
+<main class="wiki-main">
+  <header class="wiki-top-hud">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="mobile-nav-toggle" onclick="toggleSidebar()" aria-label="Toggle menu">☰</button>
+      <div class="hud-pill live-dot"><span>FLATLAND</span></div>
+      <div class="hud-stats">
+        <span class="hud-pill">⚖️ 213 thiên luật</span>
+        <span class="hud-pill">🌐 42 endpoint</span>
+        <span class="hud-pill">🎯 7 mẫu</span>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:12px;color:var(--text-muted)">Khối Cầu định đoạt thiên luật, không can thiệp số mệnh</span>
+      <a href="../" target="_blank" rel="noopener noreferrer" class="hud-pill" style="text-decoration:none;color:var(--accent-blue)">🌐 Landing Page ↗</a>
+      <a href="../docs/" class="hud-pill" style="text-decoration:none;color:var(--accent-blue)">📄 Swagger /docs</a>
+      <a href="../" class="hud-live-link">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent-green);box-shadow:0 0 6px var(--accent-green)"></span>
+        ← Bản demo
+      </a>
+    </div>
+  </header>
+
+  <article class="wiki-article">
+    <section id="overview" class="wiki-section"><h1 id="b-ch-khoa-to-n-th-wiki-flatland">Bách khoa toàn thư &amp; Wiki Flatland</h1>
+<p>&gt; <strong>Trang chủ / Landing Page</strong>: <a href="../">/</a></p>
+<p>&gt; <strong>Mã nguồn</strong>: <a href="https://github.com/longphanmn/flatland">https://github.com/longphanmn/flatland</a></p>
+<p>&gt; <strong>Phát triển bởi <a href="/cdn-cgi/l/email-protection#92fefdfcf5d2fffbfcfafcfaf3fcbcfbfc">Long Phan</a></strong> (<a href="/cdn-cgi/l/email-protection#f29e9d9c95b29f9b9c9a9c9a939cdc9b9c"><span class="__cf_email__" data-cfemail="88e4e7e6efc8e5e1e6e0e6e0e9e6a6e1e6">[email&#160;protected]</span></a> · Bản demo: <a href="../">/demo/</a>)</p>
+<p>&gt; Xây dựng và hoàn thiện bằng <strong>OpenCode</strong> &amp; <strong>Antigravity</strong> · Phát triển từ ý niệm nền tảng trong danh tác <em><strong>Flatland: A Romance of Many Dimensions</strong></em> (1884) của <strong>Edwin A. Abbott</strong>.</p>
+<p>Flatland là một thế giới mô phỏng sự sống nhân tạo 2D tự hành, vận dụng sáng tạo các tiền đề toán học và không gian từ tác phẩm kinh điển <em>Flatland</em> (Xứ Phẳng) xuất bản năm 1884 của Edwin A. Abbott.</p>
+<h3 id="tri-t-l-thi-t-k">Triết lý thiết kế</h3>
+<p>Dự án được <strong>phát triển từ ý niệm cốt lõi của Xứ Phẳng chứ không sao chép máy móc từng câu chữ trong tiểu thuyết</strong>. Hệ thống tiếp thu các tiên đề hình học của Abbott — mặt phẳng 2D, trật tự xã hội dựa trên số đỉnh, tầm nhìn trong sương mù và góc quan sát từ chiều không gian cao hơn — để kiến tạo một <strong>hệ sinh thái sự sống nhân tạo tự sinh, tự thích nghi và phát triển hữu cơ theo thời gian</strong>.</p>
+<h3 id="ki-n-tr-c-c-c-h-th-ng-c-t-l-i">Kiến trúc &amp; Các hệ thống cốt lõi</h3>
+<ul>
+<li><strong>Khối Cầu (Đấng Sáng Tạo)</strong>: Khối Cầu (The Sphere) ban hành <strong>thiên luật tự nhiên</strong> (sức tải môi trường, tốc độ mọc cây, trao đổi chất, dịch bệnh, thời tiết) từ Spaceland, hoàn toàn không can thiệp thô bạo vào số mệnh cá thể. Người dùng có thể điều chỉnh qua <strong>🎯 Thiết lập mẫu</strong> và 6 <strong>⚖️ Lĩnh vực Vĩ mô</strong> bằng thanh trượt trực quan. Sinh vật định hướng liên tục qua 16 cảm biến tia quét và mạng nơ-ron Micro-RNN.</li>
+<li><strong>Sinh thái thực vật &amp; Dinh dưỡng chức năng</strong>: 6 loài thực vật chuyên biệt (<code>cỏ</code>, <code>lúa mì</code>, <code>quả mọng</code>, <code>thảo dược</code>, <code>nấm</code>, <code>cây độc</code>) với mật độ calo riêng biệt, đồng hồ phân hủy, dược tính trị bệnh và hành vi tự tìm kiếm thức ăn theo nhu cầu sinh tồn.</li>
+<li><strong>Trí tuệ nhân tạo &amp; Xã hội thị tộc</strong>: AI thỏa dụng đa mục tiêu đánh giá sinh tồn, nghĩa vụ và gắn kết huyết thống; bản đồ tinh thần ghi nhớ địa hình; đội hình phalanx của binh sĩ, chiến thuật thả diều linh hoạt của nữ giới (đoạn thẳng), kết bạn đồng hành dựa trên tin cậy, phân công lao động thị tộc, các thể chế (Quân chủ, Thần quyền, Quân phiệt, Cộng hòa), sắc lệnh thích ứng (phát chẩn mùa đông, thiết quân luật), cớ tuyên chiến (Casus Belli), đoàn buôn liên tộc và đại yến mùa thu mừng vụ mùa.</li>
+<li><strong>Tiến hóa tự hành &amp; Bản sắc văn hóa</strong>: 6 hình mẫu tính cách di truyền (<code>dũng cảm</code>, <code>thận trọng</code>, <code>vị tha</code>, <code>tư lợi</code>, <code>khai phá</code>, <code>xây dựng</code>), công cụ chế tác (giáo, túi cói, thuốc đắp, vương miện thủ lĩnh), 4 kỹ năng tinh thông (Nông canh 🌾, Chiến đấu ⚔️, Hái lượm 🦴, Y thuật 🌿), tước hiệu động, truyền dạy tri thức trong nhà ở và hiển thị suy nghĩ trực quan.</li>
+<li><strong>Năng lượng &amp; Trao đổi chất thực tế</strong>: Con non tiêu hao ít năng lượng ($0.45\times$), thể lực sụt giảm khi tác chiến, và thói quen dự trữ thức ăn trong túi cói.</li>
+<li><strong>Ấp định cư &amp; Bang giao</strong>: Nhà tường kín có cửa ra vào vừa vặn kích thước cơ thể, lãnh thổ thị tộc đa công trình, kho lương chung, khối liên minh phòng thủ, nộp cống và phân liệt ly khai khi bất mãn.</li>
+<li><strong>Vật lý hình học &amp; Đột biến hình thái (K∈[3,24])</strong>: Bộ gen cực $(r_i,\phi_i)$ $K\in[3,24]$ (<code>KMAX 24</code>, <code>morphology_engine.py</code>) với đặc tính thể chất tích hợp ($A,P,I_{zz},\theta_{\min},asym,D_{mult}$) và va chạm đa giác SAT; cơ chế ủ nhiệt $\lambda(g)$ dung hòa giữa chuẩn mực Abbott cổ điển và tiến hóa tự do, ghép đôi nơ-ron, cùng mạng lưới bảo hộ chống tuyệt diệt ($\eta(N)$, Phép Miracle Khai Thế Cấp 1/2/3).</li>
+<li><strong>Gương Phản chiếu Bộ gen Tiến hóa</strong> <span id="genome-mirror"></span>: Trực quan hóa kiểu hình sinh động nơi thân thể, vành nhật hoa và ánh sáng phát quang phản chiếu trực tiếp bộ gen sống, độ sâu thế hệ (Gen 0 → 2000+) và đột biến thể chất qua hàng thiên niên kỷ.</li>
+<li><strong>Đồng bộ hóa thời gian thực</strong>: Vòng lặp mô phỏng xác định truyền phát trạng thái thế giới qua WebSocket (<code>/ws</code>) ở tốc độ ~30–60 FPS kết hợp lưu trữ biên niên sử bền vững trên SQLite.</li>
+</ul></section>
+<hr/>
+<section id="book-comparison" class="wiki-section"><h1 id="x-ph-ng-i-chi-u-ti-u-thuy-t-abbott-b-n-m-ph-ng">Xứ Phẳng: Đối Chiếu Tiểu Thuyết Abbott &amp; Bản Mô Phỏng</h1>
+<p>Khảo cứu đối chiếu giữa danh tác châm biếm kinh điển năm 1884 của *<em>Edwin A. Abbott — </em>Flatland: A Romance of Many Dimensions*** và hệ sinh thái mô phỏng sự sống nhân tạo tự hành.</p>
+<p>---</p>
+<h2 id="1-giai-t-ng-h-nh-h-c-tr-t-t-x-h-i">1. Giai tầng, Hình học &amp; Trật tự Xã hội</h2>
+<p>| Khía cạnh | Tiểu thuyết của Abbott (<em>Flatland</em>, 1884) | Bản Mô Phỏng (<em>Flatland Simulator</em>) |</p>
+<p>| :--- | :--- | :--- |</p>
+<p>| <strong>Nguyên lý giai tầng</strong> | <em>&quot;Hình thù làm nên địa vị.&quot;</em> Thứ bậc xã hội được ấn định nghiêm ngặt bởi số lượng cạnh và độ đều của các góc. | Các cá thể kế thừa giai tầng hình học chính xác dựa trên số đỉnh (đa giác N cạnh) và tính đều đặn. |</p>
+<p>| <strong>Phụ nữ (Đoạn thẳng)</strong> | Là các đoạn thẳng không có độ dày góc. Do gần như vô hình khi nhìn trực diện và sắc bén như dao cạo, họ buộc phải liên tục cất tiếng ngâm nga hòa bình và đi lối cửa phụ. | Hiển thị dưới dạng đoạn thẳng 1D (<code>shape: &#x27;line&#x27;</code>). Cực kỳ linh hoạt, có tập tính di chuyển và nhu cầu trú ẩn đặc thù. |</p>
+<p>| <strong>Binh lính &amp; Tiền đạo</strong> | Tam giác cân với góc đỉnh rất nhọn hoắt (hung hãn, hiếu chiến, mầm mống bạo loạn). | <strong>Binh sĩ</strong> (<code>#ff7b72</code>): Chiến binh sắc bén với sát thương cao, kỷ luật tác chiến và tuần tra bảo vệ biên giới. |</p>
+<p>| <strong>Thợ thủ công &amp; Trung lưu</strong> | Tam giác đều (3 cạnh bằng nhau) — tầng lớp lao động và buôn bán ổn định, đáng kính. | <strong>Nghệ nhân</strong> (3–4 cạnh, <code>#f2cc60</code>): Nông dân, thợ hái lượm và thợ xây phụ trách thu hoạch mùa màng, chăm sóc vựa lương và sửa chữa nhà cửa. |</p>
+<p>| <strong>Thân sĩ &amp; Quý tộc</strong> | Hình vuông (4 cạnh) và Ngũ giác (5 cạnh) — tầng lớp quản lý hành chính và học giả. | <strong>Thân sĩ</strong> (4 cạnh, <code>#ffa657</code>) &amp; <strong>Học giả</strong> (5 cạnh, <code>#d2a8ff</code>): Đảm nhiệm vai trò quản lý và điều hành cộng đồng. |</p>
+<p>| <strong>Giới Quý tộc thượng lưu</strong> | Lục giác (6 cạnh) và các đa giác bậc cao — giới quý tộc và nhà lập pháp. | <strong>Quý tộc</strong> (6–8 cạnh, <code>#79c0ff</code>): Có tiếng nói xã hội lớn và vị thế ưu tiên trong gia phả dòng tộc. |</p>
+<p>| <strong>Tế tư (Hình tròn)</strong> | Đa giác có vô số cạnh (≥ 24 đến hàng trăm) đến mức các đỉnh tạo thành đường tròn trơn láng. Nắm giữ luật pháp và đức tin. | <strong>Tế tư</strong> (≥ 24 cạnh, <code>#e6edf3</code>): Tỏa ánh hào quang chữa lành vết thương, xua tan mầm bệnh cho đồng tộc và miễn nhiễm dịch tễ. |</p>
+<p>---</p>
+<h2 id="2-nh-lu-t-t-nhi-n-s-th-ng-ti-n-d-ng-t-c">2. &quot;Định luật Tự nhiên&quot; &amp; Sự Thăng tiến Dòng tộc</h2>
+<ul>
+<li><strong>Trong Tiểu thuyết</strong>:</li>
+<p>  - Abbott xây dựng <strong>&quot;Định luật Thăng tiến&quot;</strong>: Con trai của đa giác đều hầu như luôn thừa hưởng <strong>nhiều hơn cha mình một cạnh</strong> (ví dụ: Hình Vuông sinh ra Ngũ Giác, rồi sinh ra Lục Giác), nâng tầm dòng dõi hướng tới sự hoàn hảo tròn trịa của Tế tư qua nhiều đời.</p>
+<p>  - Những cá thể <strong>&quot;Dị dạng&quot;</strong> (các cạnh/góc bất thường) bị coi là mối họa cho xã hội và bị cách ly hoặc xử tử.</p>
+<li><strong>Trong Ứng dụng Mô phỏng</strong>:</li>
+<p>  - <strong>Tiến hóa thế hệ</strong>: Thế hệ con kế thừa các đặc tính từ cha mẹ với xác suất tăng thêm cạnh (<code>sides += 1</code>), mô phỏng chân thực sự thăng tiến dần dần qua các thời kỳ lịch sử.</p>
+<p>  - <strong>Dị tật &amp; Giáng cấp</strong>: Sinh vật phát triển dị tật gen sẽ bị theo dõi độ dị hình, bị giáng cấp và có biểu tượng nhận diện trực quan riêng.</p>
+<p>  - <strong>Gia phả dòng họ</strong>: Cây phả hệ lưu giữ chi tiết cha, mẹ và dòng dõi qua hàng trăm ngày lịch sử thế giới.</p>
+</ul>
+<p>---</p>
+<h2 id="3-nh-n-bi-t-th-gi-c-th-i-ti-t-c-m-nh-n-s-ng-m">3. Nhận biết Thị giác, Thời tiết &amp; Cảm nhận Sương mù</h2>
+<ul>
+<li><strong>Trong Tiểu thuyết</strong>:</li>
+<p>  - Trong thế giới 2 chiều phẳng, mọi cư dân nhìn ngang đều chỉ là những đoạn dẹt!</p>
+<p>  - Ở <strong>Miền Nam Sương mù</strong>, cư dân dùng <strong>&quot;Nhận biết bằng mắt&quot;</strong> — phán đoán góc và khoảng cách của một đa giác qua tốc độ mờ dần của các cạnh trong sương mù.</p>
+<p>  - Ở <strong>Miền Bắc Trong trẻo</strong>, họ phải dựa vào <strong>&quot;Sờ soạng&quot;</strong> (chạm vào các đỉnh bằng đầu ngón tay).</p>
+<li><strong>Trong Ứng dụng Mô phỏng</strong>:</li>
+<p>  - <strong>Động cơ thời tiết động</strong>: Tái hiện 4 trạng thái <strong>Quang đãng</strong>, <strong>Sương mù</strong>, <strong>Mưa</strong> và <strong>Giông bão</strong>.</p>
+<p>  - <strong>Tầm nhìn khí quyển</strong>: Sương mù và giông bão trực tiếp thu hẹp bán kính quan sát, buộc sinh vật phải dựa vào tiếng hú báo động và cảm biến khoảng cách gần.</p>
+<p>  - <strong>Ngày &amp; Đêm</strong>: Cường độ chiếu sáng thay đổi tự nhiên qua bình minh, giữa trưa, hoàng hôn và đêm tối mịt mùng, thúc đẩy sinh vật tìm đường về nhà trú ẩn.</p>
+</ul>
+<p>---</p>
+<h2 id="4-nh-khu-nh-c-ki-n-tr-c-l-nh-th">4. Nhà ở, Khu định cư &amp; Kiến trúc Lãnh thổ</h2>
+<ul>
+<li><strong>Trong Tiểu thuyết</strong>:</li>
+<p>  - Nhà ở bắt buộc phải có hình ngũ giác hoặc lục giác với cửa riêng: cửa nhỏ phía sau cho phụ nữ (đoạn thẳng) và cửa chính cho nam giới đa giác.</p>
+<li><strong>Trong Ứng dụng Mô phỏng</strong>:</li>
+<p>  - <strong>Kinh tế định cư</strong>: Nhà cửa là cấu trúc vật lý 2D với ranh giới bên trong, cửa ra vào có hướng (<code>bắc</code>, <code>đông</code>, <code>nam</code>, <code>tây</code>) và số chỗ ngủ giới hạn.</p>
+<p>  - <strong>Bản doanh duy nhất</strong>: Mỗi thị tộc sở hữu đúng <strong>một Nhà Chính / Bản doanh</strong> (nơi ở của Thủ lĩnh) cùng các chòi trú ẩn vệ tinh bao quanh.</p>
+<p>  - <strong>Nhu cầu trú ẩn</strong>: Sinh vật tìm về nhà để ngủ khi màn đêm buông xuống, tránh rét buốt mùa đông, hồi phục sinh lực và nuôi dưỡng con non.</p>
+<p>  - <strong>Điều hướng qua cửa</strong>: Sinh vật tính toán điểm đứng chờ thông minh để di chuyển mượt mà qua khe cửa khi trời tối và tỏa ra tìm thức ăn khi bình minh, không bị kẹt vào vách tường.</p>
+</ul>
+<p>---</p>
+<h2 id="5-bang-giao-th-t-c-ng-x-h-i-t-h-nh">5. Bang giao Thị tộc, Đồ đằng &amp; Xã hội Tự hành</h2>
+<p>Khác với mô hình chính quyền tập quyền thời Victoria trong sách, ứng dụng triển khai <strong>mô phỏng xã hội tiến hóa tự sinh</strong>:</p>
+<ul>
+<li><strong>Đồ đằng Thần thánh</strong>: Mỗi thị tộc tôn sùng một trong 8 Đồ đằng thiêng của Khối Cầu (⭕ Sung Túc, ⚡ Nộ Thần, 👁️ Toàn Tri, 🛡️ Trường Tồn, 🌿 Tái Sinh, ⚖️ Cân Bằng, 🌀 Huyền Bí, 🕯️ Bếp Ấm), định hình thiên hướng nghề nghiệp và sự chuyên môn hóa giữa các chiến binh, nông dân và thợ hái lượm.</li>
+<li><strong>Bang giao, Cống nạp &amp; Chiến tranh</strong>: Quan hệ thị tộc diễn tiến linh hoạt với hòa ước đình chiến, liên minh tương trợ, cống nạp bảo hộ và nguy cơ phân liệt nội bộ.</li>
+<li><strong>Tính cách độc lập</strong>: Các hình mẫu tính cách (Dũng cảm, Thận trọng, Vị tha, Tư lợi, Khai phá, Xây dựng) mang túi cói cá nhân, công cụ (giáo, thuốc đắp, vương miện) và phản xạ tự cứu mình khi nguy cấp.</li>
+</ul>
+<p>---</p>
+<h2 id="6-chi-u-kh-ng-gian-cao-h-n-ng-i-d-ng-trong-vai-kh-i-c-u">6. Chiều Không Gian Cao Hơn: Người Dùng Trong Vai &quot;Khối Cầu&quot;</h2>
+<p>Mối liên kết sâu sắc nhất giữa ứng dụng và tiểu thuyết chính là <strong>vai trò của người quan sát</strong>:</p>
+<ul>
+<li>Trong tiểu thuyết, nhân vật chính <strong>A Square (Hình Vuông)</strong> được viếng thăm bởi <strong>Khối Cầu (A Sphere)</strong> đến từ <em>Không Gian 3D (Spaceland)</em>, người có thể nhìn từ trục Z xuống, thấy được bên trong các căn phòng kín, nhìn thấu tâm can và thao túng mặt phẳng 2D như một Đấng Sáng Tạo toàn năng.</li>
+<li><strong>Trong Ứng dụng của chúng ta</strong>:</li>
+<p>  - <strong>Bạn chính là Khối Cầu (Chúa)</strong>: Khi nhìn vào màn hình, bạn đang quan sát Xứ Phẳng từ chiều không gian thứ ba.</p>
+<p>  - <strong>Bảng Khối Cầu</strong>: Bạn nắm giữ quyền năng tối thượng để ban bố &quot;Thiên luật Tự nhiên&quot; theo thời gian thực — tạo ra nạn đói, điều chỉnh sinh trưởng thức ăn, phát tán hoặc chữa lành dịch bệnh, mang mùa đông buốt giá đến hoặc ban phước lành thịnh vượng cho các thị tộc.</p>
+</ul></section>
+<hr/>
+<section id="quickstart" class="wiki-section"><h1 id="c-u-h-nh-v-n-h-nh">Cấu hình &amp; Vận hành</h1>
+<h2 id="bi-n-m-i-tr-ng-flatworld">Biến môi trường (<code>FLATWORLD_*</code>)</h2>
+<p>| Biến môi trường | Mặc định | Ý nghĩa &amp; Mô tả |</p>
+<p>|---|---|---|</p>
+<p>| <code>FLATWORLD_WIDTH</code> | <code>400</code> | Chiều rộng không gian thế giới (đơn vị lưới) |</p>
+<p>| <code>FLATWORLD_HEIGHT</code> | <code>300</code> | Chiều cao không gian thế giới |</p>
+<p>| <code>FLATWORLD_BOUNDARY</code> | <code>wrap</code> | Biên giới vô hạn hình xuyến (<code>wrap</code>) hoặc tường chặn (<code>clamp</code>) |</p>
+<p>| <code>FLATWORLD_SEED</code> | <code>42</code> | Hạt giống ngẫu nhiên khởi tạo thế giới |</p>
+<p>| <code>FLATWORLD_TICK_RATE</code> | <code>10</code> | Số tick tính toán mô phỏng mỗi giây |</p>
+<p>| <code>FLATWORLD_DB</code> | <code>backend/flatworld.db</code> | Đường dẫn tệp cơ sở dữ liệu SQLite |</p>
+<p>| <code>FLATWORLD_GOD_KEY</code> | — | Khóa mật mã Thượng đế thiết lập lúc khởi động |</p>
+<h2 id="kh-a-m-t-m-th-ng-god-passkey">Khóa mật mã Thượng đế (God Passkey)</h2>
+<p>Các thao tác <code>POST /api/laws</code>, <code>POST /api/presets/{name}</code>, <code>POST /api/control</code> và thông điệp điều khiển qua WebSocket yêu cầu quyền Thượng đế (thông qua header <code>X-God-Key</code> hoặc trường <code>key</code> trên socket). Nếu hệ thống chưa có mật mã, API sẽ trả về lỗi <code>409 Conflict</code> và giao diện web sẽ yêu cầu khởi tạo (<code>POST /api/auth/setup</code>). Nếu quên mật mã, có thể đặt lại trực tiếp trên máy chủ bằng lệnh: <code>cd backend &amp;&amp; uv run python -m app.godkey reset &lt;mật_mã_mới&gt;</code>. Giao diện TUI có thể nhận mật mã qua lệnh: <code>./run.sh tui ws://host/ws &lt;passkey&gt;</code> hoặc biến môi trường <code>FLATWORLD_GOD_KEY</code>. Hệ thống chỉ lưu trữ chuỗi băm bảo mật PBKDF2.</p>
+<h2 id="c-ch-l-u-tr-d-li-u-b-n-v-ng-db-py-20">Cơ chế lưu trữ dữ liệu bền vững (<code>db.py:20</code>)</h2>
+<p>Cơ sở dữ liệu SQLite <code>flatworld.db</code> chạy ở chế độ ghi nhật ký trước WAL (Write-Ahead Logging) và khóa luồng an toàn. Các bảng dữ liệu chính:</p>
+<ul>
+<li><code>worlds</code>: Thông tin các thế giới (mã số, seed, kích thước, thời điểm bắt đầu/kết thúc).</li>
+<li><code>events</code>: Biên niên sử biến cố thế giới (sinh, tử, thăng hạng, chiến tranh, dịch bệnh).</li>
+<li><code>law_changes</code>: Nhật ký thay đổi các định luật của Thượng đế theo tick.</li>
+<li><code>creatures</code>: Gia phả dòng dõi sinh vật (cha mẹ, thế hệ, thời điểm sinh/tử).</li>
+<li><code>snapshots</code>: Các bản sao lưu trạng thái thế giới để khôi phục khi khởi động lại.</li>
+</ul>
+<h2 id="ki-n-tr-c-lu-ng-ng-c-simengine">Kiến trúc luồng &amp; Động cơ SimEngine</h2>
+<p>Lõi mô phỏng được <strong>thiết kế tất định tuyệt đối</strong>: một luồng số ngẫu nhiên duy nhất, một thứ tự thực thi tick cố định. Chạy uvicorn với <strong>1 worker duy nhất</strong>. Với kiến trúc <code>SimEngine</code> (<code>main.py:446</code>), việc tính toán mô phỏng diễn ra trên một luồng OS nền chuyên trách độc lập với vòng lặp sự kiện asyncio. Bước tiến thế giới diễn ra dưới khóa <code>RT.lock</code> trong khi việc mã hóa JSON snapshot diễn ra bên ngoài khóa (<code>advance_world_lockless</code>), giúp các yêu cầu HTTP REST luôn phản hồi tức thì mà không bị nghẽn. Các điểm cuối vận hành &amp; chẩn đoán quan trọng:</p>
+<ul>
+<li><code>GET /healthz</code> — Kiểm tra sức khỏe máy chủ, TPS thời gian thực, dung lượng RAM, thời gian chạy và số client kết nối.</li>
+<li><code>GET /api/perf/telemetry</code> — Vòng đo lường hiệu năng: thời gian tick, thời gian giữ khóa và độ trễ phát sóng.</li>
+<li><code>GET /api/analytics/summary</code> — Tổng hợp dữ liệu vĩ mô nhân khẩu học, sinh khối và chuỗi thức ăn.</li>
+</ul></section>
+<hr/>
+<section id="how-the-world-works" class="wiki-section"><h1 id="nguy-n-l-v-n-h-nh-th-gi-i">Nguyên lý vận hành thế giới</h1>
+<p><strong>The Sphere (Thượng đế ba chiều):</strong> The Sphere thiết lập các <em>định luật tự nhiên</em> từ Spaceland, tuyệt đối không can thiệp vào số phận của từng sinh vật riêng lẻ. Mọi hành vi và trật tự đều tự vận hành phát sinh.</p>
+<h2 id="v-ng-l-p-tick-t-t-nh">Vòng lặp tick tất định</h2>
+<p><code>s = Simulation(Config(seed))</code> → <code>s.step()</code> hoàn toàn tất định (mỗi thế giới dùng đúng một luồng số ngẫu nhiên <code>random.Random</code>). Cùng một seed ban đầu sẽ luôn tạo ra cùng một diễn biến lịch sử. Thứ tự thực thi mỗi tick (<code>backend/app/simulation/core.py</code> <code>Simulation.step()</code>): thời tiết → cây cối sinh trưởng → cập nhật lưới không gian → sinh vật hành động → bệnh dịch lây lan → chiến tranh giao tranh → sinh sản → quan hệ ngoại giao → luật cân bằng thức ăn → xác chết phân hủy → khu định cư → tăng tick+=1. Quá trình tính toán chạy trên một luồng hệ điều hành riêng biệt (<code>SimEngine</code>) với cơ chế tuần tự hóa không khóa (lockless), truyền phát trạng thái qua WebSocket <code>state</code> mỗi tick.</p>
+<h2 id="v-ng-i-c-c-giai-o-n-a">Vòng đời &amp; Các giai đoạn (§A)</h2>
+<p>Tuổi thọ tính theo tick + đẳng cấp (từ Phụ nữ 4.800 tick đến Tu sĩ 9.000 tick). Phân chia giai đoạn theo tỷ lệ <code>tuổi/tuổi thọ</code>: Sơ sinh (&lt;15%), Vị thành niên (&lt;30%), Trưởng thành (&lt;75%), Lão niên (≥75%). Tuổi tác ảnh hưởng đến tốc độ di chuyển và tầm nhìn (sơ sinh 0.6×, lão niên 0.85×) cũng như khả năng sinh sản (lão niên giảm 50%). Nguyên nhân tử vong gồm: <code>starvation</code> (chết đói), <code>old_age</code> (già yếu), <code>euthanasia</code> (thanh lọc dị hình), và <code>disease</code> (bệnh tật).</p>
+<h2 id="c-ch-sinh-l-c-c-t-l-i-at-4-h-0">Cơ chế sinh lực cốt lõi (§AT-4 H-0)</h2>
+<p>Máu (HP) là một nguồn tài nguyên biến động, không phải hằng số cố định. Để tự hồi phục vết thương, sinh vật bắt buộc phải có năng lượng dồi dào: khi năng lượng dưới 40% <code>energy_max</code> (<code>HEALTH_REGEN_MIN_ENERGY</code>), mọi vết thương sẽ ngừng khép miệng dù đang thức hay ngủ; nghỉ ngơi trong nhà hồi máu theo tỷ lệ <code>0.15×rest_recovery_mult</code>, còn hồi phục tự nhiên khi thức là <code>0.1/tick</code> (cộng thêm giáp phòng thủ từ avatar Indomitable Monolith). Khi năng lượng tụt dưới 20%, cơ thể tự thiêu đốt sinh lực: giảm <code>−0.05</code> HP/tick (<code>HEALTH_SELF_DRAIN_*</code>) dẫn tới chết vì kiệt sức. Sinh lực suy yếu làm chậm từng bước chân (<code>HEALTH_SPEED_TIERS</code>): HP &lt;80 tốc độ ×0.95, &lt;60 ×0.85, &lt;40 ×0.70, &lt;20 ×0.50. Cơ thể đau ốm không thể phối ngẫu: sinh sản yêu cầu <code>health ≥ REPRO_MIN_HEALTH</code> (50 HP), do đó dịch bệnh sẽ ức chế tỷ lệ sinh mà không cần can thiệp vào định luật sinh sản.</p>
+<h2 id="a-d-ng-s-t-th-ng-kinh-t-tr-li-u-at-4-h-1">Đa dạng sát thương &amp; Kinh tế trị liệu (§AT-4 H-1)</h2>
+<p>Đói kinh niên tàn phá cơ thể: dưới 20% năng lượng quá 30 tick sẽ rút <code>0.08</code> HP/tick (nguyên nhân tử vong <code>exhaustion</code>). Tuổi già bào mòn: sinh vật già mất thụ động <code>0.02</code> HP/tick. Bệnh tật làm mờ mắt (HP &lt;60 giảm tầm nhìn 10%, &lt;30 giảm 25%) và làm cùn khả năng thu hoạch (giảm 20% sản lượng khi HP &lt;60, giảm 50% khi &lt;30). Sinh vật bị thương nặng (&lt;30 HP) không bao giờ chủ động gây hấn quyết đấu. Đòn đánh lớn (&gt;15 sát thương) để lại vết thương sâu kéo dài 50–100 tick làm giảm tốc độ và giảm một nửa khả năng hồi máu. Vị trí đứng quyết định tốc độ bình phục: ngoài trời chỉ đạt 50% tốc độ hồi phục so với 80% khi ở trong nhà và 100% khi ngủ say. Thức ăn có tác dụng dược lý: quả mọng hồi +0.3 HP/tick trong 20 tick, ngũ cốc +0.2 HP trong 30 tick, thảo dược +0.8 HP trong 40 tick — sinh vật bị thương sẽ chủ động tìm thảo dược kể cả khi no bụng.</p>
+<h2 id="ti-n-v-t-l-t-nhi-n-aq-ph-0">Tiên đề vật lý tự nhiên (§AQ PH-0)</h2>
+<p>Năng lượng là đơn vị tiền tệ phổ quát của Flatland. Ánh sáng mặt trời là nguồn thu nhập năng lượng duy nhất: hàm <code>_sun_factor()</code> tuân theo chu kỳ ngày đêm — bằng 0 vào ban đêm và đạt đỉnh vào buổi trưa — kiểm soát tốc độ lớn của cây và gieo hạt, nên không loài cây nào có thể lớn tự do trong bóng tối. Mỗi hình dạng cơ thể trả phí tiêu hao theo độ phức tạp hình học (<code>METABOLIC_COST</code>): tam giác 1.0×, tứ giác 1.1×, ngũ giác 1.2×, lục giác/quý tộc 1.3×, phụ nữ và tu sĩ 1.5× (tu sĩ tiêu tốn năng lượng để duy trì hào quang). Chữa lành vết thương là quá trình chuyển hóa: mỗi điểm HP phục hồi tiêu tốn 0.5 điểm năng lượng.</p>
+<h2 id="nhi-t-ng-l-c-h-c-th-n-nhi-t-aq-ph-1">Nhiệt động lực học &amp; Thân nhiệt (§AQ PH-1)</h2>
+<p>Bản đồ nhiệt độ không gian chia thành các ô 25 đơn vị (<code>_update_temperature</code>) dao động theo mùa (Xuân 12°C / Hạ 24°C / Thu 8°C / Đông −4°C) tạo ra các luồng gió lạnh từ phía Tây và gió ấm từ phía Đông, cộng thêm biên độ ngày đêm (±5°C), thời tiết (mưa −2°C, bão −3°C) và ngọn lửa (+60°C trong bán kính 8 đơn vị). Mỗi sinh vật mang thân nhiệt riêng (<code>body_temp</code>) cân bằng dần theo môi trường. Đứng trong nhà vật liệu rơm, gỗ, đá giúp cách nhiệt về mức dễ chịu 18°C. Quá nhiệt trên 36°C làm mất máu dẫn đến tử vong do say nắng (<code>hyperthermia</code>); lạnh cóng dưới 2°C gây hạ thân nhiệt.</p>
+<h2 id="gi-kh-quy-n-aq-ph-2">Gió &amp; Khí quyển (§AQ PH-2)</h2>
+<p>Bầu trời mang một vector gió (<code>wind_angle</code>/<code>wind_speed</code>) thay đổi theo thời tiết: lặng gió 0.25, mưa 0.55, bão tố 1.0 và đổi hướng theo mùa. Ngọn lửa tuân theo chiều gió: cả xác suất bén lửa và tốc độ cháy lan nhân với hướng xuôi gió, khiến đám cháy lan nhanh về phía cuối gió.</p>
+<h2 id="di-truy-n-quy-lu-t-ng-c-p-b">Di truyền &amp; Quy luật đẳng cấp (§B)</h2>
+<p>Giới tính: đa giác là giống đực, đoạn thẳng một chiều là giống cái. Con trai thừa kế số cạnh từ cha: <code>số cạnh = cha + 1</code>, giới hạn tối đa 24 cạnh (Trở thành Tu sĩ hình tròn). Con gái luôn là đoạn thẳng. Đột biến cạnh gây ra độ bất đối xứng (<code>irregularity</code> từ 0.3 đến 1.0). Tam giác cân có góc đỉnh tăng dần 0.5° mỗi thế hệ; khi đạt ≥60° trở thành tam giác đều và thăng hạng từ Binh lính lên Thợ thủ công. Động cơ hình thái (<code>morphology_engine</code>) dùng hệ tọa độ cực $(r_i,\phi_i)$ để nội suy hình thái chuyển tiếp qua các thế hệ.</p>
+<h2 id="ng-c-h-nh-th-i-h-nh-h-c-c-c-k-3-24">Động cơ hình thái &amp; Hình học cực (K∈[3,24])</h2>
+<p>Bộ gen cực $K\in[3,24]$ lưu trữ cấu trúc SoA gồm bán kính, góc, diện tích, chu vi, mômen quán tính $I_{zz}$, góc nhỏ nhất $\theta_{\min}$ và hệ số bất đối xứng $asym$. Tự động điều chỉnh dung lượng năng lượng, lực đẩy và tính sát thương va chạm. Có cơ chế cứu rỗi (<code>safeguard_morph_mercy</code>) tạm hoãn thanh lọc dị hình khi dân số suy kiệt.</p>
+<h2 id="bi-n-ni-n-s-l-ch-s-th-gi-i-ai-k-chuy-n-bm">Biên niên sử, Lịch sử Thế giới &amp; AI Kể chuyện (§BM)</h2>
+<p>Flatland trang bị hệ thống phân tích biên niên sử đa thời kỳ và trợ lý viết truyện AI toàn diện:</p>
+<ul>
+<li><strong>Khoảnh khắc Then chốt &amp; Nhảy mốc thời gian</strong>: 5 ngày biến động lớn nhất (thương vong, thôn tính, ly khai) hiển thị dạng chip nhảy nhanh trên bảng biên niên. Cho phép gõ số tick để nhảy tức thì đến thời khắc lịch sử.</li>
+<li><strong>Thanh Kỷ nguyên &amp; Đồ thị Dân số</strong>: Điều hướng dòng thời gian với các kỷ nguyên màu sắc (Khởi nguyên, Thời bộ lạc, Kỷ phong kiến, Cực thịnh, Suy vong) cùng biểu đồ dân số đánh dấu khủng hoảng chiến tranh và dịch bệnh.</li>
+<li><strong>Bảng Kỷ lục &amp; Huyền thoại</strong>: Vinh danh Bộ tộc hiếu chiến nhất, Ngày đẫm máu nhất, Đế chế đông dân nhất, Kiến trúc sư Thần thánh dựng nhiều đền nhất, Đại biến ly khai và các cá thể Anh hùng / Kẻ phản nghịch tiêu biểu.</li>
+<li><strong>Phân tích Lịch sử</strong>: Ma trận Nhiệt Thù địch giữa các bộ tộc, Biểu đồ Nguyên nhân Tử vong theo kỷ nguyên 10 ngày và Chỉ số Đức tin theo dòng thời gian.</li>
+<li><strong>Trình Viết truyện AI Tích hợp</strong>: Trực tiếp tạo truyện dạng tiểu thuyết hoặc biên niên sử bằng Gemini 1.5 Flash hoặc OpenAI GPT-4o-mini với khóa API lưu riêng tại trình duyệt người dùng. Hỗ trợ 4 phong cách văn phong (Sử thi, Biên niên, Thần thoại, Bi kịch) bằng cả 3 ngôn ngữ EN, VI, FR.</li>
+<li><strong>Liên kết Sâu &amp; Thẻ Chia sẻ</strong>: Hỗ trợ đường dẫn <code>?history=42</code> để mở trực tiếp ngày thứ 42 hoặc <code>?clan=7</code> để mở tiểu sử bộ tộc #7, cùng nút tải ảnh thẻ xã hội chuẩn 1200×630 PNG.</li>
+</ul>
+<h2 id="ph-n-c-p-ng-c-p-d-h-nh-c">Phân cấp đẳng cấp &amp; Dị hình (§C)</h2>
+<p>Đến tuổi trưởng thành, nếu mức độ bất đối xứng vượt ngưỡng (<code>euthanasia_threshold</code>), sinh vật sẽ bị xã hội đào thải tiêu hủy; nếu nhẹ hơn sẽ bị giáng cấp làm Binh lính thường. Bảng <code>CASTE_TRAITS</code> quy định tuổi thọ, tốc độ, tầm nhìn và độ màu mỡ của từng đẳng cấp.</p>
+<h2 id="d-ch-b-nh-l-y-nhi-m-d">Dịch bệnh &amp; Lây nhiễm (§D)</h2>
+<p>Dịch bệnh tự phát theo tỷ lệ quy định, lây lan trong bán kính tiếp xúc (mùa đông lây nhanh hơn 1.5×), rút cạn năng lượng và trừ máu theo độc lực bệnh. Sinh vật có thể dần bình phục nhờ sức đề kháng tự nhiên hoặc ăn thảo dược.</p>
+<h2 id="m-i-tr-ng-kh-h-u-e">Môi trường &amp; Khí hậu (§E)</h2>
+<p>Thời gian tính theo chu kỳ ngày đêm và 4 mùa trong năm. Ban đêm và sương mù làm giảm tầm nhìn đáng kể. Mùa màng ảnh hưởng trực tiếp đến hệ số thức ăn: Mùa xuân (1.0× thức ăn, +25% sinh sản), Mùa hè (1.2×), Mùa thu (1.0×), Mùa đông (0.5× thức ăn, +50% nguy cơ dịch bệnh). Thời tiết thay đổi ngẫu nhiên giữa Trời quang, Mưa rào, Sương mù và Bão tố.</p>
+<h2 id="b-t-c-tr-t-t-x-h-i-c-i-p-v">Bộ tộc &amp; Trật tự xã hội (§C/I/P/V)</h2>
+<p>Mỗi ngôi nhà vững chắc khởi nguồn cho một bộ tộc do sinh vật gần tâm nhà nhất làm thủ lĩnh. Con cái mang mã bộ tộc của mẹ. Bộ tộc tôn thờ một trong 8 Linh vật Thần thánh (Vòng tròn Rạng rỡ, Sấm sét Thiên giới, Con mắt Thấu thị, Cự thạch Kiên cường, Vòng xoắn Thần thánh, Bàn cân Vũ trụ, Vết rách Chiều không gian, Ngọn lửa Vĩnh cửu) mang lại bùa chú riêng. Các tộc nhân đóng góp đức tin để thỉnh cầu phép màu mùa màng hoặc xây dựng Đền thờ thiêng liêng.</p>
+<h2 id="kinh-t-th-c-ph-m-h-sinh-th-i-h-n-o">Kinh tế thực phẩm &amp; Hệ sinh thái (§H/N/O)</h2>
+<p>Cây cối phát triển từ mầm non đến trưởng thành và phát tán hạt giống trong bán kính xung quanh. Sinh vật chết để lại xác thịt có thể ăn được hoặc phân hủy nuôi dưỡng đất đai. Hệ thực vật đa dạng gồm 6 loài: Cỏ thông thường, Hạt ngũ cốc, Quả mọng tăng tốc, Thảo dược hồi máu, Nấm hoại sinh và Cây có độc. Thú ăn cỏ hoang dã tự do sinh sôi và là mục tiêu săn mồi của các loài ăn thịt.</p>
+<h2 id="giao-ti-p-tri-th-c-b-y-n-q-x">Giao tiếp &amp; Tri thức bầy đàn (§Q/X)</h2>
+<p>Sinh vật phát tín hiệu gọi ăn hoặc cảnh báo nguy hiểm cho đồng loại. Kinh nghiệm sống (điểm kiếm ăn, mối nguy hiểm, nơi an toàn, kẻ thù) được lưu giữ trong trí nhớ và truyền dạy cho nhau khi trò chuyện. Khi một cá thể bị tấn công, tiếng kêu cứu sẽ triệu tập các chiến binh gần đó đến ứng cứu.</p>
+<h2 id="ch-nh-tr-bang-giao-ab">Chính trị &amp; Bang giao (§AB)</h2>
+<p>Các bộ tộc thân thiện có thể ký hiệp ước liên minh phòng thủ chung, chia sẻ kho lương thực, hoặc thu cống nạp từ các tộc yếu thế hơn. Thủ lĩnh dũng cảm sẽ tuyên chiến với kẻ thù truyền kiếp, trong khi thủ lĩnh ôn hòa sẽ tìm kiếm hiệp ước hòa bình khi thế lực suy giảm.</p>
+<h2 id="n-th-t-ng-lo-i-khi-tuy-t-v-ng-ac">Ăn thịt đồng loại khi tuyệt vọng (§AC)</h2>
+<p>Khi nạn đói đỉnh điểm khiến năng lượng chạm đáy tuyệt vọng, sinh vật bị ép phải tấn công và ăn thịt các sinh vật yếu thế hoặc kẻ thù để sinh tồn. Kẻ ăn thịt đồng tộc sẽ bị xã hội ruồng bỏ, trở thành kẻ lưu đày và tạo nên mối thù truyền kiếp.</p>
+<h2 id="c-y-h-o-t-n-t-nhi-n-lu-n-h-i-ae">Cây héo tàn &amp; Tự nhiên luân hồi (§AE)</h2>
+<p>Cây cối trưởng thành sau một khoảng thời gian sẽ già cỗi và héo úa, giải phóng chất dinh dưỡng cho đất đai xung quanh trước khi biến mất, nhường chỗ cho các mầm sống mới nảy nở.</p>
+<h2 id="nh-n-i-tr-n-nh-c-l-n">Nhà ở &amp; Nơi trú ẩn định cư (§L/N)</h2>
+<p>Nhà cửa bằng gỗ, rơm hoặc đá che chắn mưa bão và cái lạnh ban đêm. Cửa nhà được thiết kế vừa vặn cho cư dân nhưng quá hẹp đối với các dã thú ăn thịt hung dữ, tạo thành nơi trú ẩn an toàn tuyệt đối.</p>
+<h2 id="ti-n-h-a-t-ch-c-ng-c-ag">Tiến hóa tự chủ &amp; Công cụ (§AG)</h2>
+<p>Sinh vật sở hữu các thiên hướng tính cách bẩm sinh (<code>dũng cảm</code>, <code>thận trọng</code>, <code>vị tha</code>, <code>tham lam</code>, <code>thám hiểm</code>, <code>xây dựng</code>). Tự động chế tạo và mang theo công cụ: Giáo chiến đấu, Giỏ đựng thức ăn, Túi thảo dược và Vương miện thủ lĩnh. Rèn luyện 4 kỹ năng chính: Canh tác, Chiến đấu, Kiếm ăn và Trị liệu.</p>
+<h2 id="trao-i-ch-t-th-l-c-chi-n-u-ah">Trao đổi chất &amp; Thể lực chiến đấu (§AH)</h2>
+<p>Nhu cầu năng lượng thay đổi theo giai đoạn phát triển: trẻ nhỏ tiêu thụ ít hơn 55%, thiếu niên ít hơn 25%. Va chạm chiến trận làm tiêu hao thể lực; kiệt sức sẽ khiến đòn đánh giảm 30% hiệu lực sát thương.</p>
+<h2 id="tr-tu-b-y-n-utility-ai-al">Trí tuệ bầy đàn Utility AI (§AL)</h2>
+<p>Hệ thống trí tuệ nhân tạo đa mục tiêu tính toán điểm số sinh tồn, nghĩa vụ đẳng cấp và tín hiệu đồng loại. Sinh vật lập bản đồ tư duy với các tọa độ nhà, vùng thức ăn và điểm tuần tra; phối hợp tác chiến theo đội hình chiến thuật kỷ luật.</p>
+<h2 id="a-d-ng-sinh-h-c-d-c-t-nh-am">Đa dạng sinh học &amp; Dược tính (§AM)</h2>
+<p>Hạt vàng cung cấp nguồn năng lượng no lâu; Quả mọng ban tặng sự dẻo dai bứt tốc; Thảo dược giải độc và làm lành vết thương; Nấm phân hủy phát triển tươi tốt quanh xác chết và mùa đông giá rét.</p>
+<h2 id="giao-di-n-d-ng-l-nh-tui-ai">Giao diện dòng lệnh TUI (§AI)</h2>
+<p>Bộ điều khiển giao diện terminal đầy đủ gắn trực tiếp vào thế giới đang chạy, hỗ trợ bám sát góc nhìn sinh vật, lọc biên niên sử sự kiện và điều chỉnh luật chơi trực tiếp.</p>
+<h2 id="m-ng-n-ron-h-i-quy-elman-ng-c-ti-n-h-a-ba">Mạng nơ-ron hồi quy Elman &amp; Động cơ tiến hóa (BA)</h2>
+<p>Mỗi sinh vật mang một mạng nơ-ron Elman RNN thu nhỏ (16 đầu vào cảm biến → 12 nơ-ron ẩn → 7 đầu ra vận động với 295 trọng số <code>float32</code>). Vận hành song song ở tần số 15 Hz, tiếp nhận thông tin thị giác raycast, âm thanh, mùi hương và trạng thái nội tại để tự học cách sinh tồn và truyền lại bộ gen ưu việt cho đời sau.</p></section>
+<hr/>
+<section id="sustainability" class="wiki-section"><h1 id="t-nh-b-n-v-ng-c-n-b-ng-sinh-th-i-a-th-h">Tính bền vững — Cân bằng sinh thái Đa thế hệ</h1>
+<p>Thế giới tự động duy trì sự cân bằng qua hàng trăm ngày và tạo điều kiện cho các thị tộc hưng thịnh truyền đời dưới trạng thái cân bằng sinh thái và xã hội hoàn chỉnh.</p>
+<h2 id="c-c-thi-t-l-p-m-u-tuy-n-ch-n-presets">Các thiết lập mẫu tuyển chọn (Presets)</h2>
+<ul>
+<li><strong>balance</strong> ⚖️ (Mặc định) — Trạng thái cân bằng vàng cho <strong>200–350 cư dân</strong> với 380 thức ăn, sức tải 400 (tối đa 500), chiến tranh vừa độ, chuỗi săn mồi cân bằng, nông nghiệp bài bản, tự hãm mật độ ($\xi$), cơ chế bảo hộ tuyệt chủng ($\eta$) và các thị tộc đa thế hệ phát triển phồn vinh.</li>
+<li><strong>sustainable</strong> 🌿 — Nghìn ngày thái bình: thức ăn dồi dào (550), sức tải 550 (tối đa 600), vựa thóc trù phú, lễ hội mùa gặt, đại yến và hãm mật độ êm dịu.</li>
+<li><strong>theocracy</strong> 🔮 — Thời đại Khối Cầu: tôn sùng các Đồ đằng thiêng liêng, đại đền rực sáng, thần tích hiển linh, đốn ngộ 3 chiều, công đồng tôn giáo và dâng nộp đức tin.</li>
+<li><strong>warlords</strong> ⚔️ — Quần hùng tranh bá: chinh phạt đế chế, cướp bóc kho lương, chiếm đoạt nhà cửa, thôn tính lãnh thổ và thiết lập khối liên minh phòng thủ.</li>
+<li><strong>chaos</strong> 🔥 — Thú săn hung dữ bủa vây, huyết chiến đẫm máu, cháy rừng, động đất, dịch bệnh liên miên và thời tiết biến đổi khôn lường.</li>
+<li><strong>extinction</strong> 💀 — Nạn đói cùng cực (120 thức ăn), mùa đông giá buốt (0.30×), phơi sương gió kiệt quệ, thử thách sức chống chịu của xã hội trước bờ vực diệt vong.</li>
+<li><strong>boom</strong> 🚀 — Đại thịnh vượng: sinh sản bùng nổ, 440 thức ăn, sức tải 800 (tối đa 850) phục vụ thử nghiệm các siêu đô thị sầm uất.</li>
+</ul>
+<p>Sử dụng: <code>curl -X POST localhost:8000/api/presets/balance?reset=true</code> hoặc chọn trực tiếp trên Bảng Khối Cầu.</p>
+<h2 id="c-n-b-ng-n-i-m-i-ng-c-ch-ph-ng-ch-ng-di-t-vong">Cân bằng nội môi động &amp; Cơ chế phòng chống diệt vong</h2>
+<p>Flatland tích hợp hai cơ chế phản hồi khép kín tự động nhằm đảm bảo trật tự dài hạn:</p>
+<h3 id="1-c-ch-h-m-m-m-ph-thu-c-m-t-qu-t-i-xi">1. Cơ chế hãm mềm phụ thuộc mật độ quá tải ($\xi$)</h3>
+<p>Khi dân số $N$ vượt quá sức tải môi trường $K_{cap}$, tỷ lệ vượt ngưỡng $\xi = (N - K_{cap}) / K_{cap}$ đóng vai trò như chiếc phanh phi tuyến tính:</p>
+<ul>
+<li><strong>Kìm hãm sinh sản</strong>: $R_{birth} = R_0 / (1 + \text{damping\_steepness} \cdot \xi^2)$</li>
+<li><strong>Áp lực trao đổi chất do chật chội</strong>: $M_{decay} = M_0 \cdot (1 + \text{crowding\_stress\_mult} \cdot \xi)$</li>
+<li><strong>Căng thẳng tài nguyên</strong>: Tốc độ sinh trưởng và phát tán hạt giống chậm lại tương ứng với mức độ bão hòa sinh thái.</li>
+</ul>
+<h3 id="2-c-ch-c-u-tr-di-t-vong-ph-p-m-u-khai-th-eta">2. Cơ chế cứu trợ diệt vong &amp; Phép Màu Khai Thế ($\eta$)</h3>
+<p>Khi dân số sụt giảm xuống dưới ngưỡng an toàn $K_{safe} = K_{cap} \times \text{safeguard\_relief\_ratio}$, các cấp độ cứu trợ khẩn cấp sẽ kích hoạt:</p>
+<ul>
+<li><strong>Cấp 1 ($\eta \le 0.5$)</strong>: Cứu tế nạn đói, giảm mức tiêu hao năng lượng trao đổi chất tới 40%, đẩy nhanh cây lớn lên tới 60%.</li>
+<li><strong>Cấp 2 ($\eta &gt; 0.5$)</strong>: Cứu trợ nguy cấp, giảm một nửa thời gian chờ sinh sản, đình chỉ việc an tử cá thể dị tật (<code>safeguard_morph_mercy</code>).</li>
+<li><strong>Cấp 3 ($N \le K_{crit}$)</strong>: Khối Cầu can thiệp bằng Phép Màu Khai Thế (Genesis Miracle), tạo ra <code>safeguard_genesis_batch</code> sinh vật hình học hoàn hảo để cứu vãn sự diệt vong của thế giới.</li>
+</ul></section>
+<hr/>
+<section id="performance" class="wiki-section"><h1 id="hi-u-n-ng-quy-m-h-n-1000-th-c-th-60-fps">Hiệu năng &amp; Quy mô — Hơn 1000 thực thể @ 60 FPS</h1>
+<ul>
+<li><strong>Bảng băm không gian Zero-Allocation</strong>: Mảng 1 chiều cấp phát sẵn trong <code>world.py</code> loại bỏ việc tạo bộ tuple và băm lại từ điển mỗi nhịp; hàm <code>query_radius</code> sử dụng so sánh khoảng cách bình phương thoát sớm không cần gọi <code>math.hypot</code>.</li>
+<li><strong>Tìm bạn tình siêu tốc</strong>: Truy vấn đối tác tiềm năng lân cận qua chỉ mục không gian trong thời gian $O(1)$ thay vì quét lặp lồng nhau $O(N^2)$.</li>
+<li><strong>Bộ nhớ đệm ảnh chụp (Snapshot Caching)</strong>: Địa hình tĩnh và công trình được nạp sẵn vào bộ nhớ đệm, loại bỏ việc sao chép danh sách cấu trúc thừa thãi trong mỗi khung hình truyền phát.</li>
+<li><strong>Vẽ gộp nhóm Canvas 2D (Batched Canvas 2D)</strong>: Gom nhóm các lượt vẽ theo giai tầng, biến thể cây và nhà ở với phép biến đổi lượng giác nội dòng, loại bỏ hoàn toàn chi phí <code>ctx.save()</code> / <code>ctx.restore()</code> cho từng cá thể (lệnh vẽ giảm từ hơn 20.000 xuống còn ~30-50).</li>
+<li><strong>Mức độ chi tiết động (Dynamic LOD)</strong>: Hiển thị phụ thuộc tỷ lệ thu phóng, tự động lược bỏ văn bản danh tính và gợn sóng khi nhìn xa, bảo toàn độ mượt mà 60 FPS ngay cả khi dân số dày đặc.</li>
+<li><strong>Tách biệt trạng thái React</strong>: Ảnh chụp trạng thái mô phỏng tần số cao truyền thẳng vào tham chiếu biến đổi (mutable refs) ở tốc độ 60 FPS cho Canvas, trong khi giao diện React (thống kê HUD, đồ thị) được điều tiết ở tần số ~6 Hz giúp trình duyệt nhẹ nhàng và phản hồi tức thì.</li>
+</ul></section>
+<hr/>
+<section id="codebase-map" class="wiki-section"><h1 id="b-n-m-ngu-n">Bản đồ mã nguồn</h1>
+<h2 id="c-u-tr-c-backend-backend-app">Cấu trúc Backend (<code>backend/app/</code>)</h2>
+<ul>
+<li><code>config.py:13</code> — Dataclass <code>Config</code>: Hình học thế giới, mật độ sinh vật, thức ăn, xác chết, hành vi bầy đàn, sinh sản, dịch bệnh, môi trường, nhà ở, địa hình, xã hội và biên niên sử. Tự động đọc cấu hình từ biến môi trường qua <code>from_env()</code>.</li>
+<li><code>entities.py:1</code> — Định nghĩa các thực thể cốt lõi: <code>CasteTraits</code>, <code>CASTE_TRAITS</code>, <code>YIELD_RANK</code>, <code>caste_name()</code>, <code>Creature</code> (hình dạng, số cạnh, đẳng cấp, tuổi tác, máu, trạng thái nhiễm bệnh, bang phái, ngủ...), <code>Food</code> (độ chín sinh trưởng), <code>Corpse</code> (xác chết phân hủy), <code>House</code> (nhà ở, cửa ra vào, quyền sở hữu).</li>
+<li><code>world.py:32</code> — Lớp đăng ký thực thể <code>World</code> tích hợp lưới băm không gian đồng nhất (<code>cell_size</code>, <code>rebuild_index</code>), tính toán khoảng cách bao quanh hình xuyến và truy vấn bán kính <code>query_radius</code>.</li>
+<li><code>simulation/</code> — Gói động cơ mô phỏng mô-đun hóa (§BI):</li>
+<p>  - <code>core.py</code> — Lớp điều phối <code>Simulation</code>, vòng lặp tick tất định, đồng bộ khe SoA và làm mới bộ nhớ đệm.</p>
+<p>  - <code>creature_update.py</code> — Vòng lặp hành vi sinh vật 7 giai đoạn phân rã (<code>_creature_movement</code>, <code>_creature_feeding</code>, v.v.).</p>
+<p>  - <code>settlement.py</code> — Kinh tế nhà ở, xây dựng, tuyên bố chủ quyền, chiếm nhà và va chạm tường.</p>
+<p>  - <code>lifecycle.py</code> — Khởi tạo dân số, sinh sản, sinh tử, danh hiệu kỹ năng và lây lan dịch bệnh.</p>
+<p>  - <code>ecology.py</code> — Vòng đời thực vật, nông nghiệp, yến tiệc, phân hủy xác chết và tái tạo dinh dưỡng.</p>
+<p>  - <code>theology.py</code> — Quỹ đức tin, 8 Avatar Linh thiêng, đền thờ, phép màu, công đồng và hiển linh.</p>
+<p>  - <code>society.py</code> — Bang tộc, ngoại giao, chiến tranh, liên minh, kho lương, đoàn buôn và ăn thịt đồng loại.</p>
+<p>  - <code>serialization.py</code> — Đóng gói dữ liệu snapshot và delta truyền qua mạng.</p>
+<p>  - <code>environment.py</code> — Máy trạng thái thời tiết, gió, lưới nhiệt độ, độ cao và cháy rừng.</p>
+<p>  - <code>constants.py</code> — Hằng số bảng tra cứu, hệ số nhân và quy tắc đặt tên.</p>
+<li><code>agent_soa.py</code> — Mảng cấu trúc SoA vector hóa tối ưu bộ nhớ đệm CPU cho hàng ngàn sinh vật.</li>
+<li><code>agent_pipeline.py</code> — Xử lý cảm biến raycast và vật lý chuyển động vector hóa hàng loạt.</li>
+<li><code>neural_engine.py</code> — Mạng nơ-ron hồi quy Elman RNN (16→12→7, 295 trọng số) suy luận trực tiếp.</li>
+<li><code>morphology_engine.py</code> — Động cơ hình thái cực, va chạm SAT đa giác và thuộc tính thể chất.</li>
+<li><code>evolution_manager.py</code> — Quản lý ủ nhiệt hình thái λ(g), khuôn mẫu Abbott K3..64 và lai ghép cực.</li>
+<li><code>spatial_grid.py</code> — Lưới không gian vector hóa phục vụ truy vấn lân cận nhanh chóng.</li>
+<li><code>analytics.py</code> — Vòng telemetry, chỉ số vĩ mô, nhân khẩu học và đa dạng sinh học.</li>
+<li><code>safeguard_engine.py</code> — Cơ chế bảo vệ khỏi tuyệt chủng và Phép màu Khởi nguyên.</li>
+<li><code>density_damping.py</code> — Hãm mềm phụ thuộc mật độ (ξ).</li>
+<li><code>auth.py:1</code> — Cơ chế xác thực FastAPI dependency bảo vệ quyền Thượng đế thông qua chuỗi băm PBKDF2 (<code>X-God-Key</code>).</li>
+<li><code>protocol.py:7</code> — Định nghĩa lược đồ dữ liệu mạng Pydantic: <code>ControlAction</code>, <code>ControlMessage</code>, <code>EntityState</code>, <code>StateMessage</code>, <code>HistoryEvent</code>, <code>HelloMessage</code>, <code>GodLaws</code>.</li>
+<li><code>db.py:1</code> — Lớp bọc SQLite3 <code>Database</code> tối ưu với nhật ký WAL, khóa luồng và bộ đệm ghi nền cho các sự kiện sinh, tử, chiến tranh và snapshot.</li>
+<li><code>main.py:1</code> — Điểm khởi đầu FastAPI <code>app</code>, luồng động cơ riêng <code>SimEngine</code>, bộ phát sóng WebSocket <code>Hub</code>, các tuyến API REST và tài liệu <code>/wiki</code>.</li>
+</ul>
+<h2 id="c-u-tr-c-frontend-frontend-src">Cấu trúc Frontend (<code>frontend/src/</code>)</h2>
+<ul>
+<li><code>App.tsx</code> — Bố cục ứng dụng chính, thanh HUD thông số, đồng bộ WebSocket và bảng điều khiển đa năng.</li>
+<li><code>analytics/</code> — Đài thiên văn &amp; Động cơ phân tích vĩ mô (Observatory):</li>
+<p>  - <code>Observatory.tsx</code> — Khung hiển thị toàn màn hình các bảng phân tích vĩ mô theo thẻ.</p>
+<p>  - <code>MacroOverview.tsx</code> — Biểu đồ sparkline nhân khẩu học, sinh lực, sinh khối và tốc độ.</p>
+<p>  - <code>SociologyTab.tsx</code> — Bá quyền bang tộc, đoàn buôn liên bộ tộc, chiến tranh và kế vị.</p>
+<p>  - <code>EcologyTab.tsx</code> — Đa dạng thực vật, độ màu mỡ đất và tháp sinh thái.</p>
+<p>  - <code>CrisisTab.tsx</code> — Lây lan dịch bệnh, cảnh báo nạn đói và nhật ký thiên tai.</p>
+<p>  - <code>MutationLab.tsx</code> — Cây phát sinh hình thái học và biểu đồ phân tán không gian hình thái 2D.</p>
+<p>  - <code>MetricCard.tsx</code> / <code>Sparkline.tsx</code> — Khung hiển thị thẻ chỉ số và biểu đồ đường nhẹ SVG.</p>
+<li><code>render/CanvasRenderer.tsx</code> — Bộ hiển thị HTML5 Canvas đồ họa 60 FPS hiệu năng cao với vẽ hàng loạt (batching).</li>
+<li><code>render/ClanPanel.tsx</code> — Bảng hiển thị thông tin bang phái trực tiếp, cây totem linh vật và chiến tích lịch sử.</li>
+<li><code>render/ChronicleFeed.tsx</code> — Dòng sự kiện biên niên sử thời gian thực có bộ lọc thông minh.</li>
+<li><code>render/PlotsPanel.tsx</code> — Biểu đồ sparkline theo dõi dân số, tỷ lệ đẳng cấp và chuỗi thức ăn sinh thái.</li>
+<li><code>clan/ClanDetails.tsx</code> — Hồ sơ chi tiết bang tộc, nơi cư ngụ của thủ lĩnh và thống kê thương vong.</li>
+<li><code>history/WorldHistoryModal.tsx</code> — Nhật ký tóm tắt từng ngày, các cuộc đại chiến và tính năng xuất truyện AI Story.</li>
+<li><code>god/GodPanel.tsx</code> — Bảng điều khiển định luật tự nhiên tương tác với 7 cấu hình mẫu tuyển chọn.</li>
+<li><code>god/auth.tsx</code> — Hộp thoại xác thực mật mã Thượng đế và hàm gọi API bảo mật <code>godFetch</code>.</li>
+<li><code>inspect/Inspector.tsx</code> — Bảng hồ sơ cá nhân sinh vật, radar hình thái cực, chỉ số sinh tồn và cây gia phả.</li>
+<li><code>wiki/Wiki.tsx</code> — Bách khoa toàn thư tích hợp sẵn trong ứng dụng và công cụ thử nghiệm API.</li>
+<li><code>types.ts</code> — Định nghĩa kiểu TypeScript ánh xạ chính xác lược đồ giao thức backend.</li>
+<li><code>websocket.ts</code> — Trình khách WebSocket tự động kết nối lại khi gián đoạn mạng.</li>
+</ul>
+<h2 id="lu-ng-d-li-u-h-th-ng">Luồng dữ liệu hệ thống</h2>
+<p><code>SimEngine</code> (luồng riêng) → <code>sim.step()</code> → <code>sim.snapshot()</code> (tuần tự hóa không khóa) → <code>HUB.broadcast</code> → <code>ws</code> → <code>CanvasRenderer</code> + Trạng thái React <code>App</code>. Phía người dùng gửi <code>ControlMessage</code> → <code>apply_control</code> → Cập nhật cấu hình mô phỏng → Lưu nhật ký luật vào DB. Biến cố thế giới → <code>DB.add_events</code> + Lưu hồ sơ gia phả.</p></section>
+<hr/>
+<section id="data-model-protocol" class="wiki-section"><h1 id="m-h-nh-d-li-u-giao-th-c-m-ng">Mô hình dữ liệu &amp; Giao thức mạng</h1>
+<h2 id="c-c-th-c-th-trong-b-nh-in-memory-entities">Các thực thể trong bộ nhớ (In-memory Entities)</h2>
+<ul>
+<li><code>Creature</code> (<code>entities.py:95</code>): <code>id</code>, tọa độ <code>x</code>, <code>y</code>, góc quay <code>angle</code>, hình dáng <code>shape</code> (đa giác <code>polygon</code> hoặc đoạn thẳng <code>line</code>), số cạnh <code>sides</code>, đẳng cấp <code>caste</code>, bán kính <code>radius</code>, số tuổi <code>age</code>, tuổi thọ <code>lifespan</code>, giai đoạn <code>stage</code> (sơ sinh <code>infant</code>, thiếu niên <code>juvenile</code>, trưởng thành <code>adult</code>, lão niên <code>elder</code>), độ bất đối xứng <code>irregularity</code>, sinh lực <code>health</code> (0–100), nhiễm bệnh <code>infected</code>, giới tính <code>sex</code>, <code>mother_id</code>/<code>father_id</code>, mã bang tộc <code>clan_id</code>/màu cờ <code>clan_color</code>, đang ngủ <code>sleeping</code>/trong nhà <code>indoors</code>, thế hệ <code>generation</code>, thời điểm sinh <code>born_tick</code>, năng lượng <code>energy</code>, trạng thái đói <code>status</code>, số bữa ăn <code>meals</code>.</li>
+<li><code>Food</code> (<code>entities.py:158</code>): Vị trí <code>x</code>, <code>y</code>, độ chín sinh trưởng <code>growth</code> từ 0.15 đến 1.0.</li>
+<li><code>Corpse</code> (<code>entities.py:170</code>): Vị trí <code>x</code>, <code>y</code>, thời gian phân hủy còn lại <code>ttl</code>, lượng năng lượng cung cấp <code>energy</code>.</li>
+<li><code>House</code> (<code>entities.py:184</code>): Vị trí <code>x</code>, <code>y</code>, kích thước nhà <code>size</code>, độ rộng cửa <code>door_width</code>, cạnh đặt cửa <code>door_side</code>, bang tộc sở hữu <code>clan_id</code>/<code>clan_color</code>, dấu hiệu phế tích <code>is_ruin</code>, số tick bị bỏ hoang <code>abandoned_ticks</code>, thời điểm bị chiếm đoạt <code>takeover_tick</code>.</li>
+<li>Địa hình bản đồ (Terrain): Các khu đất màu mỡ <code>fertile: [{x,y,r}]</code> và các mỏ đá cản trở <code>rocks: [{x,y,r}]</code> được đóng gói trong snapshot.</li>
+</ul>
+<h2 id="c-u-tr-c-d-li-u-m-ng-truy-n-t-i-protocol-py">Cấu trúc dữ liệu mạng truyền tải (<code>protocol.py</code>)</h2>
+<ul>
+<li><code>EntityState</code> (<code>protocol.py:27</code>): <code>id</code>, loại thực thể <code>kind</code> (<code>creature</code> | <code>food</code> | <code>house</code> | <code>corpse</code>), tọa độ <code>x</code>/<code>y</code>, hướng quay <code>angle</code>, kèm các trường trạng thái sinh học bổ trợ.</li>
+<li><code>StateMessage</code> (<code>protocol.py:62</code>): Thông điệp trạng thái toàn thế giới gửi mỗi tick gồm: số tick <code>tick</code>, hạt giống <code>seed</code>, kích thước bản đồ <code>width</code>/<code>height</code>/<code>boundary</code>, tổng dân số <code>population</code>, danh sách thực thể <code>entities</code>, thông tin bang phái <code>clans</code>, số sinh vật sống/chết và nguyên nhân tử vong, số ca nhiễm bệnh, thời điểm trong ngày/ngày/mùa/thời tiết, địa hình, ma trận quan hệ ngoại giao, danh sách biến cố mới phát sinh, kèm khung dữ liệu <code>analytics</code> định kỳ 1 Hz phục vụ Đài thiên văn.</li>
+<li><code>HistoryEvent</code> (<code>protocol.py:86</code>): Bản ghi sự kiện lịch sử gồm: loại sự kiện <code>type</code> (tử vong, sinh nở, thăng hạng, giáng cấp, bùng dịch, bình phục, cây nở hoa, liên minh, thù địch, săn mồi, tuyên chiến, phế tích, lập ấp), số tick xảy ra, mã thực thể liên quan, đẳng cấp, nguyên nhân, tọa độ và gói dữ liệu bổ trợ <code>payload</code>.</li>
+<li><code>HelloMessage</code> (<code>protocol.py:99</code>): Thông điệp chào ban đầu khi kết nối WebSocket thành công: hạt giống <code>seed</code>, tốc độ tick <code>tick_rate</code>, giới hạn thế giới <code>width</code>/<code>height</code>/<code>boundary</code>.</li>
+<li><code>ControlMessage</code> (<code>protocol.py:22</code>): Lệnh điều khiển gửi từ giao diện web lên máy chủ: hành động <code>action</code> (<code>pause</code> tạm dừng, <code>resume</code> tiếp tục, <code>step</code> chạy một bước, <code>reset</code> làm mới thế giới, <code>set_speed</code> chỉnh tốc độ) kèm giá trị số <code>value</code>.</li>
+</ul>
+<h2 id="giao-th-c-ng-b-websocket">Giao thức đồng bộ WebSocket</h2>
+<p>Máy chủ gửi về trình duyệt: Gửi <code>{&quot;type&quot;:&quot;hello&quot;, ...}</code> ngay khi kết nối, sau đó liên tục phát sóng <code>{&quot;type&quot;:&quot;state&quot;, ...}</code> theo tần số tick (kèm gói <code>analytics</code> 1 Hz cho Đài thiên văn). Trình duyệt gửi lên máy chủ: Gửi gói tin điều khiển <code>{&quot;action&quot;:&quot;pause&quot;|&quot;resume&quot;|&quot;step&quot;|&quot;reset&quot;|&quot;set_speed&quot;, &quot;value&quot;:...}</code>.</p></section>
+<hr/>
+<section id="god-laws" class="wiki-section"><h1 id="thi-n-lu-t-c-a-kh-i-c-u-the-sphere">Thiên luật của Khối Cầu (The Sphere)</h1>
+<p>Toàn bộ định luật trong <code>GodLaws</code> (<code>protocol.py:108</code>) kèm kiểu dữ liệu, phạm vi và giá trị mặc định. Thay đổi qua <code>POST /api/laws</code> hoặc chọn thiết lập mẫu.</p><div class="table-wrapper"><table><thead><tr><th>Định luật</th><th>Kiểu</th><th>Khoảng</th><th>Mặc định</th><th>Gợi ý & tài liệu</th></tr></thead><tbody><tr><td><code>boundary</code></td><td>typing.typing.Literal&#x27;wrap&#x27;, &#x27;clamp&#x27;</td><td>—</td><td>wrap</td><td><small style="color:var(--text-muted)">Quy tắc ranh giới thế giới: &#x27;wrap&#x27; (vòng xuyến vô tận) vs &#x27;clamp&#x27; (tường chắn vật lý).</small> <a href="../docs/god-laws.md#boundary" style="font-size:10px">md</a></td></tr><tr><td><code>food_count</code></td><td>typing.int</td><td>≥0, ≤2000</td><td>210</td><td><small style="color:var(--text-muted)">Lượng cây thức ăn / lương thực thế giới duy trì liên tục (mùa hè ×1.2, mùa đông ×0.5).</small> <a href="../docs/god-laws.md#food_count" style="font-size:10px">md</a></td></tr><tr><td><code>energy_max</code></td><td>typing.float</td><td>&gt;1, ≤10000</td><td>100.0</td><td><small style="color:var(--text-muted)">Mức năng lượng tối đa một cá thể có thể tích lũy (10–500).</small> <a href="../docs/god-laws.md#energy_max" style="font-size:10px">md</a></td></tr><tr><td><code>energy_decay_per_tick</code></td><td>typing.float</td><td>≥0, ≤2</td><td>0.025</td><td><small style="color:var(--text-muted)">Tiêu hao năng lượng trao đổi chất cơ bản mỗi nhịp khi nhịn đói (0.025).</small> <a href="../docs/god-laws.md#energy_decay_per_tick" style="font-size:10px">md</a></td></tr><tr><td><code>energy_from_food</code></td><td>typing.float</td><td>≥0, ≤1000</td><td>32.0</td><td><small style="color:var(--text-muted)">Năng lượng thu được khi thu hoạch cây chín (quả mọng 48, cỏ 32, nấm 24, cây độc 8).</small> <a href="../docs/god-laws.md#energy_from_food" style="font-size:10px">md</a></td></tr><tr><td><code>plant_variants_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Công tắc chính bật tính đa dạng với 6 loài thực vật chuyên biệt.</small> <a href="../docs/god-laws.md#plant_variants_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>plant_growth_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.05</td><td><small style="color:var(--text-muted)">Tốc độ cây non sinh trưởng thành cây có thể thu hoạch (0.045).</small> <a href="../docs/god-laws.md#plant_growth_rate" style="font-size:10px">md</a></td></tr><tr><td><code>plant_spread_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.006</td><td><small style="color:var(--text-muted)">Xác suất mỗi nhịp cây chín phát tán hạt giống sang ô đất màu mỡ lân cận (0.006).</small> <a href="../docs/god-laws.md#plant_spread_rate" style="font-size:10px">md</a></td></tr><tr><td><code>nutrient_cycle_rate</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.65</td><td><small style="color:var(--text-muted)">Gia tốc mọc cây quanh xác thực thể phân hủy (0.65) — cái chết bồi đắp cho sự sống.</small> <a href="../docs/god-laws.md#nutrient_cycle_rate" style="font-size:10px">md</a></td></tr><tr><td><code>poison_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.01</td><td><small style="color:var(--text-muted)">Xác suất chồi non mọc ra là cây có độc (-30 sinh lực khi ăn phải).</small> <a href="../docs/god-laws.md#poison_rate" style="font-size:10px">md</a></td></tr><tr><td><code>food_decay_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Phân hủy xác thực vật già cỗi bồi bổ dưỡng chất cho đất.</small> <a href="../docs/god-laws.md#food_decay_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>food_lifespan_ticks</code></td><td>typing.int</td><td>≥100, ≤1000000</td><td>9000</td><td><small style="color:var(--text-muted)">Thời gian tồn tại của cây trưởng thành trước khi tự rũ bỏ thân xác vào đất (8000 nhịp).</small> <a href="../docs/god-laws.md#food_lifespan_ticks" style="font-size:10px">md</a></td></tr><tr><td><code>agriculture_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Khai phá nông canh, luống cày xới (lớn nhanh 2×, sản lượng 2.5×), rãnh tưới và làm cỏ.</small> <a href="../docs/god-laws.md#agriculture_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>granaries_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Dựng vựa thóc lớn tại làng để tích trữ lương thực vượt qua mùa đông.</small> <a href="../docs/god-laws.md#granaries_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>granary_capacity</code></td><td>typing.float</td><td>≥0, ≤100000</td><td>400.0</td><td><small style="color:var(--text-muted)">Dung tích tối đa của vựa lương (400) — mở đại yến khi đầy ≥80%.</small> <a href="../docs/god-laws.md#granary_capacity" style="font-size:10px">md</a></td></tr><tr><td><code>perceive_radius</code></td><td>typing.float</td><td>&gt;0.5, ≤60</td><td>20.0</td><td><small style="color:var(--text-muted)">Bán kính quan sát chuẩn (16) — biến đổi theo giai tầng (Nữ giới 0.8×, Tế tư 1.35×), đêm tối (0.6×) và sương mù (0.6×).</small> <a href="../docs/god-laws.md#perceive_radius" style="font-size:10px">md</a></td></tr><tr><td><code>eat_radius</code></td><td>typing.float</td><td>&gt;0.1, ≤10</td><td>1.4</td><td><small style="color:var(--text-muted)">Khoảng cách tiếp xúc vật lý tối thiểu để ăn thức ăn, rỉa xác hoặc bắt mồi (1.4).</small> <a href="../docs/god-laws.md#eat_radius" style="font-size:10px">md</a></td></tr><tr><td><code>hungry_ratio</code></td><td>typing.float</td><td>&gt;0, ≤1</td><td>0.35</td><td><small style="color:var(--text-muted)">Ngưỡng đói (≤35%) đưa tín hiệu vào mạng nơ-ron để thôi thúc tìm kiếm thức ăn.</small> <a href="../docs/god-laws.md#hungry_ratio" style="font-size:10px">md</a></td></tr><tr><td><code>starving_ratio</code></td><td>typing.float</td><td>&gt;0, ≤1</td><td>0.15</td><td><small style="color:var(--text-muted)">Ngưỡng đói lả nguy kịch (≤15%) kích hoạt nước rút sinh tồn và phát tín hiệu báo nguy.</small> <a href="../docs/god-laws.md#starving_ratio" style="font-size:10px">md</a></td></tr><tr><td><code>steer_turn</code></td><td>typing.float</td><td>≥0, ≤3.2</td><td>0.45</td><td><small style="color:var(--text-muted)">Góc quay đầu tối đa mỗi nhịp, tính toán theo quán tính hình thể của sinh vật.</small> <a href="../docs/god-laws.md#steer_turn" style="font-size:10px">md</a></td></tr><tr><td><code>birth_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Công tắc chính cho phép giao phối, sinh sản và kế thừa dòng dõi.</small> <a href="../docs/god-laws.md#birth_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>lifespan_mult</code></td><td>typing.float</td><td>≥0.01, ≤100</td><td>1.0</td><td><small style="color:var(--text-muted)">Hệ số nhân thọ mệnh cho mọi giai tầng (Nữ giới: 4.800 nhịp → Tế tư: 9.000 nhịp).</small> <a href="../docs/god-laws.md#lifespan_mult" style="font-size:10px">md</a></td></tr><tr><td><code>adult_age</code></td><td>typing.float</td><td>≥0, ≤100000</td><td>600.0</td><td><small style="color:var(--text-muted)">Số nhịp cần thiết để con non trưởng thành và có thể sinh sản (220).</small> <a href="../docs/god-laws.md#adult_age" style="font-size:10px">md</a></td></tr><tr><td><code>birth_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.05</td><td><small style="color:var(--text-muted)">Tỷ lệ thụ thai cơ bản của mỗi cặp đôi trưởng thành đủ no mỗi nhịp (0.28).</small> <a href="../docs/god-laws.md#birth_rate" style="font-size:10px">md</a></td></tr><tr><td><code>carrying_capacity</code></td><td>typing.int</td><td>≥-1, ≤10000</td><td>-1</td><td><small style="color:var(--text-muted)">Ngưỡng sức tải môi trường: vượt ngưỡng này tỷ lệ sinh sẽ suy giảm (-1 = tự động).</small> <a href="../docs/god-laws.md#carrying_capacity" style="font-size:10px">md</a></td></tr><tr><td><code>max_population</code></td><td>typing.int</td><td>≥-1, ≤15000</td><td>-1</td><td><small style="color:var(--text-muted)">Trần dân số cứng: ngăn chặn mọi ca sinh mới cho đến khi mật độ giảm (-1 = tự động).</small> <a href="../docs/god-laws.md#max_population" style="font-size:10px">md</a></td></tr><tr><td><code>mutation_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.05</td><td><small style="color:var(--text-muted)">Xác suất con trai sinh ra bị đột biến lệch ±1 cạnh so với quy luật thừa kế (0.05).</small> <a href="../docs/god-laws.md#mutation_rate" style="font-size:10px">md</a></td></tr><tr><td><code>mutation_heritability</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.35</td><td>—</td></tr><tr><td><code>sex_ratio</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.5</td><td><small style="color:var(--text-muted)">Xác suất sinh con trai (đa giác tiến hóa) so với con gái (đoạn thẳng linh hoạt) (0.50).</small> <a href="../docs/god-laws.md#sex_ratio" style="font-size:10px">md</a></td></tr><tr><td><code>max_sides</code></td><td>typing.int</td><td>≥3, ≤64</td><td>24</td><td><small style="color:var(--text-muted)">Giới hạn số cạnh tối đa của đa giác đều (chạm ngưỡng Tế tư / Hình tròn) (24).</small> <a href="../docs/god-laws.md#max_sides" style="font-size:10px">md</a></td></tr><tr><td><code>euthanasia_threshold</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.7</td><td><small style="color:var(--text-muted)">Ngưỡng dị hình; cá thể vượt mốc này sẽ bị loại trừ khi vừa trưởng thành (0.70).</small> <a href="../docs/god-laws.md#euthanasia_threshold" style="font-size:10px">md</a></td></tr><tr><td><code>mutation_sigma</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.08</td><td><small style="color:var(--text-muted)">Độ lệch chuẩn Gaussian (σ) áp dụng lên trọng số não bộ khi lai phối (0.08).</small> <a href="../docs/god-laws.md#mutation_sigma" style="font-size:10px">md</a></td></tr><tr><td><code>crossover_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.5</td><td><small style="color:var(--text-muted)">Tỷ lệ hòa trộn đồng đều 50/50 bộ gen cha mẹ trong quá trình thụ thai (0.50).</small> <a href="../docs/god-laws.md#crossover_rate" style="font-size:10px">md</a></td></tr><tr><td><code>morphology_annealing_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Công tắc chính cho vật lý hình học — ủ nhiệt (r,φ), va chạm SAT và giải phóng hình thể.</small> <a href="../docs/god-laws.md#morphology_annealing_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>annealing_start_generation</code></td><td>typing.int</td><td>≥0, ≤1000</td><td>15</td><td>—</td></tr><tr><td><code>annealing_decay_generations</code></td><td>typing.int</td><td>≥1, ≤5000</td><td>250</td><td><small style="color:var(--text-muted)">Số thế hệ để quá trình ủ nhiệt chuyển từ khuôn mẫu Abbott sang tiến hóa tự do (150).</small> <a href="../docs/god-laws.md#annealing_decay_generations" style="font-size:10px">md</a></td></tr><tr><td><code>morph_lambda_override</code></td><td>typing.float</td><td>≥-1.0, ≤1.0</td><td>None</td><td>—</td></tr><tr><td><code>vertex_mutation_std</code></td><td>typing.float</td><td>≥0, ≤0.5</td><td>0.025</td><td>—</td></tr><tr><td><code>angle_mutation_std</code></td><td>typing.float</td><td>≥0, ≤0.5</td><td>0.012</td><td>—</td></tr><tr><td><code>topological_mutation_rate</code></td><td>typing.float</td><td>≥0, ≤0.2</td><td>0.008</td><td>—</td></tr><tr><td><code>safeguard_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>safeguard_critical_pop</code></td><td>typing.int</td><td>≥2, ≤50</td><td>12</td><td>—</td></tr><tr><td><code>safeguard_relief_ratio</code></td><td>typing.float</td><td>≥0.05, ≤0.5</td><td>0.3</td><td>—</td></tr><tr><td><code>safeguard_genesis_batch</code></td><td>typing.int</td><td>≥1, ≤20</td><td>6</td><td>—</td></tr><tr><td><code>safeguard_morph_mercy</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>safeguard_max_miracles</code></td><td>typing.int</td><td>≥1</td><td>1</td><td>—</td></tr><tr><td><code>soft_cap_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>damping_steepness</code></td><td>typing.float</td><td>≥1.0, ≤20.0</td><td>12.0</td><td>—</td></tr><tr><td><code>crowding_stress_mult</code></td><td>typing.float</td><td>≥0.0, ≤1.0</td><td>1.0</td><td>—</td></tr><tr><td><code>resource_strain_mult</code></td><td>typing.float</td><td>≥0.0, ≤2.0</td><td>2.0</td><td>—</td></tr><tr><td><code>boom_ramp_days</code></td><td>typing.float</td><td>≥0, ≤100</td><td>1.2</td><td>—</td></tr><tr><td><code>boom_birth_floor</code></td><td>typing.float</td><td>≥0, ≤1.0</td><td>0.4</td><td>—</td></tr><tr><td><code>boom_cooldown_mult</code></td><td>typing.float</td><td>≥1.0, ≤10.0</td><td>1.0</td><td>—</td></tr><tr><td><code>boom_energy_mult</code></td><td>typing.float</td><td>≥1.0, ≤10.0</td><td>1.0</td><td>—</td></tr><tr><td><code>initial_season_offset</code></td><td>typing.int</td><td>≥0, ≤3</td><td>0</td><td>—</td></tr><tr><td><code>disease_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Công tắc chính cho phép dịch bệnh bùng phát và lây nhiễm trong quần thể.</small> <a href="../docs/god-laws.md#disease_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>disease_outbreak_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>6e-05</td><td><small style="color:var(--text-muted)">Xác suất tự bùng phát dịch bệnh mỗi nhịp khi mật độ dân cư ngột ngạt (0.00006).</small> <a href="../docs/god-laws.md#disease_outbreak_rate" style="font-size:10px">md</a></td></tr><tr><td><code>disease_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.035</td><td><small style="color:var(--text-muted)">Tỷ lệ lây truyền mầm bệnh mỗi nhịp khi tiếp xúc gần cá thể nhiễm bệnh (0.035).</small> <a href="../docs/god-laws.md#disease_rate" style="font-size:10px">md</a></td></tr><tr><td><code>disease_energy_drain</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.05</td><td><small style="color:var(--text-muted)">Năng lượng bị hao hụt mỗi nhịp do lâm bệnh nặng (0.05).</small> <a href="../docs/god-laws.md#disease_energy_drain" style="font-size:10px">md</a></td></tr><tr><td><code>disease_lethality</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.18</td><td><small style="color:var(--text-muted)">Sát thương rút máu trực tiếp mỗi nhịp do độc lực của bệnh tật (0.18).</small> <a href="../docs/god-laws.md#disease_lethality" style="font-size:10px">md</a></td></tr><tr><td><code>weather_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Công tắc chính cho chu kỳ khí tượng biến đổi (nắng, mưa, sương, giông).</small> <a href="../docs/god-laws.md#weather_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>sleep_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Tập tính ngủ nghỉ ban đêm, trú ẩn trong nhà và truyền thụ kinh nghiệm lúc đêm tối.</small> <a href="../docs/god-laws.md#sleep_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>day_length</code></td><td>typing.int</td><td>≥2, ≤200000</td><td>1200</td><td><small style="color:var(--text-muted)">Tổng số nhịp của một chu kỳ ngày đêm trọn vẹn (1200).</small> <a href="../docs/god-laws.md#day_length" style="font-size:10px">md</a></td></tr><tr><td><code>season_length</code></td><td>typing.int</td><td>≥2, ≤1000000</td><td>14400</td><td><small style="color:var(--text-muted)">Độ dài của một mùa (Xuân, Hạ, Thu, Đông) theo số nhịp (12000).</small> <a href="../docs/god-laws.md#season_length" style="font-size:10px">md</a></td></tr><tr><td><code>winter_food_mult</code></td><td>typing.float</td><td>≥0.1, ≤2</td><td>0.5</td><td><small style="color:var(--text-muted)">Hệ số khan hiếm thức ăn khi mùa đông buốt giá tràn về (0.70 nhẹ, 0.50 khốc liệt, 0.30 tuyệt diệt).</small> <a href="../docs/god-laws.md#winter_food_mult" style="font-size:10px">md</a></td></tr><tr><td><code>night_sight_mult</code></td><td>typing.float</td><td>≥0.05, ≤2</td><td>0.6</td><td><small style="color:var(--text-muted)">Hệ số thu hẹp tầm nhìn trong bóng đêm đối với sinh vật ban ngày (0.60).</small> <a href="../docs/god-laws.md#night_sight_mult" style="font-size:10px">md</a></td></tr><tr><td><code>weather_change_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.002</td><td><small style="color:var(--text-muted)">Tần suất biến chuyển giữa các trạng thái thời tiết (0.002).</small> <a href="../docs/god-laws.md#weather_change_rate" style="font-size:10px">md</a></td></tr><tr><td><code>weather_sickness_enabled</code></td><td>typing.bool</td><td>—</td><td>False</td><td><small style="color:var(--text-muted)">Bị nhiễm hàn khí và hạ thân nhiệt khi đứng ngoài mưa gió buốt lạnh không có mái che.</small> <a href="../docs/god-laws.md#weather_sickness_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>chill_drain</code></td><td>typing.float</td><td>≥0, ≤5</td><td>0.18</td><td><small style="color:var(--text-muted)">Tổn hao sinh lực mỗi nhịp khi cơ thể bị nhiễm lạnh ngoài trời (0.18).</small> <a href="../docs/god-laws.md#chill_drain" style="font-size:10px">md</a></td></tr><tr><td><code>shelter_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Công tắc chính cho cơ chế nhận nhà, điều hướng qua cửa và mái che bảo vệ.</small> <a href="../docs/god-laws.md#shelter_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>exposure_drain</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.03</td><td><small style="color:var(--text-muted)">Tổn hại máu và năng lượng mỗi nhịp khi phơi mình ngoài sương gió mùa đông (0.025).</small> <a href="../docs/god-laws.md#exposure_drain" style="font-size:10px">md</a></td></tr><tr><td><code>house_capacity</code></td><td>typing.int</td><td>≥1, ≤64</td><td>12</td><td><small style="color:var(--text-muted)">Số lượng chỗ nằm trong mỗi căn nhà (12); thành viên vượt mức phải ngủ ngoài trời.</small> <a href="../docs/god-laws.md#house_capacity" style="font-size:10px">md</a></td></tr><tr><td><code>house_decay_ticks</code></td><td>typing.int</td><td>≥100, ≤100000</td><td>2400</td><td><small style="color:var(--text-muted)">Thời gian một căn nhà bỏ hoang sụp đổ thành phế tích (10000 nhịp).</small> <a href="../docs/god-laws.md#house_decay_ticks" style="font-size:10px">md</a></td></tr><tr><td><code>rest_recovery_mult</code></td><td>typing.float</td><td>≥0, ≤10</td><td>2.0</td><td><small style="color:var(--text-muted)">Hệ số tăng tốc hồi sinh lực khi ngủ trong nhà ấm có che chắn (2.0).</small> <a href="../docs/god-laws.md#rest_recovery_mult" style="font-size:10px">md</a></td></tr><tr><td><code>territory_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Xác lập ranh giới lãnh thổ thị tộc, bảo vệ biên cương và phạt xâm nhập.</small> <a href="../docs/god-laws.md#territory_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>territory_radius</code></td><td>typing.float</td><td>≥1, ≤50</td><td>14.0</td><td><small style="color:var(--text-muted)">Bán kính tầm ảnh hưởng lãnh thổ tỏa ra từ các căn nhà của thị tộc (16).</small> <a href="../docs/god-laws.md#territory_radius" style="font-size:10px">md</a></td></tr><tr><td><code>trespass_decay</code></td><td>typing.float</td><td>≥0, ≤5</td><td>0.25</td><td><small style="color:var(--text-muted)">Điểm bang giao bị khấu trừ mỗi nhịp khi kẻ thù tự tiện bước vào lãnh địa (0.15).</small> <a href="../docs/god-laws.md#trespass_decay" style="font-size:10px">md</a></td></tr><tr><td><code>max_clans</code></td><td>typing.int</td><td>≥-1, ≤64</td><td>-1</td><td><small style="color:var(--text-muted)">Số lượng thị tộc tối đa được khởi tạo khi lập thế giới mới (-1 = tự động).</small> <a href="../docs/god-laws.md#max_clans" style="font-size:10px">md</a></td></tr><tr><td><code>totems_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Cho phép thị tộc đón nhận phước lành từ một trong 8 Đồ đằng Thần thánh thiêng liêng.</small> <a href="../docs/god-laws.md#totems_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>succession_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Tự động bầu chọn người tài kế vị quyền lãnh đạo khi thủ lĩnh băng hà.</small> <a href="../docs/god-laws.md#succession_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>communication_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Phát tiếng gọi tìm mồi, hú báo nguy, ngâm nga hòa bình và bóng suy nghĩ.</small> <a href="../docs/god-laws.md#communication_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>knowledge_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Ghi nhớ địa hình thức ăn, mối hiểm họa và truyền miệng tin tức trong thị tộc.</small> <a href="../docs/god-laws.md#knowledge_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>schism_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Thành viên đói kém và mất chỗ ở sẽ nổi dậy ly khai lập tộc mới.</small> <a href="../docs/god-laws.md#schism_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>schism_threshold</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.5</td><td><small style="color:var(--text-muted)">Tỷ lệ bất mãn thổi bùng làn sóng ly khai chia rẽ nội bộ (0.40).</small> <a href="../docs/god-laws.md#schism_threshold" style="font-size:10px">md</a></td></tr><tr><td><code>war_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Chiến tranh liên thị tộc, tập kích cướp lương và mở rộng bờ cõi.</small> <a href="../docs/god-laws.md#war_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>attack_damage</code></td><td>typing.float</td><td>≥0, ≤1000</td><td>30.0</td><td><small style="color:var(--text-muted)">Sát thương cơ bản do binh sĩ gây ra trong chiến trận (32.0).</small> <a href="../docs/god-laws.md#attack_damage" style="font-size:10px">md</a></td></tr><tr><td><code>predation_enabled</code></td><td>typing.bool</td><td>—</td><td>False</td><td><small style="color:var(--text-muted)">Kích hoạt chuỗi thức ăn thú săn mồi ăn thịt và con mồi ăn cỏ.</small> <a href="../docs/god-laws.md#predation_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>predator_ratio</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.0</td><td><small style="color:var(--text-muted)">Tỷ lệ sinh ra thú ăn thịt hung hãn trong tự nhiên (0.02).</small> <a href="../docs/god-laws.md#predator_ratio" style="font-size:10px">md</a></td></tr><tr><td><code>hunt_radius</code></td><td>typing.float</td><td>≥1, ≤40</td><td>8.0</td><td><small style="color:var(--text-muted)">Bán kính săn mồi và truy sát mục tiêu của thú ăn thịt (16.0).</small> <a href="../docs/god-laws.md#hunt_radius" style="font-size:10px">md</a></td></tr><tr><td><code>bite_damage</code></td><td>typing.float</td><td>≥0, ≤1000</td><td>28.0</td><td><small style="color:var(--text-muted)">Sát thương từ vết cắn xé của thú ăn thịt (28.0).</small> <a href="../docs/god-laws.md#bite_damage" style="font-size:10px">md</a></td></tr><tr><td><code>energy_from_prey</code></td><td>typing.float</td><td>≥0, ≤1000</td><td>40.0</td><td><small style="color:var(--text-muted)">Năng lượng calo hấp thụ được khi săn gục và ăn thịt con mồi (45.0).</small> <a href="../docs/god-laws.md#energy_from_prey" style="font-size:10px">md</a></td></tr><tr><td><code>fear_radius</code></td><td>typing.float</td><td>≥1, ≤40</td><td>12.0</td><td><small style="color:var(--text-muted)">Khoảng cách thú ăn cỏ đánh hơi thấy nguy hiểm để bỏ chạy tháo thân (12.0).</small> <a href="../docs/god-laws.md#fear_radius" style="font-size:10px">md</a></td></tr><tr><td><code>coalitions_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Ký kết hòa ước liên minh phòng thủ tương trợ giữa các thị tộc thân thiện.</small> <a href="../docs/god-laws.md#coalitions_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>coalition_threshold</code></td><td>typing.int</td><td>≥-100, ≤100</td><td>40</td><td><small style="color:var(--text-muted)">Điểm tin cậy ngoại giao tối thiểu để hai tộc kết nghĩa liên minh phòng thủ (40).</small> <a href="../docs/god-laws.md#coalition_threshold" style="font-size:10px">md</a></td></tr><tr><td><code>leader_decisions_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Thủ lĩnh ban bố sắc lệnh (phát chẩn lúc đói, thiết quân luật, phát động chiến tranh).</small> <a href="../docs/god-laws.md#leader_decisions_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>resource_sharing_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Kho lương chung tại bản doanh giúp sẻ chia miếng ăn và cứu đói nhau.</small> <a href="../docs/god-laws.md#resource_sharing_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>larder_capacity</code></td><td>typing.float</td><td>≥0, ≤5000</td><td>300.0</td><td><small style="color:var(--text-muted)">Trữ lượng năng lượng tối đa của kho lương tập thể thị tộc (300).</small> <a href="../docs/god-laws.md#larder_capacity" style="font-size:10px">md</a></td></tr><tr><td><code>cannibalism_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Ăn thịt đồng loại trong tuyệt vọng khi rơi vào đường cùng của nạn đói.</small> <a href="../docs/god-laws.md#cannibalism_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>eat_kin_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Cho phép ăn thịt người cùng dòng tộc (phải trả giá bằng lưu đày và thù hận muôn đời).</small> <a href="../docs/god-laws.md#eat_kin_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>cannibalism_energy</code></td><td>typing.float</td><td>≥0, ≤1000</td><td>35.0</td><td><small style="color:var(--text-muted)">Năng lượng thu được khi ăn thịt một cá thể đồng loại lúc đói lả (45.0).</small> <a href="../docs/god-laws.md#cannibalism_energy" style="font-size:10px">md</a></td></tr><tr><td><code>theology_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Thần học 8 Đồ đằng, dựng đền miếu, dâng lễ vật đức tin và thần tích hiển linh.</small> <a href="../docs/god-laws.md#theology_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>tithe_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.04</td><td><small style="color:var(--text-muted)">Tỷ lệ năng lượng tín đồ dâng hiến vào lúc bình minh và hoàng hôn để tích lũy đức tin (0.04).</small> <a href="../docs/god-laws.md#tithe_rate" style="font-size:10px">md</a></td></tr><tr><td><code>temple_faith_cost</code></td><td>typing.float</td><td>≥0, ≤100000</td><td>400.0</td><td><small style="color:var(--text-muted)">Lượng đức tin cần thiết để nâng cấp đền miếu thành Đại Đền Khối Cầu (400.0).</small> <a href="../docs/god-laws.md#temple_faith_cost" style="font-size:10px">md</a></td></tr><tr><td><code>age_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Tiến trình các thời đại lịch sử lớn (Hoàng Kim, Băng Hà, Hỗn Thoát, Dịch Bệnh).</small> <a href="../docs/god-laws.md#age_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>age_length</code></td><td>typing.int</td><td>≥100, ≤1000000</td><td>12000</td><td><small style="color:var(--text-muted)">Độ dài của một thời đại lịch sử tính theo số nhịp (50000).</small> <a href="../docs/god-laws.md#age_length" style="font-size:10px">md</a></td></tr><tr><td><code>culture_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Bản sắc văn hóa, tập tục và sự lan tỏa tập quán giữa các thị tộc.</small> <a href="../docs/god-laws.md#culture_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>culture_spread_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.005</td><td><small style="color:var(--text-muted)">Tốc độ truyền bá tập tục văn hóa sang các thị tộc đồng minh cận kề (0.0005).</small> <a href="../docs/god-laws.md#culture_spread_rate" style="font-size:10px">md</a></td></tr><tr><td><code>rivers_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Dòng sông tự nhiên ngăn cách đôi bờ, kèm vùng nước xiết, bãi cạn và cầu bắc ngang.</small> <a href="../docs/god-laws.md#rivers_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>river_count</code></td><td>typing.int</td><td>≥0, ≤8</td><td>2</td><td><small style="color:var(--text-muted)">Số nhánh sông được kiến tạo tự nhiên ngăn chia bản đồ (2).</small> <a href="../docs/god-laws.md#river_count" style="font-size:10px">md</a></td></tr><tr><td><code>relief_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Địa hình trập trùng: dốc cao tốn sức, vách đá gây ngã gãy xương, đường mòn đi nhanh.</small> <a href="../docs/god-laws.md#relief_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>structural_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Công trình bị hao mòn do bão lốc, thợ xây sửa chữa, sập thành đống đổ nát.</small> <a href="../docs/god-laws.md#structural_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>earthquake_enabled</code></td><td>typing.bool</td><td>—</td><td>False</td><td><small style="color:var(--text-muted)">Địa chấn làm rung chuyển mặt đất, làm đổ sập những căn nhà ọp ẹp.</small> <a href="../docs/god-laws.md#earthquake_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>earthquake_rate</code></td><td>typing.float</td><td>≥0, ≤0.01</td><td>8e-05</td><td><small style="color:var(--text-muted)">Tần suất xảy ra địa chấn rung chuyển mặt đất mỗi nhịp (0.00008).</small> <a href="../docs/god-laws.md#earthquake_rate" style="font-size:10px">md</a></td></tr><tr><td><code>lightning_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Tia sét đánh trúng mặt đất trong cơn giông, phát hỏa và sát thương sinh mệnh.</small> <a href="../docs/god-laws.md#lightning_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>lightning_strike_rate</code></td><td>typing.float</td><td>≥0, ≤0.05</td><td>0.0015</td><td><small style="color:var(--text-muted)">Tần suất tia sét giáng xuống mặt đất trong cơn giông bão (0.0015).</small> <a href="../docs/god-laws.md#lightning_strike_rate" style="font-size:10px">md</a></td></tr><tr><td><code>wildfire_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Cháy rừng lan truyền nhanh chóng qua các thảm cỏ và rừng rậm rạp.</small> <a href="../docs/god-laws.md#wildfire_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>fire_rate</code></td><td>typing.float</td><td>≥0, ≤0.05</td><td>8e-05</td><td><small style="color:var(--text-muted)">Xác suất thực vật bốc cháy khi khô hạn hoặc bị sét giáng trúng (0.00008).</small> <a href="../docs/god-laws.md#fire_rate" style="font-size:10px">md</a></td></tr><tr><td><code>disaster_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td><small style="color:var(--text-muted)">Đại thảm họa bất ngờ như mưa thiên thạch hoặc hồng thủy dâng trào.</small> <a href="../docs/god-laws.md#disaster_enabled" style="font-size:10px">md</a></td></tr><tr><td><code>disaster_rate</code></td><td>typing.float</td><td>≥0, ≤0.05</td><td>4e-05</td><td><small style="color:var(--text-muted)">Xác suất ngẫu nhiên giáng xuống đại thảm họa thiên nhiên (0.0003).</small> <a href="../docs/god-laws.md#disaster_rate" style="font-size:10px">md</a></td></tr><tr><td><code>anomaly_count</code></td><td>typing.int</td><td>≥0, ≤8</td><td>3</td><td><small style="color:var(--text-muted)">Số lượng vùng dị thường không gian làm biến dạng quy luật vật lý cục bộ (3).</small> <a href="../docs/god-laws.md#anomaly_count" style="font-size:10px">md</a></td></tr><tr><td><code>door_clearance</code></td><td>typing.float</td><td>≥1, ≤5</td><td>1.5</td><td><small style="color:var(--text-muted)">Tỷ lệ độ rộng cửa nhà so với kích thước cá thể lớn nhất (1.5).</small> <a href="../docs/god-laws.md#door_clearance" style="font-size:10px">md</a></td></tr><tr><td><code>house_min_size</code></td><td>typing.float</td><td>≥3, ≤60</td><td>5.5</td><td>—</td></tr><tr><td><code>house_max_size</code></td><td>typing.float</td><td>≥3, ≤80</td><td>8.0</td><td>—</td></tr><tr><td><code>aid_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.05</td><td>—</td></tr><tr><td><code>alarm_call_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.12</td><td>—</td></tr><tr><td><code>alignment_weight</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.0</td><td>—</td></tr><tr><td><code>alliance_threshold</code></td><td>typing.int</td><td>≥-100, ≤100</td><td>50</td><td>—</td></tr><tr><td><code>attack_radius</code></td><td>typing.float</td><td>≥0, ≤10</td><td>1.8</td><td>—</td></tr><tr><td><code>banquets_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>beast_ratio</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.0</td><td>—</td></tr><tr><td><code>betrayal_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>birth_energy_cost</code></td><td>typing.float</td><td>≥0, ≤1000</td><td>20.0</td><td>—</td></tr><tr><td><code>bite_cooldown</code></td><td>typing.int</td><td>≥0, ≤1000</td><td>15</td><td>—</td></tr><tr><td><code>cannibalism_hunger_ratio</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.08</td><td>—</td></tr><tr><td><code>chill_rate</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.04</td><td>—</td></tr><tr><td><code>chill_threshold</code></td><td>typing.float</td><td>≥0, ≤1000</td><td>12.0</td><td>—</td></tr><tr><td><code>coalition_min_size</code></td><td>typing.int</td><td>≥1, ≤100</td><td>2</td><td>—</td></tr><tr><td><code>cohesion_weight</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.0</td><td>—</td></tr><tr><td><code>corpse_energy</code></td><td>typing.float</td><td>≥0, ≤1000</td><td>25.0</td><td>—</td></tr><tr><td><code>corpse_ttl</code></td><td>typing.int</td><td>≥0, ≤100000</td><td>600</td><td>—</td></tr><tr><td><code>corpses_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>creature_density</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.0013</td><td>—</td></tr><tr><td><code>defection_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>defense_weight</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.5</td><td>—</td></tr><tr><td><code>desperate_perceive_mult</code></td><td>typing.float</td><td>≥1, ≤10</td><td>1.6</td><td>—</td></tr><tr><td><code>desperate_speed_mult</code></td><td>typing.float</td><td>≥1, ≤10</td><td>1.35</td><td>—</td></tr><tr><td><code>dialect_drift_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>diet_strictness</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.0</td><td>—</td></tr><tr><td><code>disease_radius</code></td><td>typing.float</td><td>≥0, ≤100</td><td>3.0</td><td>—</td></tr><tr><td><code>eat_enemy_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>energy_start</code></td><td>typing.float</td><td>≥0, ≤1000</td><td>85.0</td><td>—</td></tr><tr><td><code>envoys_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>exile_on_kin_eat</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>fertile_food_bias</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.7</td><td>—</td></tr><tr><td><code>fertile_patches</code></td><td>typing.int</td><td>≥-1, ≤1000</td><td>-1</td><td>—</td></tr><tr><td><code>fire_spread_rate</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.035</td><td>—</td></tr><tr><td><code>flock_radius</code></td><td>typing.float</td><td>≥0, ≤100</td><td>6.0</td><td>—</td></tr><tr><td><code>fog_mushroom_mult</code></td><td>typing.float</td><td>≥0, ≤10</td><td>1.35</td><td>—</td></tr><tr><td><code>fog_sight_mult</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.6</td><td>—</td></tr><tr><td><code>food_call_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.08</td><td>—</td></tr><tr><td><code>food_giveup_ticks</code></td><td>typing.int</td><td>≥0, ≤100000</td><td>240</td><td>—</td></tr><tr><td><code>hearths_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>height</code></td><td>typing.float</td><td>≥10, ≤10000</td><td>300.0</td><td>—</td></tr><tr><td><code>help_call_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>help_radius</code></td><td>typing.float</td><td>≥0, ≤100</td><td>12.0</td><td>—</td></tr><tr><td><code>history_max</code></td><td>typing.int</td><td>≥0, ≤1000000</td><td>200</td><td>—</td></tr><tr><td><code>house_claim_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>house_density</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.00065</td><td>—</td></tr><tr><td><code>house_gap</code></td><td>typing.float</td><td>≥0, ≤100</td><td>6.0</td><td>—</td></tr><tr><td><code>hungry_perceive_mult</code></td><td>typing.float</td><td>≥1, ≤10</td><td>1.3</td><td>—</td></tr><tr><td><code>kin_stigma</code></td><td>typing.float</td><td>≥0, ≤1000</td><td>40</td><td>—</td></tr><tr><td><code>knowledge_share_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.05</td><td>—</td></tr><tr><td><code>knowledge_ttl</code></td><td>typing.int</td><td>≥0, ≤1000000</td><td>600</td><td>—</td></tr><tr><td><code>markets_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>mate_energy_min</code></td><td>typing.float</td><td>≥0, ≤1000</td><td>30.0</td><td>—</td></tr><tr><td><code>mate_radius</code></td><td>typing.float</td><td>≥0, ≤100</td><td>10.0</td><td>—</td></tr><tr><td><code>nn_inference_hz</code></td><td>typing.int</td><td>≥1, ≤1000</td><td>15</td><td>—</td></tr><tr><td><code>num_hexagons</code></td><td>typing.int</td><td>≥-1, ≤100</td><td>-1</td><td>—</td></tr><tr><td><code>num_houses</code></td><td>typing.int</td><td>≥-1, ≤100</td><td>-1</td><td>—</td></tr><tr><td><code>num_pentagons</code></td><td>typing.int</td><td>≥-1, ≤100</td><td>-1</td><td>—</td></tr><tr><td><code>num_priests</code></td><td>typing.int</td><td>≥-1, ≤100</td><td>-1</td><td>—</td></tr><tr><td><code>num_squares</code></td><td>typing.int</td><td>≥-1, ≤100</td><td>-1</td><td>—</td></tr><tr><td><code>num_triangles</code></td><td>typing.int</td><td>≥-1, ≤100</td><td>-1</td><td>—</td></tr><tr><td><code>num_women</code></td><td>typing.int</td><td>≥-1, ≤100</td><td>-1</td><td>—</td></tr><tr><td><code>omens_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>omp_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>omp_threshold</code></td><td>typing.int</td><td>≥0, ≤10000</td><td>100</td><td>—</td></tr><tr><td><code>rain_growth_mult</code></td><td>typing.float</td><td>≥0, ≤10</td><td>1.25</td><td>—</td></tr><tr><td><code>rain_speed_mult</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.85</td><td>—</td></tr><tr><td><code>recovery_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.03</td><td>—</td></tr><tr><td><code>relation_drift_rate</code></td><td>typing.float</td><td>≥0, ≤10</td><td>2.2</td><td>—</td></tr><tr><td><code>reproduction_cooldown</code></td><td>typing.int</td><td>≥0, ≤100000</td><td>600</td><td>—</td></tr><tr><td><code>rivalry_threshold</code></td><td>typing.int</td><td>≥-100, ≤100</td><td>-75</td><td>—</td></tr><tr><td><code>rock_count</code></td><td>typing.int</td><td>≥-1, ≤1000</td><td>-1</td><td>—</td></tr><tr><td><code>rubble_blocking_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>scent_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>schism_min_pop</code></td><td>typing.int</td><td>≥1, ≤1000</td><td>6</td><td>—</td></tr><tr><td><code>seed</code></td><td>typing.int</td><td>≥0</td><td>42</td><td>—</td></tr><tr><td><code>separation_weight</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.0</td><td>—</td></tr><tr><td><code>signal_radius</code></td><td>typing.float</td><td>≥0, ≤100</td><td>12.0</td><td>—</td></tr><tr><td><code>signal_speed</code></td><td>typing.float</td><td>≥0, ≤100</td><td>8.0</td><td>—</td></tr><tr><td><code>sleep_energy_mult</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.5</td><td>—</td></tr><tr><td><code>soil_depletion_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>spawn_variance</code></td><td>typing.float</td><td>≥0, ≤100</td><td>0.25</td><td>—</td></tr><tr><td><code>storm_plant_damage</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.02</td><td>—</td></tr><tr><td><code>storm_wander_bonus</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.35</td><td>—</td></tr><tr><td><code>tick_rate</code></td><td>typing.float</td><td>≥0.1, ≤1000</td><td>10.0</td><td>—</td></tr><tr><td><code>trait_mutation_rate</code></td><td>typing.float</td><td>≥0, ≤1</td><td>0.02</td><td>—</td></tr><tr><td><code>tribute_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>vocalizations_enabled</code></td><td>typing.bool</td><td>—</td><td>True</td><td>—</td></tr><tr><td><code>wander_turn</code></td><td>typing.float</td><td>≥0, ≤10</td><td>0.35</td><td>—</td></tr><tr><td><code>wet_disease_mult</code></td><td>typing.float</td><td>≥0, ≤10</td><td>1.5</td><td>—</td></tr><tr><td><code>width</code></td><td>typing.float</td><td>≥10, ≤10000</td><td>400.0</td><td>—</td></tr></tbody></table></div></section>
+<hr/>
+<section id="presets" class="wiki-section"><h1 id="thi-t-l-p-m-u-nh-h-nh-th-gi-i-v-i-1-ch-m">Thiết lập mẫu — Định hình thế giới với 1 chạm</h1>
+<p>&#x27;sustainable&#x27; mang lại nền thái bình thịnh trị 1000 ngày. Áp dụng qua bảng Khối Cầu hoặc lệnh <code>POST /api/presets/{name}?reset</code>.</p><div class="table-wrapper"><table><thead><tr><th>Thiết lập mẫu</th><th>Quy luật trọng tâm</th><th>Áp dụng</th></tr></thead><tbody><tr style="background:rgba(35,134,54,0.08);"><td><code>balance</code> <span class="badge" style="background:#238636;color:#fff;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:700;">ĐANG DÙNG</span></td><td><small style="color:var(--text-muted)">boundary=wrap, door_clearance=1.5, food_count=380, plant_growth_rate=0.065, plant_spread_rate=0.008, nutrient_cycle_rate=0.65 … +179 more</small></td><td><span style="color:var(--text-muted);font-size:11px;">Thực hiện qua ứng dụng hoặc TUI</span></td></tr><tr><td><code>sustainable</code></td><td><small style="color:var(--text-muted)">boundary=wrap, door_clearance=1.5, food_count=550, plant_growth_rate=0.08, plant_spread_rate=0.01, nutrient_cycle_rate=0.85 … +179 more</small></td><td><span style="color:var(--text-muted);font-size:11px;">Thực hiện qua ứng dụng hoặc TUI</span></td></tr><tr><td><code>chaos</code></td><td><small style="color:var(--text-muted)">boundary=wrap, door_clearance=1.5, food_count=320, plant_growth_rate=0.045, plant_spread_rate=0.006, nutrient_cycle_rate=0.65 … +179 more</small></td><td><span style="color:var(--text-muted);font-size:11px;">Thực hiện qua ứng dụng hoặc TUI</span></td></tr><tr><td><code>extinction</code></td><td><small style="color:var(--text-muted)">boundary=wrap, door_clearance=1.5, food_count=120, plant_growth_rate=0.025, plant_spread_rate=0.003, nutrient_cycle_rate=0.5 … +179 more</small></td><td><span style="color:var(--text-muted);font-size:11px;">Thực hiện qua ứng dụng hoặc TUI</span></td></tr><tr><td><code>boom</code></td><td><small style="color:var(--text-muted)">boundary=wrap, door_clearance=1.5, food_count=440, plant_growth_rate=0.06, plant_spread_rate=0.012, nutrient_cycle_rate=0.85 … +179 more</small></td><td><span style="color:var(--text-muted);font-size:11px;">Thực hiện qua ứng dụng hoặc TUI</span></td></tr><tr><td><code>theocracy</code></td><td><small style="color:var(--text-muted)">boundary=wrap, door_clearance=1.5, food_count=400, plant_growth_rate=0.055, plant_spread_rate=0.007, nutrient_cycle_rate=0.7 … +179 more</small></td><td><span style="color:var(--text-muted);font-size:11px;">Thực hiện qua ứng dụng hoặc TUI</span></td></tr><tr><td><code>warlords</code></td><td><small style="color:var(--text-muted)">boundary=wrap, door_clearance=1.5, food_count=340, plant_growth_rate=0.05, plant_spread_rate=0.006, nutrient_cycle_rate=0.65 … +179 more</small></td><td><span style="color:var(--text-muted);font-size:11px;">Thực hiện qua ứng dụng hoặc TUI</span></td></tr></tbody></table></div></section>
+<hr/>
+<section id="api-reference" class="wiki-section"><h1 id="tham-chi-u-api">Tham chiếu API</h1>
+<p>Danh sách endpoint từ <code>app.routes</code> + tài liệu tương tác tại <a href="../docs/">/docs</a>. Xem các ví dụ <code>curl</code> bên dưới.</p><div class="table-wrapper"><table><thead><tr><th>Tuyến API</th><th>Tên hàm</th></tr></thead><tbody><tr><td><code>/ws</code></td><td></td></tr><tr><td><code>GET /api/analytics/hegemony</code></td><td>get_analytics_hegemony</td></tr><tr><td><code>GET /api/analytics/summary</code></td><td>get_analytics_summary</td></tr><tr><td><code>GET /api/analytics/timeseries</code></td><td>get_analytics_timeseries</td></tr><tr><td><code>GET /api/analytics/trophic</code></td><td>get_analytics_trophic</td></tr><tr><td><code>GET /api/analytics/warnings</code></td><td>get_analytics_warnings</td></tr><tr><td><code>GET /api/annals</code></td><td>get_annals</td></tr><tr><td><code>GET /api/auth/status</code></td><td>auth_status</td></tr><tr><td><code>GET /api/clan/{clan_id}/biography</code></td><td>get_clan_biography</td></tr><tr><td><code>GET /api/clans/{clan_id}/history</code></td><td>get_clan_history</td></tr><tr><td><code>GET /api/clans/{clan_id}</code></td><td>get_clan</td></tr><tr><td><code>GET /api/clans</code></td><td>get_clans</td></tr><tr><td><code>GET /api/config</code></td><td>get_config</td></tr><tr><td><code>GET /api/creature/{creature_id}</code></td><td>get_creature</td></tr><tr><td><code>GET /api/history/summary</code></td><td>get_history_summary</td></tr><tr><td><code>GET /api/history</code></td><td>get_history</td></tr><tr><td><code>GET /api/laws</code></td><td>read_laws</td></tr><tr><td><code>GET /api/metrics/damping</code></td><td>get_damping_metrics</td></tr><tr><td><code>GET /api/metrics/morphology</code></td><td>get_morphology_metrics</td></tr><tr><td><code>GET /api/metrics/safeguards</code></td><td>get_safeguards_metrics</td></tr><tr><td><code>GET /api/perf/telemetry</code></td><td>get_telemetry</td></tr><tr><td><code>GET /api/presets</code></td><td>list_presets</td></tr><tr><td><code>GET /api/state</code></td><td>get_state</td></tr><tr><td><code>GET /api/version</code></td><td>get_version</td></tr><tr><td><code>GET /api/wiki</code></td><td>get_wiki_json</td></tr><tr><td><code>GET /api/worlds</code></td><td>get_worlds</td></tr><tr><td><code>GET /guide</code></td><td>get_guide</td></tr><tr><td><code>GET /health.html</code></td><td>health_dashboard</td></tr><tr><td><code>GET /health</code></td><td>health_dashboard</td></tr><tr><td><code>GET /healthz</code></td><td>healthz</td></tr><tr><td><code>GET /robots.txt</code></td><td>get_robots_txt</td></tr><tr><td><code>GET /sitemap.xml</code></td><td>get_sitemap_xml</td></tr><tr><td><code>GET /wiki</code></td><td>get_wiki</td></tr><tr><td><code>POST /api/auth/setup</code></td><td>auth_setup</td></tr><tr><td><code>POST /api/control</code></td><td>post_control</td></tr><tr><td><code>POST /api/laws</code></td><td>write_laws</td></tr><tr><td><code>POST /api/presets/{name}</code></td><td>apply_preset</td></tr></tbody></table></div><h2 id="c-ng-c-d-ng-l-nh-curl-th-nghi-m">Công cụ dòng lệnh Curl thử nghiệm</h2>
+<pre><code>
+# Truy vấn và thiết lập định luật tự nhiên
+curl localhost:8000/api/laws
+curl -X POST localhost:8000/api/laws -H &#x27;content-type: application/json&#x27; -d &#x27;{&quot;food_count&quot;: 90}&#x27;
+
+# Áp dụng cấu hình mẫu thế giới 1-chạm (thế giới bền vững 1000 ngày)
+curl -X POST localhost:8000/api/presets/sustainable?reset=true
+curl -X POST localhost:8000/api/presets/chaos
+curl -X POST localhost:8000/api/presets/extinction?reset=true
+
+# Truy vấn trạng thái thế giới và lịch sử biên niên sử
+curl localhost:8000/api/state | jq .tick
+curl localhost:8000/api/history?limit=5 | jq
+curl localhost:8000/api/worlds | jq
+curl localhost:8000/api/clans | jq
+
+# Điều khiển mô phỏng thời gian thực
+curl -X POST localhost:8000/api/control -H &#x27;content-type: application/json&#x27; -d &#x27;{&quot;action&quot;:&quot;pause&quot;}&#x27;
+curl -X POST localhost:8000/api/control -d &#x27;{&quot;action&quot;:&quot;reset&quot;}&#x27;
+
+# Kết nối trực tiếp WebSocket
+# ws://localhost:8000/ws  → Nhận gói {&quot;type&quot;:&quot;hello&quot;} sau đó liên tục nhận {&quot;type&quot;:&quot;state&quot;} ~30Hz
+# Gửi lệnh điều khiển: {&quot;action&quot;:&quot;pause&quot;} hoặc {&quot;action&quot;:&quot;set_speed&quot;,&quot;value&quot;:20}
+</pre></section>
+<hr/>
+<section id="configuration-ops" class="wiki-section"><h1 id="c-u-h-nh-v-n-h-nh">Cấu hình &amp; Vận hành</h1>
+<h2 id="bi-n-m-i-tr-ng-flatworld">Biến môi trường (<code>FLATWORLD_*</code>)</h2>
+<p>| Biến môi trường | Mặc định | Ý nghĩa &amp; Mô tả |</p>
+<p>|---|---|---|</p>
+<p>| <code>FLATWORLD_WIDTH</code> | <code>400</code> | Chiều rộng không gian thế giới (đơn vị lưới) |</p>
+<p>| <code>FLATWORLD_HEIGHT</code> | <code>300</code> | Chiều cao không gian thế giới |</p>
+<p>| <code>FLATWORLD_BOUNDARY</code> | <code>wrap</code> | Biên giới vô hạn hình xuyến (<code>wrap</code>) hoặc tường chặn (<code>clamp</code>) |</p>
+<p>| <code>FLATWORLD_SEED</code> | <code>42</code> | Hạt giống ngẫu nhiên khởi tạo thế giới |</p>
+<p>| <code>FLATWORLD_TICK_RATE</code> | <code>10</code> | Số tick tính toán mô phỏng mỗi giây |</p>
+<p>| <code>FLATWORLD_DB</code> | <code>backend/flatworld.db</code> | Đường dẫn tệp cơ sở dữ liệu SQLite |</p>
+<p>| <code>FLATWORLD_GOD_KEY</code> | — | Khóa mật mã Thượng đế thiết lập lúc khởi động |</p>
+<h2 id="kh-a-m-t-m-th-ng-god-passkey">Khóa mật mã Thượng đế (God Passkey)</h2>
+<p>Các thao tác <code>POST /api/laws</code>, <code>POST /api/presets/{name}</code>, <code>POST /api/control</code> và thông điệp điều khiển qua WebSocket yêu cầu quyền Thượng đế (thông qua header <code>X-God-Key</code> hoặc trường <code>key</code> trên socket). Nếu hệ thống chưa có mật mã, API sẽ trả về lỗi <code>409 Conflict</code> và giao diện web sẽ yêu cầu khởi tạo (<code>POST /api/auth/setup</code>). Nếu quên mật mã, có thể đặt lại trực tiếp trên máy chủ bằng lệnh: <code>cd backend &amp;&amp; uv run python -m app.godkey reset &lt;mật_mã_mới&gt;</code>. Giao diện TUI có thể nhận mật mã qua lệnh: <code>./run.sh tui ws://host/ws &lt;passkey&gt;</code> hoặc biến môi trường <code>FLATWORLD_GOD_KEY</code>. Hệ thống chỉ lưu trữ chuỗi băm bảo mật PBKDF2.</p>
+<h2 id="c-ch-l-u-tr-d-li-u-b-n-v-ng-db-py-20">Cơ chế lưu trữ dữ liệu bền vững (<code>db.py:20</code>)</h2>
+<p>Cơ sở dữ liệu SQLite <code>flatworld.db</code> chạy ở chế độ ghi nhật ký trước WAL (Write-Ahead Logging) và khóa luồng an toàn. Các bảng dữ liệu chính:</p>
+<ul>
+<li><code>worlds</code>: Thông tin các thế giới (mã số, seed, kích thước, thời điểm bắt đầu/kết thúc).</li>
+<li><code>events</code>: Biên niên sử biến cố thế giới (sinh, tử, thăng hạng, chiến tranh, dịch bệnh).</li>
+<li><code>law_changes</code>: Nhật ký thay đổi các định luật của Thượng đế theo tick.</li>
+<li><code>creatures</code>: Gia phả dòng dõi sinh vật (cha mẹ, thế hệ, thời điểm sinh/tử).</li>
+<li><code>snapshots</code>: Các bản sao lưu trạng thái thế giới để khôi phục khi khởi động lại.</li>
+</ul>
+<h2 id="ki-n-tr-c-lu-ng-ng-c-simengine">Kiến trúc luồng &amp; Động cơ SimEngine</h2>
+<p>Lõi mô phỏng được <strong>thiết kế tất định tuyệt đối</strong>: một luồng số ngẫu nhiên duy nhất, một thứ tự thực thi tick cố định. Chạy uvicorn với <strong>1 worker duy nhất</strong>. Với kiến trúc <code>SimEngine</code> (<code>main.py:446</code>), việc tính toán mô phỏng diễn ra trên một luồng OS nền chuyên trách độc lập với vòng lặp sự kiện asyncio. Bước tiến thế giới diễn ra dưới khóa <code>RT.lock</code> trong khi việc mã hóa JSON snapshot diễn ra bên ngoài khóa (<code>advance_world_lockless</code>), giúp các yêu cầu HTTP REST luôn phản hồi tức thì mà không bị nghẽn. Các điểm cuối vận hành &amp; chẩn đoán quan trọng:</p>
+<ul>
+<li><code>GET /healthz</code> — Kiểm tra sức khỏe máy chủ, TPS thời gian thực, dung lượng RAM, thời gian chạy và số client kết nối.</li>
+<li><code>GET /api/perf/telemetry</code> — Vòng đo lường hiệu năng: thời gian tick, thời gian giữ khóa và độ trễ phát sóng.</li>
+<li><code>GET /api/analytics/summary</code> — Tổng hợp dữ liệu vĩ mô nhân khẩu học, sinh khối và chuỗi thức ăn.</li>
+</ul>
+<h2 id="kh-i-ch-y-v-n-h-nh">Khởi chạy &amp; Vận hành</h2>
+<pre><code>
+./run.sh
+# Hoặc khởi chạy thủ công từng thành phần:
+cd backend &amp;&amp; uv run uvicorn app.main:app --reload --port 8000
+cd frontend &amp;&amp; npm run dev
+</pre>
+<h2 id="ki-m-th-t-ng">Kiểm thử tự động</h2>
+<pre><code>
+cd backend &amp;&amp; uv run pytest -q
+cd backend &amp;&amp; uv run pytest tests/test_synergies.py -q
+</pre></section>
+<hr/>
+<section id="roadmap" class="wiki-section"><h1 id="l-tr-nh-ph-t-tri-n">Lộ trình phát triển</h1>
+<p>Xem <code>TODO.md</code> (đang mở) + <code>docs/roadmap-archive.md</code> (đã hoàn thành) — 13 phần + 213 thiên luật + 42 endpoint + 7 thiết lập mẫu. Wiki bổ trợ Cẩm nang với các preset, cân bằng sinh thái và công cụ thử nghiệm.</p></section>
+    <hr/>
+    <p style="font-size:12px;color:var(--text-muted)">Trích xuất trực tiếp từ mã nguồn — <code>Config</code> + <code>GodLaws</code> + <code>app.routes</code>. Bách khoa toàn thư sống chính thức của Flatland. · Phát triển bởi <strong>Long Phan</strong> — <a href="/cdn-cgi/l/email-protection#107c7f7e77507d797e787e78717e3e797e"><span class="__cf_email__" data-cfemail="65090a0b0225080c0b0d0b0d040b4b0c0b">[email&#160;protected]</span></a> · Bản demo: <a href="../" target="_blank" rel="noopener noreferrer">Bản demo ↗</a> · Trang chủ: <a href="../" target="_blank" rel="noopener noreferrer">Trang chủ ↗</a> · <a href="https://github.com/longphanmn/flatland" target="_blank" rel="noopener noreferrer">GitHub</a> · Xây dựng với OpenCode & Antigravity</p>
+  </article>
+</main>
+</div>
+
+<div id="wiki-toast"></div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// Mobile Sidebar Toggle
+function toggleSidebar() {
+  const sidebar = document.getElementById('wikiSidebar');
+  const overlay = document.getElementById('mobileOverlay');
+  sidebar.classList.toggle('sidebar-open');
+  overlay.classList.toggle('overlay-open');
+}
+
+// Search filter
+function filterWiki(q){
+  q = q.toLowerCase();
+  document.querySelectorAll('.wiki-section, h1, h2, table tr, p, li').forEach(el => {
+    if (!q) { el.style.display = ''; return; }
+    const txt = (el.textContent || '').toLowerCase();
+    if (el.tagName === 'TR' || el.tagName === 'LI' || el.tagName === 'P') {
+      el.style.display = txt.includes(q) ? '' : 'none';
+    }
+  });
+  document.querySelectorAll('.wiki-section').forEach(sec => {
+    const vis = [...sec.querySelectorAll('tr, li, p')].some(e => e.style.display !== 'none');
+    const title = (sec.querySelector('h1, h2')?.textContent || '').toLowerCase();
+    sec.style.display = (vis || title.includes(q) || !q) ? '' : 'none';
+  });
+}
+
+// Keyboard shortcut '/' to search & Escape to clear
+document.addEventListener('keydown', e => {
+  if (e.key === '/' && document.activeElement?.tagName !== 'INPUT') {
+    e.preventDefault();
+    document.getElementById('q')?.focus();
+  } else if (e.key === 'Escape' && document.activeElement?.id === 'q') {
+    document.getElementById('q').value = '';
+    filterWiki('');
+    document.getElementById('q').blur();
+  }
+});
+
+// Toast notification
+function showToast(msg, isError = false) {
+  const toast = document.getElementById('wiki-toast');
+  if (!toast) return;
+  toast.innerText = msg;
+  toast.className = 'toast-visible ' + (isError ? 'toast-error' : 'toast-success');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(() => {
+    toast.className = '';
+  }, 3200);
+}
+
+// Preset changes are reserved for the app UI and TUI — /wiki is read-only.
+// Kept as a guidance stub so older cached pages degrade gracefully.
+async function applyPreset(name) {
+  showToast('Presets can only be changed in the app UI or TUI', true);
+}
+
+// Enhance code blocks with copy buttons
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('pre').forEach(pre => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'code-container';
+    pre.parentNode.insertBefore(wrapper, pre);
+    wrapper.appendChild(pre);
+
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'copy-btn';
+    copyBtn.innerText = 'Copy';
+    copyBtn.onclick = () => {
+      navigator.clipboard.writeText(pre.innerText).then(() => {
+        copyBtn.innerText = '✓ Copied';
+        copyBtn.style.color = '#3fb950';
+        setTimeout(() => { copyBtn.innerText = 'Copy'; copyBtn.style.color = ''; }, 1600);
+      });
+    };
+    wrapper.appendChild(copyBtn);
+  });
+
+  // Wrap tables without .table-wrapper
+  document.querySelectorAll('table').forEach(tbl => {
+    if (!tbl.closest('.table-wrapper')) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'table-wrapper';
+      tbl.parentNode.insertBefore(wrapper, tbl);
+      wrapper.appendChild(tbl);
+    }
+  });
+
+  // Scroll spy with IntersectionObserver
+  const sections = document.querySelectorAll('.wiki-section');
+  const navLinks = document.querySelectorAll('.nav-link');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach(link => {
+          if (link.getAttribute('data-section') === id) {
+            link.classList.add('active');
+          } else {
+            link.classList.remove('active');
+          }
+        });
+      }
+    });
+  }, { rootMargin: '-15% 0px -70% 0px' });
+
+  sections.forEach(sec => observer.observe(sec));
+});
+
+try { localStorage.setItem('flatland_lang', 'vi'); } catch(e){}
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"423f0669d3ab442083bf6504dee20e1e","r":1,"spa":2}' crossorigin="anonymous"></script>
+</body></html>

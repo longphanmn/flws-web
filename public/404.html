@@ -40,23 +40,23 @@
         repoPrefix = '/flws-web';
       }
 
-      var backendBase = 'https://world.minhnhan.in';
+      var base = origin + repoPrefix;
       var landingBase = 'https://longphanmn.github.io/flws-page';
 
-      var target = origin + repoPrefix + '/';
+      var target = base + '/';
 
       if (path.indexOf('god-laws.md') !== -1) {
-        target = backendBase + '/docs/god-laws.md' + hash;
+        target = base + '/docs/god-laws.md' + hash;
       } else if (path.indexOf('wiki') !== -1) {
-        target = backendBase + '/wiki' + search + hash;
+        target = base + '/wiki/' + search + hash;
       } else if (path.indexOf('docs') !== -1) {
-        target = backendBase + '/docs' + search;
+        target = base + '/docs/' + search;
       } else if (path.indexOf('openapi.json') !== -1) {
-        target = backendBase + '/openapi.json';
+        target = base + '/openapi.json';
       } else if (path.indexOf('health') !== -1) {
-        target = backendBase + '/health' + search;
-      } else if (path.indexOf('landing') !== -1 || path.indexOf('home') !== -1) {
-        target = landingBase;
+        target = base + '/health/' + search;
+      } else if (path.indexOf('landing') !== -1 || path.indexOf('intro') !== -1 || path.indexOf('page') !== -1) {
+        target = landingBase + '/';
       }
 
       window.location.replace(target);

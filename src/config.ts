@@ -97,9 +97,12 @@ export function getFrontendUrl(): string {
       const demo = loc.pathname.replace(/\/demo(\/.*)?$/, '/demo/')
       return `${loc.origin}${demo}`
     }
+    if (loc.hostname.includes('github.io')) {
+      return `${loc.origin}/flws-web/`
+    }
     return `${loc.origin}/`
   }
-  return ''
+  return 'https://longphanmn.github.io/flws-web/'
 }
 
 export function getDemoUrl(): string {
@@ -123,15 +126,33 @@ export function getLandingUrl(): string {
 }
 
 /**
- * Resolves user-facing documentation / API / wiki links.
- * Resolves to the live backend domain (e.g. https://world.minhnhan.in/docs, /openapi.json)
- * so flws-page remains strictly the marketing landing portal.
+ * Resolves user-facing documentation / API / wiki / health links.
+ * All resources are hosted on flws-web (https://longphanmn.github.io/flws-web/...).
+ * Only the introduce page link (getLandingUrl) points to flws-page.
  */
 export function docUrl(path: string): string {
-  const backend = getBackendBaseUrl().replace(/\/+$/, '')
   const cleanPath = path.startsWith('/') ? path : `/${path}`
-  if (backend) {
-    return `${backend}${cleanPath}`
+  if (isDemoEnvironment) {
+    const frontend = getFrontendUrl().replace(/\/+$/, '')
+    if (cleanPath.startsWith('/wiki')) {
+      const rest = cleanPath.slice('/wiki'.length).replace(/^\/+/, '')
+      return `${frontend}/wiki/${rest}`
+    }
+    if (cleanPath.startsWith('/docs')) {
+      const rest = cleanPath.slice('/docs'.length).replace(/^\/+/, '')
+      return `${frontend}/docs/${rest}`
+    }
+    if (cleanPath.startsWith('/health')) {
+      const rest = cleanPath.slice('/health'.length).replace(/^\/+/, '')
+      return `${frontend}/health/${rest}`
+    }
+    if (cleanPath.startsWith('/openapi.json')) {
+      return `${frontend}/openapi.json`
+    }
+    if (cleanPath.startsWith('/api/wiki')) {
+      return `${frontend}/wiki/`
+    }
+    return `${frontend}${cleanPath}`
   }
   return cleanPath
 }

@@ -10,7 +10,7 @@ Dedicated web frontend simulation client for **Flatland** (`flws`), built with R
 
 - **Live Web App**: [https://longphanmn.github.io/flws-web/](https://longphanmn.github.io/flws-web/)
 - **Backend Simulation Engine**: [https://github.com/longphanmn/flws](https://github.com/longphanmn/flws)
-- **Project Landing Page (Private)**: [https://github.com/longphanmn/flws-page](https://github.com/longphanmn/flws-page)
+- **Project Landing Page**: [https://github.com/longphanmn/flws-page](https://github.com/longphanmn/flws-page)
 
 ---
 
