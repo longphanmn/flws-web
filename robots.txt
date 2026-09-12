@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Allow: /wiki
+Allow: /guide
+Allow: /docs
+
+Sitemap: https://longphanmn.github.io/flws-web/sitemap.xml
