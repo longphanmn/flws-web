@@ -62,10 +62,10 @@ const proxyConfig = {
 
 export default defineConfig(({ mode }) => {
   const rootDir = fs.existsSync(path.resolve(__dirname, '.env')) ? __dirname : (fs.existsSync(path.resolve(__dirname, '..', '.env')) ? path.resolve(__dirname, '..') : __dirname)
-  const env = loadEnv(mode, rootDir, ['API_', 'BACKEND_', 'VITE_', 'WS_', 'FRONTEND_', 'DEMO_', 'LANDING_', 'REST_'])
+  const env = loadEnv(mode, rootDir, ['API_', 'BACKEND_', 'VITE_', 'WS_', 'FRONTEND_', 'DEMO_', 'LANDING_'])
 
   const isDemo = process.env.VITE_IS_DEMO === 'true' || env.VITE_IS_DEMO === 'true'
-  const rawApiUrl = process.env.REST_API || env.REST_API || process.env.VITE_DEMO_API_URL || process.env.API_URL || env.API_URL || env.VITE_BACKEND_URL || env.BACKEND_URL || ''
+  const rawApiUrl = process.env.API_URL || env.API_URL || process.env.VITE_DEMO_API_URL || env.VITE_DEMO_API_URL || env.VITE_BACKEND_URL || env.BACKEND_URL || ''
   const cleanApiUrl = rawApiUrl.replace(/\/+$/, '')
 
   const rawFrontendUrl = process.env.VITE_FRONTEND_URL || process.env.FRONTEND_URL || env.FRONTEND_URL || process.env.VITE_DEMO_URL || process.env.DEMO_URL || env.DEMO_URL || 'https://longphanmn.github.io/flws-web'
@@ -89,7 +89,7 @@ export default defineConfig(({ mode }) => {
   return {
     base: process.env.VITE_BASE || './',
     envDir: rootDir,
-    envPrefix: ['VITE_', 'API_', 'BACKEND_', 'WS_', 'FRONTEND_', 'DEMO_', 'LANDING_', 'REST_'],
+    envPrefix: ['VITE_', 'API_', 'BACKEND_', 'WS_', 'FRONTEND_', 'DEMO_', 'LANDING_'],
     define: {
       '__ENV_API_URL__': JSON.stringify(cleanApiUrl ? Buffer.from(cleanApiUrl).toString('base64') : ''),
       '__ENV_WS_URL__': JSON.stringify(rawWsUrl ? Buffer.from(rawWsUrl).toString('base64') : ''),

@@ -38,11 +38,10 @@ jobs:
         env:
           VITE_BASE: "./"
           VITE_IS_DEMO: "true"
-          REST_API: ${{ vars.REST_API || secrets.REST_API || '' }}
+          API_URL: ${{ vars.API_URL || secrets.API_URL || '' }}
+          VITE_DEMO_API_URL: ${{ vars.API_URL || secrets.API_URL || vars.VITE_DEMO_API_URL || secrets.VITE_DEMO_API_URL || '' }}
           VITE_WS_URL: ${{ vars.VITE_WS_URL || secrets.VITE_WS_URL || '' }}
-          API_URL: ${{ vars.REST_API || secrets.REST_API || vars.API_URL || secrets.API_URL || '' }}
           WS_URL: ${{ vars.VITE_WS_URL || secrets.VITE_WS_URL || vars.WS_URL || secrets.WS_URL || '' }}
-          VITE_DEMO_API_URL: ${{ vars.REST_API || secrets.REST_API || vars.VITE_DEMO_API_URL || secrets.VITE_DEMO_API_URL || '' }}
           VITE_DEMO_WS_URL: ${{ vars.VITE_WS_URL || secrets.VITE_WS_URL || vars.VITE_DEMO_WS_URL || secrets.VITE_DEMO_WS_URL || '' }}
           FRONTEND_URL: "https://longphanmn.github.io/flws-web/"
           LANDING_URL: "https://longphanmn.github.io/flws-page/"

@@ -29,10 +29,9 @@ function decodeEnvUrl(val: unknown): string {
   return str
 }
 
-// Configured from .env (REST_API / API_URL / BACKEND_URL / VITE_WS_URL) via Vite define/import.meta.env
+// Configured from .env (API_URL / BACKEND_URL / VITE_WS_URL) via Vite define/import.meta.env
 const envApiUrl = decodeEnvUrl(
   (typeof __ENV_API_URL__ !== 'undefined' && __ENV_API_URL__) ||
-  ((import.meta as any).env?.REST_API as string) ||
   ((import.meta as any).env?.API_URL as string) ||
   ((import.meta as any).env?.VITE_DEMO_API_URL as string) ||
   ''
