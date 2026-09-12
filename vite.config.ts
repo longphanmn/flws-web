@@ -68,11 +68,14 @@ export default defineConfig(({ mode }) => {
   const rawApiUrl = process.env.VITE_DEMO_API_URL || process.env.API_URL || env.API_URL || env.VITE_BACKEND_URL || env.BACKEND_URL || ''
   const cleanApiUrl = rawApiUrl.replace(/\/+$/, '')
 
-  const rawFrontendUrl = process.env.VITE_FRONTEND_URL || process.env.FRONTEND_URL || env.FRONTEND_URL || process.env.VITE_DEMO_URL || process.env.DEMO_URL || env.DEMO_URL || ''
+  const rawFrontendUrl = process.env.VITE_FRONTEND_URL || process.env.FRONTEND_URL || env.FRONTEND_URL || process.env.VITE_DEMO_URL || process.env.DEMO_URL || env.DEMO_URL || 'https://longphanmn.github.io/flws-web'
   const cleanFrontendUrl = rawFrontendUrl.replace(/\/+$/, '')
 
-  const rawLandingUrl = process.env.VITE_LANDING_URL || process.env.LANDING_URL || env.LANDING_URL || ''
+  const rawLandingUrl = process.env.VITE_LANDING_URL || process.env.LANDING_URL || env.LANDING_URL || 'https://longphanmn.github.io/flws-page'
   const cleanLandingUrl = rawLandingUrl.replace(/\/+$/, '')
+
+  process.env.FRONTEND_URL = cleanFrontendUrl
+  process.env.LANDING_URL = cleanLandingUrl
 
   let rawWsUrl = (process.env.VITE_DEMO_WS_URL || process.env.WS_URL || env.WS_URL || env.VITE_WS_URL || '').replace(/\\/g, '')
   if (!rawWsUrl && cleanApiUrl) {
