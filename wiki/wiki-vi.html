@@ -602,7 +602,7 @@ tr:hover td { background: rgba(56, 139, 253, 0.05); }
       <div style="color:var(--text-muted);font-size:11px">Phát triển bởi</div>
       <strong style="color:var(--text-primary);font-size:13px">Long Phan</strong>
       <div style="margin-top:4px;font-size:11px">
-        <a href="/cdn-cgi/l/email-protection#e5898a8b82a5888c8b8d8b8d848bcb8c8b" style="color:var(--accent-blue)"><span class="__cf_email__" data-cfemail="197576777e597470777177717877377077">[email&#160;protected]</span></a> · <a href="../" target="_blank" rel="noopener noreferrer" style="color:var(--accent-blue)">Demo</a> · <a href="../" target="_blank" rel="noopener noreferrer" style="color:var(--accent-blue)">Landing</a>
+        <a href="/cdn-cgi/l/email-protection#315d5e5f56715c585f595f59505f1f585f" style="color:var(--accent-blue)"><span class="__cf_email__" data-cfemail="3a5655545d7a5753545254525b54145354">[email&#160;protected]</span></a> · <a href="../" target="_blank" rel="noopener noreferrer" style="color:var(--accent-blue)">Demo</a> · <a href="../" target="_blank" rel="noopener noreferrer" style="color:var(--accent-blue)">Landing</a>
       </div>
       <div style="color:var(--text-dim);font-size:10.5px;margin-top:4px">Xây dựng với OpenCode & Antigravity<br/>Lấy cảm hứng từ Edwin A. Abbott</div>
     </div>
@@ -634,8 +634,8 @@ tr:hover td { background: rgba(56, 139, 253, 0.05); }
   <article class="wiki-article">
     <section id="overview" class="wiki-section"><h1 id="b-ch-khoa-to-n-th-wiki-flatland">Bách khoa toàn thư &amp; Wiki Flatland</h1>
 <p>&gt; <strong>Trang chủ / Landing Page</strong>: <a href="../">/</a></p>
-<p>&gt; <strong>Mã nguồn</strong>: <a href="https://github.com/longphanmn/flatland">https://github.com/longphanmn/flatland</a></p>
-<p>&gt; <strong>Phát triển bởi <a href="/cdn-cgi/l/email-protection#92fefdfcf5d2fffbfcfafcfaf3fcbcfbfc">Long Phan</a></strong> (<a href="/cdn-cgi/l/email-protection#f29e9d9c95b29f9b9c9a9c9a939cdc9b9c"><span class="__cf_email__" data-cfemail="88e4e7e6efc8e5e1e6e0e6e0e9e6a6e1e6">[email&#160;protected]</span></a> · Bản demo: <a href="../">/demo/</a>)</p>
+<p>&gt; <strong>Các kho mã nguồn</strong>: <a href="https://github.com/longphanmn/flws"><code>flws</code> (Backend)</a> · <a href="https://github.com/longphanmn/flws-web"><code>flws-web</code> (Web Frontend)</a> · <a href="https://github.com/longphanmn/flws-page"><code>flws-page</code> (Trang giới thiệu)</a></p>
+<p>&gt; <strong>Phát triển bởi <a href="/cdn-cgi/l/email-protection#3f535051587f5256515751575e51115651">Long Phan</a></strong> (<a href="/cdn-cgi/l/email-protection#14787b7a7354797d7a7c7a7c757a3a7d7a"><span class="__cf_email__" data-cfemail="bad6d5d4ddfad7d3d4d2d4d2dbd494d3d4">[email&#160;protected]</span></a> · Bản demo: <a href="../">/demo/</a>)</p>
 <p>&gt; Xây dựng và hoàn thiện bằng <strong>OpenCode</strong> &amp; <strong>Antigravity</strong> · Phát triển từ ý niệm nền tảng trong danh tác <em><strong>Flatland: A Romance of Many Dimensions</strong></em> (1884) của <strong>Edwin A. Abbott</strong>.</p>
 <p>Flatland là một thế giới mô phỏng sự sống nhân tạo 2D tự hành, vận dụng sáng tạo các tiền đề toán học và không gian từ tác phẩm kinh điển <em>Flatland</em> (Xứ Phẳng) xuất bản năm 1884 của Edwin A. Abbott.</p>
 <h3 id="tri-t-l-thi-t-k">Triết lý thiết kế</h3>
@@ -852,6 +852,14 @@ tr:hover td { background: rgba(56, 139, 253, 0.05); }
 </ul></section>
 <hr/>
 <section id="codebase-map" class="wiki-section"><h1 id="b-n-m-ngu-n">Bản đồ mã nguồn</h1>
+<h2 id="ki-n-tr-c-3-kho-m-ngu-n-tri-n-khai-h-th-ng-bp">Kiến trúc 3 Kho mã nguồn &amp; Triển khai hệ thống (§BP)</h2>
+<p>Flatland được phân rã thành 3 kho mã nguồn GitHub chuyên biệt với phương thức triển khai đồng nhất trên cùng một hệ thống:</p>
+<ul>
+<li><code>flws</code> (<code>github.com/longphanmn/flws</code>): Động cơ mô phỏng backend thuần túy (FastAPI, luồng SimEngine, SoA NumPy, micro-RNN Elman, SAT hình thái cực, TUI, SQLite WAL). Lắng nghe trên cổng <code>:8000</code>.</li>
+<li><code>flws-web</code> (<code>github.com/longphanmn/flws-web</code>): Khách web frontend độc lập (React 18, Vite, TypeScript, khung nhìn Canvas2D/WebGL 60 FPS, Đài thiên văn vĩ mô). Triển khai trên GitHub Pages (<code>https://longphanmn.github.io/flws-web/</code>) và chạy trên cổng <code>:5173</code> / <code>:80</code> (Nginx reverse-proxy sang backend).</li>
+<li><code>flws-page</code> (<code>github.com/longphanmn/flws-page</code>): Trang đích giới thiệu chính thức (canvas sinh vật tương tác, huy hiệu âm thanh, cốt truyện). Triển khai trên GitHub Pages độc lập (<code>https://longphanmn.github.io/flws-page/</code>).</li>
+<li><strong>Triển khai đồng nhất cùng hệ thống</strong>: <code>docker-compose.yml</code> và <code>deploy.sh</code> tự động triển khai và vận hành cả backend lẫn frontend trên cùng một máy chủ mục tiêu.</li>
+</ul>
 <h2 id="c-u-tr-c-backend-backend-app">Cấu trúc Backend (<code>backend/app/</code>)</h2>
 <ul>
 <li><code>config.py:13</code> — Dataclass <code>Config</code>: Hình học thế giới, mật độ sinh vật, thức ăn, xác chết, hành vi bầy đàn, sinh sản, dịch bệnh, môi trường, nhà ở, địa hình, xã hội và biên niên sử. Tự động đọc cấu hình từ biến môi trường qua <code>from_env()</code>.</li>
@@ -1007,7 +1015,7 @@ cd backend &amp;&amp; uv run pytest tests/test_synergies.py -q
 <section id="roadmap" class="wiki-section"><h1 id="l-tr-nh-ph-t-tri-n">Lộ trình phát triển</h1>
 <p>Xem <code>TODO.md</code> (đang mở) + <code>docs/roadmap-archive.md</code> (đã hoàn thành) — 13 phần + 213 thiên luật + 42 endpoint + 7 thiết lập mẫu. Wiki bổ trợ Cẩm nang với các preset, cân bằng sinh thái và công cụ thử nghiệm.</p></section>
     <hr/>
-    <p style="font-size:12px;color:var(--text-muted)">Trích xuất trực tiếp từ mã nguồn — <code>Config</code> + <code>GodLaws</code> + <code>app.routes</code>. Bách khoa toàn thư sống chính thức của Flatland. · Phát triển bởi <strong>Long Phan</strong> — <a href="/cdn-cgi/l/email-protection#107c7f7e77507d797e787e78717e3e797e"><span class="__cf_email__" data-cfemail="65090a0b0225080c0b0d0b0d040b4b0c0b">[email&#160;protected]</span></a> · Bản demo: <a href="../" target="_blank" rel="noopener noreferrer">Bản demo ↗</a> · Trang chủ: <a href="../" target="_blank" rel="noopener noreferrer">Trang chủ ↗</a> · <a href="https://github.com/longphanmn/flatland" target="_blank" rel="noopener noreferrer">GitHub</a> · Xây dựng với OpenCode & Antigravity</p>
+    <p style="font-size:12px;color:var(--text-muted)">Trích xuất trực tiếp từ mã nguồn — <code>Config</code> + <code>GodLaws</code> + <code>app.routes</code>. Bách khoa toàn thư sống chính thức của Flatland. · Phát triển bởi <strong>Long Phan</strong> — <a href="/cdn-cgi/l/email-protection#315d5e5f56715c585f595f59505f1f585f"><span class="__cf_email__" data-cfemail="b9d5d6d7def9d4d0d7d1d7d1d8d797d0d7">[email&#160;protected]</span></a> · Bản demo: <a href="../" target="_blank" rel="noopener noreferrer">Bản demo ↗</a> · Trang chủ: <a href="../" target="_blank" rel="noopener noreferrer">Trang chủ ↗</a> · GitHub: <a href="https://github.com/longphanmn/flws" target="_blank" rel="noopener noreferrer">flws</a> / <a href="https://github.com/longphanmn/flws-web" target="_blank" rel="noopener noreferrer">flws-web</a> · Xây dựng với OpenCode & Antigravity</p>
   </article>
 </main>
 </div>
