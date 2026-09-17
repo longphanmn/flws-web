@@ -1,4 +1,5 @@
 import type { ControlMessage, DeltaStateMessage, EntityState, HelloMessage, StateMessage } from './types'
+import { getBackendBaseUrl } from './config'
 
 export type ConnStatus = 'connecting' | 'open' | 'closed'
 
@@ -23,6 +24,7 @@ export class WorldSocket {
   private entitiesList: EntityState[] = []
   private entitiesDirty = true
   private lastFullState: StateMessage | null = null
+  private fetchingFullState = false
 
   constructor(
     private url: string,
@@ -70,6 +72,21 @@ export class WorldSocket {
       } else if (msg.type === 'delta_state') {
         const delta = msg as DeltaStateMessage
         if (!this.lastFullState) {
+          if (!this.fetchingFullState) {
+            this.fetchingFullState = true
+            const apiBase = getBackendBaseUrl()
+            fetch((apiBase ? apiBase : '') + '/api/state')
+              .then(r => r.json())
+              .then(s => {
+                if (s && s.type === 'state') {
+                  this.handle(JSON.stringify(s))
+                }
+                this.fetchingFullState = false
+              })
+              .catch(() => {
+                this.fetchingFullState = false
+              })
+          }
           return
         }
         // Apply removals

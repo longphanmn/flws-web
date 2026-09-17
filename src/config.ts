@@ -45,7 +45,7 @@ const envWsUrl = decodeEnvUrl(
   ''
 )
 
-export const DEFAULT_REMOTE_BACKEND = (envApiUrl || '').replace(/\/+$/, '')
+export const DEFAULT_REMOTE_BACKEND = (envApiUrl || 'https://world.minhnhan.in').replace(/\/+$/, '')
 
 export const DEFAULT_REMOTE_WS = (envWsUrl && (envWsUrl.startsWith('ws://') || envWsUrl.startsWith('wss://')))
   ? envWsUrl
@@ -53,7 +53,7 @@ export const DEFAULT_REMOTE_WS = (envWsUrl && (envWsUrl.startsWith('ws://') || e
       ? (DEFAULT_REMOTE_BACKEND.startsWith('https')
           ? DEFAULT_REMOTE_BACKEND.replace(/^https/, 'wss') + '/ws'
           : DEFAULT_REMOTE_BACKEND.replace(/^http/, 'ws') + '/ws')
-      : '')
+      : 'wss://world.minhnhan.in/ws')
 
 export function getBackendBaseUrl(): string {
   if (paramBackend) return paramBackend.replace(/\/+$/, '')
