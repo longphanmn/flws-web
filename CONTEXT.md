@@ -2,11 +2,11 @@
 
 ## 1. Project Overview & Mission
 - **Project Name:** Flatland Web Simulation Client & Macro Observatory (`flws-web`)
-- **Production Host:** `https://longphanmn.github.io/flws-web/` (GitHub Pages docs host) / Local `:5173`
+- **Production Host:** `https://longphanmn.github.io/flws-web/` (GitHub Pages docs host) / Local `:5173` (Remote fallback: `https://world.minhnhan.in` / `wss://world.minhnhan.in/ws`)
 - **Role in Ecosystem:** The primary interactive web viewport, macro telemetry observatory, and static documentation hub for the Flatland simulation ecosystem.
 - **Stack:** React 18, TypeScript 5.6, Vite 5.4, HTML5 Canvas2D / WebGL, Tailwind/CSS variables.
 - **Dual Operating Modes:**
-  1. **Full-Stack Live Client:** Connects via WebSocket (`/ws`) and REST (`/api/*`) to an active `flws` backend instance at `localhost:8000` or a remote node.
+  1. **Full-Stack Live Client:** Connects via WebSocket (`/ws`) and REST (`/api/*`) to an active `flws` backend instance at `localhost:8000` or a remote node (defaulting to `https://world.minhnhan.in` on GitHub Pages / demo).
   2. **Static Docs Hub:** Serves as the GitHub Pages documentation host for the entire Flatland ecosystem, publishing static builds of the Multilingual Living Wiki (EN, FR, VI), Swagger OpenAPI specification viewer, and Engine Health dashboard.
 
 ---
@@ -19,10 +19,10 @@
 | **Offscreen Hillshade Cache** | Performance | 15,000-cell elevation grid pre-rendered into an `OffscreenCanvas` bitmap, blitted via a single `ctx.drawImage()` per frame. |
 | **LOD Culling (`camScale`)** | Performance | Level-of-Detail gating that culls sub-pixel phenotypic features (halos, blade glints, genesis sparks) when zoomed out (`camScale < 3.2`). |
 | **Map Lenses (`lensMode`)** | Viewport | 4 visualization modes: `1` Classic (castes/clans), `2` Mutants (asymmetry highlight), `3` Generations (ice-blue to gold gradient), `4` Dynasty (territory spheres). |
-| **Delta Reconstruction** | Networking | `websocket.ts` maintains an in-memory `Map<number, EntityState>`, patching `upsert_entities` and deleting `remove_ids` without full-state re-transfers. |
+| **Delta Reconstruction** | Networking | `websocket.ts` maintains an in-memory `Map<number, EntityState>`, patching `upsert_entities` and deleting `remove_ids` without full-state re-transfers, falling back to `GET /api/state` on premature deltas. |
 | **Polar Morphology Radar** | Inspector | Renders the exact polar polygon of a selected creature overlaid against its orthodox Abbott caste ghost template (`Inspector.tsx`). |
 | **Macro Observatory** | Telemetry | 5 full-screen telemetry views in `Observatory.tsx`: `MutationLab`, `MacroOverview`, `EcologyTab`, `SociologyTab`, and `CrisisTab`. |
-| **The Sphere Control Panel** | God Mode | `GodPanel.tsx` drawer providing real-time sliders over the 6 macro domains of natural laws, protected by PBKDF2 passkey auth. |
+| **The Sphere Control Panel** | God Mode | `GodPanel.tsx` drawer providing real-time sliders over the 6 macro domains (13 law groups) of natural laws, protected by PBKDF2 passkey auth. |
 
 ---
 
@@ -107,6 +107,10 @@ flws-web/
 │   │   └── OverviewPanel.tsx   # Day-trend demographics & mortality
 │   ├── inspect/                # Creature inspector & phenotypic radar
 │   │   └── Inspector.tsx       # Dossier, vitals, inventory & family tree
+│   ├── clan/                   # Clan inspection & diplomatic relations
+│   │   └── ClanDetails.tsx     # Clan genealogy, totems, territory & treaties
+│   ├── summary/                # World extinction & epoch milestones
+│   │   └── WorldEndSummary.tsx # Epoch completion & extinction dossier modal
 │   ├── god/                    # Laws of Nature control drawer
 │   │   ├── GodPanel.tsx        # Interactive sliders & curated world presets
 │   │   └── auth.tsx            # Passkey dialog & authorized godFetch client
@@ -114,7 +118,7 @@ flws-web/
 │   ├── components/             # Reusable UI components & avatars
 │   ├── wiki/                   # In-app interactive wiki modal
 │   ├── i18n/                   # Multi-language localization (EN, FR, VI)
-│   ├── config.ts               # Runtime API/WS endpoint resolution
+│   ├── config.ts               # Runtime API/WS endpoint resolution & remote fallback
 │   ├── websocket.ts            # Auto-reconnecting WebSocket client with delta sync
 │   ├── types.ts                # TypeScript schemas mirroring backend protocol.py
 │   ├── totems.ts               # 8 Sacred Avatars of the Sphere metadata
@@ -122,7 +126,7 @@ flws-web/
 │   └── main.tsx                # React root bootstrap
 ├── public/                     # Static documentation & PWA assets
 │   ├── wiki/                   # Static Living Wiki (EN, FR, VI)
-│   ├── docs/                   # Static Swagger API documentation viewer
+│   ├── docs/                   # Static Swagger API documentation viewer & god-laws.md
 │   ├── health/                 # Static engine health status dashboard
 │   ├── openapi.json            # Static OpenAPI specification mirror
 │   ├── 404.html                # GitHub Pages SPA router

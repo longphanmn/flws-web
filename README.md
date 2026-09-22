@@ -21,9 +21,9 @@ Dedicated web frontend simulation client and documentation host for **Flatland**
 
 - **High-Performance Canvas2D Viewport**: Zero-allocation batch renderer with LOD gating, offscreen elevation caching, and sub-pixel culling rendering thousands of geometric organisms at sustained 60 FPS.
 - **Macro Analytics Observatory**: Full-screen telemetry dashboard featuring demographics, vital health, biomass pyramids, clan hegemony, and evolutionary morphospace scatter.
-- **Real-Time WebSocket Sync**: Connects to the backend simulation engine at 10.0 TPS with delta frame updates, binary wire protocol, and automatic reconnection.
+- **Real-Time WebSocket Sync**: Connects to the backend simulation engine at 10.0 TPS with JSON delta frame reconstruction, automatic full-state recovery (`GET /api/state` fallback), and exponential-backoff reconnection.
 - **Living Creature Dossier**: Inspect individual organisms, polar morphology radar, genetic traits, vitals, inventory, and genealogy family trees.
-- **God Panel**: Interactive Laws of Nature control drawer across 6 macro domains and curated world presets with PBKDF2 passkey authentication.
+- **God Panel**: Interactive Laws of Nature control drawer across 6 macro domains (13 law groups) and curated world presets with PBKDF2 passkey authentication.
 - **History & Epoch Analytics**: Daily chronicle digests, war arc graphs, population sparklines, casualty leaderboards, and AI Story export.
 - **Bundled Static Documentation Hub**: Hosts static mirrors for the Living Wiki (English, French, Vietnamese), OpenAPI Swagger docs, health telemetry, and OpenAPI schema for GitHub Pages.
 
@@ -45,11 +45,16 @@ flws-web/
 │   │   ├── CanvasRenderer.tsx  # High-performance 60 FPS interactive viewport
 │   │   ├── renderCore.ts       # Canvas2D engine, LOD gates & scratch pools
 │   │   ├── webglRenderer.ts    # WebGL instanced sprite renderer
+│   │   ├── raycast.ts          # Raycast sensor projection math
 │   │   ├── ClanPanel.tsx       # Live clan settlements & war records (memoized)
 │   │   ├── ChronicleFeed.tsx   # Filterable real-time event log (memoized)
 │   │   └── OverviewPanel.tsx   # Day-trend demographics & mortality (memoized)
 │   ├── inspect/                # Creature inspector & phenotypic radar
 │   │   └── Inspector.tsx       # Dossier, vitals, inventory & family tree
+│   ├── clan/                   # Clan inspection & diplomatic relations
+│   │   └── ClanDetails.tsx     # Clan genealogy, totems, territory & treaties
+│   ├── summary/                # World extinction & epoch milestones
+│   │   └── WorldEndSummary.tsx # Epoch completion & extinction dossier modal
 │   ├── god/                    # Laws of Nature control drawer
 │   │   ├── GodPanel.tsx        # Interactive sliders & curated world presets
 │   │   └── auth.tsx            # Passkey dialog & authorized godFetch client
@@ -57,13 +62,15 @@ flws-web/
 │   ├── components/             # Reusable UI components & CreatureAvatar
 │   ├── wiki/                   # In-app interactive wiki modal
 │   ├── i18n/                   # Multi-language localization (EN, FR, VI)
-│   ├── config.ts               # Runtime API/WS endpoint resolution
-│   ├── websocket.ts            # Auto-reconnecting WebSocket client
+│   ├── config.ts               # Runtime API/WS endpoint resolution & fallback
+│   ├── websocket.ts            # Auto-reconnecting WebSocket client with delta sync
 │   ├── types.ts                # TypeScript schemas mirroring backend protocol
+│   ├── totems.ts               # 8 Sacred Avatars of the Sphere metadata
+│   ├── main.tsx                # React application entry point
 │   └── App.tsx                 # Main layout, HUD, WS sync & drawer navigation
 ├── public/                     # Static documentation & PWA assets
 │   ├── wiki/                   # Static Living Wiki (EN, FR, VI)
-│   ├── docs/                   # Static Swagger API documentation viewer
+│   ├── docs/                   # Static Swagger API documentation viewer & god-laws.md
 │   ├── health/                 # Static engine health status dashboard
 │   ├── openapi.json            # Static OpenAPI specification mirror
 │   ├── 404.html                # GitHub Pages SPA router
@@ -118,8 +125,8 @@ Create a `.env` file (see `.env.example`):
 
 | Variable | Description | Default / Example |
 |---|---|---|
-| `API_URL` | Remote backend REST API endpoint | `http://localhost:8000` (or `https://api.example.com`) |
-| `WS_URL` | Remote backend WebSocket endpoint | `ws://localhost:8000/ws` (or `wss://api.example.com/ws`) |
+| `API_URL` | Remote backend REST API endpoint | `http://localhost:8000` (defaults to `https://world.minhnhan.in` on GitHub Pages / demo) |
+| `WS_URL` / `VITE_WS_URL` | Remote backend WebSocket endpoint | `ws://localhost:8000/ws` (defaults to `wss://world.minhnhan.in/ws` on GitHub Pages / demo) |
 | `FRONTEND_URL` | Canonical hosted URL of the web client | `https://longphanmn.github.io/flws-web/` |
 | `LANDING_URL` | Canonical URL of the project landing page | `https://longphanmn.github.io/flws-page/` |
 | `GTM_ID` | Optional Google Tag Manager container ID | `GTM-XXXXXX` |
@@ -129,7 +136,7 @@ Create a `.env` file (see `.env.example`):
 
 ## 🚀 Deployment
 
-- **GitHub Pages**: Pushes to `main` trigger `.github/workflows/deploy-pages.yml`, which compiles the TypeScript bundle and deploys the app along with static wiki, docs, and health monitors to [https://longphanmn.github.io/flws-web/](https://longphanmn.github.io/flws-web/).
+- **GitHub Pages**: Pushes to `main` trigger `.github/workflows/deploy-pages.yml`, which compiles the TypeScript bundle and deploys the app along with static wiki, docs, and health monitors to [https://longphanmn.github.io/flws-web/](https://longphanmn.github.io/flws-web/). The workflow dynamically resolves `API_URL` and `VITE_WS_URL` from the GitHub Pages environment without hardcoded secrets, defaulting to `https://world.minhnhan.in` and `wss://world.minhnhan.in/ws`.
 - **Production Server**: Orchestrated via `./deploy.sh` from the parent workspace, which builds the bundle and restarts Nginx containers without interrupting the live backend simulation loop.
 
 ---
