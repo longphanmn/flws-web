@@ -4,6 +4,7 @@ import { totemEmoji } from '../totems'
 import { useI18n } from '../i18n'
 import { CreatureAvatar, CASTE_COLORS } from '../components/CreatureAvatar'
 import { computeCreatureRays, rayHitColor } from '../render/raycast'
+import { storageGet, storageSet } from '../storage'
 
 
 interface KinCard {
@@ -617,14 +618,14 @@ export default function Inspector({ id, state, onClose, onNavigate, onSelectClan
   }
   const [activeTab, setActiveTab] = useState<TabKey>(() => {
     try {
-      const s = sessionStorage.getItem('insp-tab') as TabKey | null
+      const s = storageGet('sessionStorage', 'insp-tab') as TabKey | null
       if (s && ['vitals','skills','lineage','chronicle'].includes(s)) return s
     } catch {}
     return 'vitals'
   })
 
   useEffect(() => {
-    try { sessionStorage.setItem('insp-tab', activeTab) } catch {}
+    try { storageSet('sessionStorage', 'insp-tab', activeTab) } catch {}
   }, [activeTab])
 
   useEffect(() => {

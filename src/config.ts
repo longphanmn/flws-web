@@ -11,22 +11,23 @@ const isDemoEnvironment = isGitHubPages || isDemoBuild
 
 export const ALLOWED_BACKEND_ORIGINS = [
   'https://world.minhnhan.in',
-  'http://localhost:8000',
-  'http://127.0.0.1:8000',
-] as const
-
-export const ALLOWED_WS_ORIGINS = [
   'wss://world.minhnhan.in',
+  'http://localhost:8000',
   'ws://localhost:8000',
+  'http://127.0.0.1:8000',
   'ws://127.0.0.1:8000',
 ] as const
+
+function isAllowedBackendOrigin(origin: string): boolean {
+  return ALLOWED_BACKEND_ORIGINS.some((allowed) => allowed === origin)
+}
 
 export function sanitizeBackendUrl(rawUrl: string | null | undefined): string | null {
   if (!rawUrl) return null
   try {
     const parsed = new URL(rawUrl)
     if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return null
-    if (ALLOWED_BACKEND_ORIGINS.includes(parsed.origin as any)) {
+    if (isAllowedBackendOrigin(parsed.origin)) {
       return parsed.origin
     }
   } catch {
@@ -40,7 +41,7 @@ export function sanitizeWsUrl(rawUrl: string | null | undefined): string | null 
   try {
     const parsed = new URL(rawUrl)
     if (parsed.protocol !== 'ws:' && parsed.protocol !== 'wss:') return null
-    if (ALLOWED_WS_ORIGINS.includes(parsed.origin as any)) {
+    if (isAllowedBackendOrigin(parsed.origin)) {
       const path = parsed.pathname === '' || parsed.pathname === '/' ? '/ws' : parsed.pathname
       if (path === '/ws') {
         return `${parsed.origin}/ws`
@@ -88,20 +89,17 @@ const envWsUrl = decodeEnvUrl(
   ''
 )
 
-export const DEFAULT_REMOTE_BACKEND = (envApiUrl || 'https://world.minhnhan.in').replace(/\/+$/, '')
+export const DEFAULT_REMOTE_BACKEND = sanitizeBackendUrl(envApiUrl) || 'https://world.minhnhan.in'
 
-export const DEFAULT_REMOTE_WS = (envWsUrl && (envWsUrl.startsWith('ws://') || envWsUrl.startsWith('wss://')))
-  ? envWsUrl
-  : (DEFAULT_REMOTE_BACKEND
-      ? (DEFAULT_REMOTE_BACKEND.startsWith('https')
-          ? DEFAULT_REMOTE_BACKEND.replace(/^https/, 'wss') + '/ws'
-          : DEFAULT_REMOTE_BACKEND.replace(/^http/, 'ws') + '/ws')
-      : 'wss://world.minhnhan.in/ws')
+export const DEFAULT_REMOTE_WS = sanitizeWsUrl(envWsUrl) || (DEFAULT_REMOTE_BACKEND
+  ? DEFAULT_REMOTE_BACKEND.replace(/^http/, 'ws') + '/ws'
+  : 'wss://world.minhnhan.in/ws')
 
 export function getBackendBaseUrl(): string {
   if (paramBackend) return paramBackend.replace(/\/+$/, '')
   const metaEnv = (import.meta as any).env
-  if (metaEnv?.VITE_BACKEND_URL) return (metaEnv.VITE_BACKEND_URL as string).replace(/\/+$/, '')
+  const envBackend = sanitizeBackendUrl(metaEnv?.VITE_BACKEND_URL)
+  if (envBackend) return envBackend
   if (isDemoEnvironment) return DEFAULT_REMOTE_BACKEND
   return ''
 }
@@ -109,7 +107,8 @@ export function getBackendBaseUrl(): string {
 export function getWebSocketUrl(): string {
   if (paramWs) return paramWs
   const metaEnv = (import.meta as any).env
-  if (metaEnv?.VITE_WS_URL) return metaEnv.VITE_WS_URL as string
+  const envWs = sanitizeWsUrl(metaEnv?.VITE_WS_URL)
+  if (envWs) return envWs
   if (paramBackend) {
     const wsProto = paramBackend.startsWith('https') ? 'wss:' : 'ws:'
     const host = paramBackend.replace(/^https?:\/\//, '').replace(/\/+$/, '')

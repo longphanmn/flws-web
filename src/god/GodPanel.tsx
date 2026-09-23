@@ -3,6 +3,7 @@ import { godFetch } from './auth'
 import { useI18n } from '../i18n'
 import type { GodLaws } from '../types'
 import { apiUrl } from '../config'
+import { storageGet, storageRemove, storageSet } from '../storage'
 
 
 const GodPanelErrorFallback = ({ error, onReset }: { error: any; onReset: () => void }) => {
@@ -466,7 +467,7 @@ interface ChangeEntry {
 const DRAFT_KEY = 'fl_god_laws_draft'
 
 function GodPanelInner({ open, onClose }: Props) {
-  const { t } = useI18n()
+  const { t, tHtml } = useI18n()
   const [laws, setLaws] = useState<GodLaws>({})
   const [baselineLaws, setBaselineLaws] = useState<GodLaws>({})
   const [loading, setLoading] = useState(true)
@@ -477,7 +478,7 @@ function GodPanelInner({ open, onClose }: Props) {
   const [expandedPreset, setExpandedPreset] = useState<string | null>('balance')
   const [presetsDetails, setPresetsDetails] = useState<Record<string, Record<string, any>> | null>(null)
   const [activeSection, setActiveSection] = useState<'presets' | 'laws'>(() => {
-    try { return (sessionStorage.getItem('god-section') as 'presets' | 'laws') || 'presets' } catch { return 'presets' }
+    try { return (storageGet('sessionStorage', 'god-section') as 'presets' | 'laws') || 'presets' } catch { return 'presets' }
   })
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 768)
   const [searchQuery, setSearchQuery] = useState('')
@@ -485,7 +486,7 @@ function GodPanelInner({ open, onClose }: Props) {
   const [filterRiskOnly, setFilterRiskOnly] = useState(false)
   const [openHint, setOpenHint] = useState<string | null>(null)
   const [activeDomain, setActiveDomain] = useState<string>(() => {
-    try { return sessionStorage.getItem('god-domain') || 'ecology' } catch { return 'ecology' }
+    try { return storageGet('sessionStorage', 'god-domain') || 'ecology' } catch { return 'ecology' }
   })
 
   // §BN-23: LocalStorage Draft Persistence
@@ -510,11 +511,11 @@ function GodPanelInner({ open, onClose }: Props) {
   const stepIntervalRef = useRef<any>(null)
 
   useEffect(() => {
-    try { sessionStorage.setItem('god-section', activeSection) } catch { /* ignore */ }
+    try { storageSet('sessionStorage', 'god-section', activeSection) } catch { /* ignore */ }
   }, [activeSection])
 
   useEffect(() => {
-    try { sessionStorage.setItem('god-domain', activeDomain) } catch { /* ignore */ }
+    try { storageSet('sessionStorage', 'god-domain', activeDomain) } catch { /* ignore */ }
   }, [activeDomain])
 
   useEffect(() => {
@@ -544,7 +545,7 @@ function GodPanelInner({ open, onClose }: Props) {
 
         // Check for saved draft in localStorage
         try {
-          const rawDraft = localStorage.getItem(DRAFT_KEY)
+          const rawDraft = storageGet('localStorage', DRAFT_KEY)
           if (rawDraft) {
             const parsed = JSON.parse(rawDraft)
             if (parsed?.laws && Object.keys(parsed.laws).length > 0) {
@@ -566,9 +567,9 @@ function GodPanelInner({ open, onClose }: Props) {
     try {
       const isMod = Object.keys(laws).some((k) => (laws as any)[k] !== (baselineLaws as any)[k])
       if (isMod) {
-        localStorage.setItem(DRAFT_KEY, JSON.stringify({ laws, date: new Date().toLocaleTimeString() }))
+        storageSet('localStorage', DRAFT_KEY, JSON.stringify({ laws, date: new Date().toLocaleTimeString() }))
       } else {
-        localStorage.removeItem(DRAFT_KEY)
+        storageRemove('localStorage', DRAFT_KEY)
       }
     } catch { /* ignore */ }
   }, [laws, baselineLaws, loading])
@@ -863,7 +864,7 @@ function GodPanelInner({ open, onClose }: Props) {
       setBaselineLaws(lawsData)
       setCurrentPreset(detectPreset(lawsData, presetsDetails ?? undefined))
       setSaved(true)
-      localStorage.removeItem(DRAFT_KEY)
+      storageRemove('localStorage', DRAFT_KEY)
       setDraftBanner(null)
       setTimeout(() => setSaved(false), 2500)
     } catch (e) {
@@ -983,7 +984,7 @@ function GodPanelInner({ open, onClose }: Props) {
       setCurrentPreset(name)
       setExpandedPreset(name)
       setSaved(true)
-      localStorage.removeItem(DRAFT_KEY)
+      storageRemove('localStorage', DRAFT_KEY)
       setDraftBanner(null)
       setTimeout(() => setSaved(false), 2500)
     } catch (e) {
@@ -1411,7 +1412,7 @@ function GodPanelInner({ open, onClose }: Props) {
               className="god-draft-btn"
               style={{ background: '#21262d', border: '1px solid #30363d', color: '#c9d1d9' }}
               onClick={() => {
-                localStorage.removeItem(DRAFT_KEY)
+                storageRemove('localStorage', DRAFT_KEY)
                 setDraftBanner(null)
               }}
             >
@@ -1797,7 +1798,7 @@ function GodPanelInner({ open, onClose }: Props) {
                   </select>
                 </label>
                 {openHint === 'boundary' && (
-                  <div className="god-hint-box" style={{ margin: '0 12px 8px' }} dangerouslySetInnerHTML={{ __html: t('god.ui.edge_hint_body') }} />
+                  <div className="god-hint-box" style={{ margin: '0 12px 8px' }} dangerouslySetInnerHTML={{ __html: tHtml('god.ui.edge_hint_body') }} />
                 )}
               </div>
 

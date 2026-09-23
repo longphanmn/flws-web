@@ -6,7 +6,7 @@ interface Props {
 }
 
 export default function CrisisTab({ data }: Props) {
-  const { t } = useI18n()
+  const { t, tHtml } = useI18n()
   const famine = data?.famine ?? {}
   const extinction = data?.extinction ?? {}
   const unrest = data?.unrest ?? {}
@@ -70,9 +70,9 @@ export default function CrisisTab({ data }: Props) {
             </span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2, fontSize: 11, color: '#e6edf3' }}>
-            {extAlarm && <div dangerouslySetInnerHTML={{ __html: t('analytics.crisis.ext_danger_desc', { ne, females: fertileFemales, males }) }} />}
-            {horizon < 300 && <div dangerouslySetInnerHTML={{ __html: t('analytics.crisis.starve_threat_desc', { horizon }) }} />}
-            {schismRisk && <div dangerouslySetInnerHTML={{ __html: t('analytics.crisis.schism_threat_desc', { score: unrestScore }) }} />}
+            {extAlarm && <div dangerouslySetInnerHTML={{ __html: tHtml('analytics.crisis.ext_danger_desc', { ne, females: fertileFemales, males }) }} />}
+            {horizon < 300 && <div dangerouslySetInnerHTML={{ __html: tHtml('analytics.crisis.starve_threat_desc', { horizon }) }} />}
+            {schismRisk && <div dangerouslySetInnerHTML={{ __html: tHtml('analytics.crisis.schism_threat_desc', { score: unrestScore }) }} />}
           </div>
         </div>
       )}

@@ -7,6 +7,7 @@ WebSocket control messages carry it in the `key` field.
 */
 import { useEffect, useState } from 'react'
 import { useI18n } from '../i18n'
+import { storageGet, storageRemove, storageSet } from '../storage'
 
 const STORAGE_KEY = 'flatworld-god-key'
 
@@ -28,29 +29,17 @@ function emit() {
 }
 
 export function getCachedKey(): string | null {
-  try {
-    return sessionStorage.getItem(STORAGE_KEY)
-  } catch {
-    return null
-  }
+  return storageGet('sessionStorage', STORAGE_KEY)
 }
 
 function rememberKey(key: string) {
-  try {
-    sessionStorage.setItem(STORAGE_KEY, key)
-    localStorage.removeItem(STORAGE_KEY)
-  } catch {
-    /* private mode etc. — session-only use */
-  }
+  storageSet('sessionStorage', STORAGE_KEY, key)
+  storageRemove('localStorage', STORAGE_KEY)
 }
 
 export function forgetKey() {
-  try {
-    sessionStorage.removeItem(STORAGE_KEY)
-    localStorage.removeItem(STORAGE_KEY)
-  } catch {
-    /* ignore */
-  }
+  storageRemove('sessionStorage', STORAGE_KEY)
+  storageRemove('localStorage', STORAGE_KEY)
 }
 
 async function serverConfigured(): Promise<boolean> {

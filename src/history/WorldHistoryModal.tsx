@@ -8,6 +8,7 @@ import WarArcGraph from './WarArcGraph'
 import RecordsLeaderboard from './RecordsLeaderboard'
 import HistoryAnalytics from './HistoryAnalytics'
 import { generateAndDownloadWorldCard } from './ShareWorldCard'
+import { storageGet, storageSet } from '../storage'
 
 interface Props {
   open: boolean
@@ -290,7 +291,7 @@ export default function WorldHistoryModal({
   // BM-7: Pinned / bookmarked days with notes in localStorage
   const [pinnedDays, setPinnedDays] = useState<Record<number, string>>(() => {
     try {
-      return JSON.parse(localStorage.getItem('flatland_pinned_days') || '{}')
+      return JSON.parse(storageGet('localStorage', 'flatland_pinned_days') || '{}')
     } catch {
       return {}
     }
@@ -305,7 +306,7 @@ export default function WorldHistoryModal({
         next[day] = ''
       }
       try {
-        localStorage.setItem('flatland_pinned_days', JSON.stringify(next))
+        storageSet('localStorage', 'flatland_pinned_days', JSON.stringify(next))
       } catch {}
       return next
     })
@@ -315,7 +316,7 @@ export default function WorldHistoryModal({
     setPinnedDays((prev) => {
       const next = { ...prev, [day]: note }
       try {
-        localStorage.setItem('flatland_pinned_days', JSON.stringify(next))
+        storageSet('localStorage', 'flatland_pinned_days', JSON.stringify(next))
       } catch {}
       return next
     })
@@ -323,14 +324,14 @@ export default function WorldHistoryModal({
 
   const [storyStyle, setStoryStyle] = useState<StoryStyle>(() => {
     try {
-      const s = sessionStorage.getItem('history-story-style') as StoryStyle | null
+      const s = storageGet('sessionStorage', 'history-story-style') as StoryStyle | null
       if (s && s in STYLE_LABELS) return s
     } catch { /* ignore */ }
     return 'saga'
   })
   const [showTimelineChart, setShowTimelineChart] = useState<boolean>(() => {
     try {
-      return sessionStorage.getItem('history-show-chart') === 'true'
+      return storageGet('sessionStorage', 'history-show-chart') === 'true'
     } catch {
       return false
     }
@@ -356,7 +357,7 @@ export default function WorldHistoryModal({
 
   // Persist the chosen writing style across modal reopens
   useEffect(() => {
-    try { sessionStorage.setItem('history-story-style', storyStyle) } catch { /* ignore */ }
+    try { storageSet('sessionStorage', 'history-story-style', storyStyle) } catch { /* ignore */ }
   }, [storyStyle])
 
   // Close on Escape key
@@ -1189,7 +1190,7 @@ ${langInstruction}
                     onClick={() => {
                       setShowTimelineChart((v) => {
                         const next = !v
-                        try { sessionStorage.setItem('history-show-chart', String(next)) } catch {}
+                        try { storageSet('sessionStorage', 'history-show-chart', String(next)) } catch {}
                         return next
                       })
                     }}

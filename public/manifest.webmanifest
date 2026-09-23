@@ -1,7 +1,7 @@
 {
   "name": "Flatland — World Simulation",
   "short_name": "Flatland",
-  "description": "Flatland is an autonomous 2D World Simulation by Long Phan (long@minhnhan.in). Geometric beings explore, farm, shelter, form clans, and evolve under emergent natural laws.",
+  "description": "Flatland is an autonomous 2D world simulation where geometric beings explore, farm, shelter, form clans, and evolve under emergent natural laws.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0d1117",

@@ -1,4 +1,5 @@
 import { ReactNode, useEffect, useState } from 'react'
+import { storageGet, storageSet } from '../storage'
 
 interface Props {
   /** Stable key for localStorage persistence (e.g. 'overview-caste'). */
@@ -15,14 +16,14 @@ export default function Collapsible({ id, title, children, defaultOpen = true, h
   const storageKey = `fl-collapsed-${id}`
   const [open, setOpen] = useState<boolean>(() => {
     if (typeof window === 'undefined') return defaultOpen
-    const saved = window.localStorage.getItem(storageKey)
+    const saved = storageGet('localStorage', storageKey)
     if (saved === null) return defaultOpen
     return saved !== '1'
   })
 
   useEffect(() => {
     try {
-      window.localStorage.setItem(storageKey, open ? '0' : '1')
+      storageSet('localStorage', storageKey, open ? '0' : '1')
     } catch {
       // ignore localStorage disabled/quota errors
     }

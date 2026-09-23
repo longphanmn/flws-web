@@ -16,6 +16,7 @@ import type { HelloMessage, HistoryEvent, LensMode, StateMessage, WorldSummary }
 import { useI18n } from './i18n'
 import ConfirmModal from './components/ConfirmModal'
 import { apiUrl, getLandingUrl, getWebSocketUrl } from './config'
+import { storageGet, storageSet } from './storage'
 
 
 const SPEEDS = [1, 5, 10, 20, 40]
@@ -75,19 +76,19 @@ export default function App() {
   const [sheetTab, setSheetTab] = useState<'world' | 'clans' | 'chronicle'>('world')
   const [rightTab, setRightTab] = useState<'overview' | 'clans' | 'chronicle'>(() => {
     if (typeof window !== 'undefined') {
-      const v = sessionStorage.getItem('right-stack-tab')
+      const v = storageGet('sessionStorage', 'right-stack-tab')
       if (v === 'overview' || v === 'clans' || v === 'chronicle') return v
     }
     return 'overview'
   })
   useEffect(() => {
-    try { sessionStorage.setItem('right-stack-tab', rightTab) } catch {}
+    try { storageSet('sessionStorage', 'right-stack-tab', rightTab) } catch {}
   }, [rightTab])
   const [rightCollapsed, setRightCollapsed] = useState<boolean>(() => {
-    try { return sessionStorage.getItem('right-stack-collapsed') === '1' } catch { return false }
+    try { return storageGet('sessionStorage', 'right-stack-collapsed') === '1' } catch { return false }
   })
   useEffect(() => {
-    try { sessionStorage.setItem('right-stack-collapsed', rightCollapsed ? '1' : '0') } catch {}
+    try { storageSet('sessionStorage', 'right-stack-collapsed', rightCollapsed ? '1' : '0') } catch {}
   }, [rightCollapsed])
   const [versionInfo, setVersionInfo] = useState<{ version: string; revision: string } | null>(null)
   const [log, setLog] = useState<HistoryEvent[]>([])

@@ -132,6 +132,8 @@ Create a `.env` file (see `.env.example`):
 | `GTM_ID` | Optional Google Tag Manager container ID | `GTM-XXXXXX` |
 | `GA_ID` | Optional Google Analytics measurement ID | `G-XXXXXXXXXX` |
 
+When adding a custom API or WebSocket origin, update `ALLOWED_BACKEND_ORIGINS` in `src/config.ts` and the matching `connect-src` directives in `index.html`, `nginx.conf`, and the static health pages together. An origin omitted from `connect-src` is blocked by the browser even when it passes configuration validation.
+
 ---
 
 ## 🚀 Deployment
@@ -143,7 +145,7 @@ Create a `.env` file (see `.env.example`):
 
 ## 👤 Author & Attribution
 
-- **Developed by**: **[Long Phan](mailto:long@minhnhan.in)** ([minhnhan.in](https://minhnhan.in/?lang=en))
+- **Developed by**: **Flatland Project** ([Repository](https://github.com/longphanmn/flws-web))
 - **Concept**: Developed from the geometric premises and social satire of Edwin A. Abbott's 1884 classic *Flatland: A Romance of Many Dimensions*.
 - **Tooling**: Built and engineered with **OpenCode** and **Antigravity**.
 - **License**: [MIT](https://opensource.org/licenses/MIT)

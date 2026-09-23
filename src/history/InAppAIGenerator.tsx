@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useI18n } from '../i18n'
+import { storageGet, storageRemove, storageSet } from '../storage'
 
 interface Props {
   prompt: string
@@ -20,33 +21,29 @@ export default function InAppAIGenerator({
 }: Props) {
   const { t } = useI18n()
   const [provider, setProvider] = useState<Provider>(() => {
-    return (localStorage.getItem('flatland_ai_provider') as Provider) || 'gemini'
+    return (storageGet('localStorage', 'flatland_ai_provider') as Provider) || 'gemini'
   })
   const [apiKey, setApiKey] = useState<string>(() => {
-    return sessionStorage.getItem('flatland_ai_key') || ''
+    return storageGet('sessionStorage', 'flatland_ai_key') || ''
   })
-  const [showKeyConfig, setShowKeyConfig] = useState<boolean>(() => !sessionStorage.getItem('flatland_ai_key'))
+  const [showKeyConfig, setShowKeyConfig] = useState<boolean>(() => !storageGet('sessionStorage', 'flatland_ai_key'))
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [generatedStory, setGeneratedStory] = useState<string>('')
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
-    try {
-      localStorage.setItem('flatland_ai_provider', provider)
-    } catch {}
+    storageSet('localStorage', 'flatland_ai_provider', provider)
   }, [provider])
 
   const saveApiKey = (key: string) => {
     setApiKey(key)
-    try {
-      if (key.trim()) {
-        sessionStorage.setItem('flatland_ai_key', key.trim())
-      } else {
-        sessionStorage.removeItem('flatland_ai_key')
-      }
-      localStorage.removeItem('flatland_ai_key')
-    } catch {}
+    if (key.trim()) {
+      storageSet('sessionStorage', 'flatland_ai_key', key.trim())
+    } else {
+      storageRemove('sessionStorage', 'flatland_ai_key')
+    }
+    storageRemove('localStorage', 'flatland_ai_key')
   }
 
   const handleGenerate = async () => {

@@ -1,6 +1,9 @@
 <!doctype html>
 <html lang="en"><head>
-<script>(function(){var p=new URLSearchParams(window.location.search);var l=p.get("lang");if(l==="vi"||l==="vn"){window.location.replace("./wiki-vi.html"+window.location.search+window.location.hash);}else if(l==="fr"){window.location.replace("./wiki-fr.html"+window.location.search+window.location.hash);}})();</script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- GitHub Pages cannot send HTTP headers, so this meta-CSP is best-effort there; nginx (prod) delivers the full header including frame-ancestors 'none'. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-nDnSm5XSkwDxtg0iJbkzDdrJvglrAeMc91/SoHj4hcM=' 'sha256-iAPuAT/eV7LmN+Ior4kwYzblK42OZp9jPB7ww6pCQgI='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://world.minhnhan.in wss://world.minhnhan.in http://localhost:8000 ws://localhost:8000 http://127.0.0.1:8000 ws://127.0.0.1:8000 https://generativelanguage.googleapis.com https://api.openai.com; object-src 'none'; base-uri 'self';">
+<script>(function(){var p=new URLSearchParams(window.location.search);var l=p.get("lang");if(l==="vi"||l==="vn"){window.location.replace("./wiki-vi.html"+window.location.search+window.location.hash);}else if(l==="fr"){window.location.replace("./wiki-fr.html"+window.location.search+window.location.hash);}})();</script>
 <title>Flatland — Living Wiki — World Simulation by Long Phan</title>
 <meta name="description" content="Official living wiki and system encyclopedia for Flatland: 2D autonomous World Simulation by Long Phan (long@minhnhan.in).">
 <meta name="keywords" content="Flatland, World Simulation, Wiki, Guide, Presets, Simulation Mechanics, Long Phan, long@minhnhan.in, Artificial Life">
@@ -776,7 +779,7 @@ tr:hover td { background: rgba(56, 139, 253, 0.05); }
 <li><strong>Epoch Bar &amp; Population Sparkline</strong>: Interactive temporal navigation with color-coded world epochs (Genesis, Age of Tribes, Feudal Era, Classical Zenith, Era of Ruin) and population curves overlaid with war and plague crisis markers.</li>
 <li><strong>Records &amp; Legends Leaderboard</strong>: Hall of fame for Sovereign of War, Deadliest Single Day, Greatest Realm, Divine Architects, Largest Schism, and Hero/Villain notables.</li>
 <li><strong>History Analytics</strong>: Clan Rivalry Heatmap Matrix, Mortality Breakdown (combat, famine, disease, age) across 10-day eras, and Faith Devotion Index over time.</li>
-<li><strong>In-App AI Story Generator</strong>: Integrated browser-based LLM narrative generator using Google Gemini 1.5 Flash or OpenAI GPT-4o-mini with client-side API keys in localStorage. Supports 4 narrative styles (Saga, Chronicle, Mythos, Tragedy) in EN, VI, and FR.</li>
+<li><strong>In-App AI Story Generator</strong>: Integrated browser-based LLM narrative generator using Google Gemini 1.5 Flash or OpenAI GPT-4o-mini with client-side API keys in sessionStorage. Supports 4 narrative styles (Saga, Chronicle, Mythos, Tragedy) in EN, VI, and FR.</li>
 <li><strong>Deep Linking</strong>: Shareable URLs with <code>?history=42</code> to auto-open specific world days or <code>?clan=7</code> to auto-open clan biographies.</li>
 </ul>
 <h2 id="irregularity-caste-c">Irregularity &amp; caste (§C)</h2>

@@ -3,8 +3,10 @@ import { createRoot } from 'react-dom/client'
 import App from './App'
 import { I18nProvider } from './i18n'
 import { initApiInterceptor } from './config'
+import { migrateLegacySecrets } from './storage'
 import './index.css'
 
+migrateLegacySecrets()
 initApiInterceptor()
 
 createRoot(document.getElementById('root')!).render(

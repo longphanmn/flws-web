@@ -2,22 +2,17 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import en from './locales/en.json'
 import fr from './locales/fr.json'
 import vi from './locales/vi.json'
+import { storageGet, storageSet } from '../storage'
 
 const locales: Record<string, any> = { en, fr, vi, vn: vi }
 export type Lang = 'en' | 'fr' | 'vi' | 'vn'
 const STORAGE_KEY = 'flatland_lang'
 
 function safeGet(key: string): string | null {
-  try {
-    return typeof localStorage !== 'undefined' ? localStorage.getItem(key) : null
-  } catch {
-    try { return typeof sessionStorage !== 'undefined' ? sessionStorage.getItem(key) : null } catch { return null }
-  }
+  return storageGet('localStorage', key) ?? storageGet('sessionStorage', key)
 }
 function safeSet(key: string, val: string) {
-  try { localStorage.setItem(key, val); } catch {
-    try { sessionStorage.setItem(key, val); } catch {}
-  }
+  if (!storageSet('localStorage', key, val)) storageSet('sessionStorage', key, val)
 }
 function getInitialLang(): Lang {
   const saved = safeGet(STORAGE_KEY) as Lang | null
@@ -48,18 +43,28 @@ export function escapeHtml(val: unknown): string {
     .replace(/'/g, '&#39;')
 }
 
-function interpolate(str: string, vars?: Record<string, any>): string {
+function interpolate(str: string, vars?: Record<string, any>, html = false): string {
   if (!vars) return str
-  return str.replace(/\{\{(\w+)\}\}/g, (_, k) => (vars[k] != null ? escapeHtml(vars[k]) : `{{${k}}}`))
+  return str.replace(/\{\{(\w+)\}\}/g, (_, key) => {
+    if (vars[key] == null) return `{{${key}}}`
+    const value = String(vars[key])
+    return html ? escapeHtml(value) : value
+  })
 }
 
 interface I18nCtx {
   lang: Lang
   setLang: (l: Lang) => void
   t: (key: string, vars?: Record<string, any>) => string
+  tHtml: (key: string, vars?: Record<string, any>) => string
 }
 
-const Ctx = createContext<I18nCtx>({ lang: 'en', setLang: () => {}, t: (k) => k })
+const Ctx = createContext<I18nCtx>({
+  lang: 'en',
+  setLang: () => {},
+  t: (key) => key,
+  tHtml: (key) => key,
+})
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [lang, setLangRaw] = useState<Lang>(getInitialLang)
@@ -74,7 +79,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, [lang])
   const dict = locales[lang] ?? en
   const t = (key: string, vars?: Record<string, any>) => interpolate(resolve(key, dict), vars)
-  return <Ctx.Provider value={{ lang, setLang, t }}>{children}</Ctx.Provider>
+  const tHtml = (key: string, vars?: Record<string, any>) => interpolate(resolve(key, dict), vars, true)
+  return <Ctx.Provider value={{ lang, setLang, t, tHtml }}>{children}</Ctx.Provider>
 }
 
 export function useI18n() {

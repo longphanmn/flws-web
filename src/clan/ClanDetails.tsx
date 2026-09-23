@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { TOTEMS, totemEmoji } from '../totems'
 import type { ClanHistoryEvent } from '../types'
 import { useI18n } from '../i18n'
+import { storageGet, storageSet } from '../storage'
 
 interface ClanMember {
   id: number
@@ -162,7 +163,7 @@ export default function ClanDetails({
   const [activeTab, setActiveTab] = useState<TabKey>(() => {
     if (initialTab) return initialTab
     try {
-      const s = sessionStorage.getItem('clan-tab') as TabKey | null
+      const s = storageGet('sessionStorage', 'clan-tab') as TabKey | null
       if (s && ['stronghold','roster','warfare','annals','biography'].includes(s)) return s
     } catch {}
     return 'stronghold'
@@ -176,7 +177,7 @@ export default function ClanDetails({
   }, [initialTab])
 
   useEffect(() => {
-    try { sessionStorage.setItem('clan-tab', activeTab) } catch {}
+    try { storageSet('sessionStorage', 'clan-tab', activeTab) } catch {}
   }, [activeTab])
 
   useEffect(() => {

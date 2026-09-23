@@ -1,6 +1,9 @@
 <!doctype html>
 <html lang="fr"><head>
-<script>(function(){var p=new URLSearchParams(window.location.search);var l=p.get("lang");if(l==="en"){window.location.replace("./"+window.location.search+window.location.hash);}else if(l==="vi"||l==="vn"){window.location.replace("./wiki-vi.html"+window.location.search+window.location.hash);}})();</script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- GitHub Pages cannot send HTTP headers, so this meta-CSP is best-effort there; nginx (prod) delivers the full header including frame-ancestors 'none'. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-wrkgK2mm/BcXkpgYbV+G+k0QikHfO4TTFLAFtveuBOQ=' 'sha256-33r2vHGToGTnBQPX5Hy9L5rklI4l9ix3T8Q9t0uJIz8='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://world.minhnhan.in wss://world.minhnhan.in http://localhost:8000 ws://localhost:8000 http://127.0.0.1:8000 ws://127.0.0.1:8000 https://generativelanguage.googleapis.com https://api.openai.com; object-src 'none'; base-uri 'self';">
+<script>(function(){var p=new URLSearchParams(window.location.search);var l=p.get("lang");if(l==="en"){window.location.replace("./"+window.location.search+window.location.hash);}else if(l==="vi"||l==="vn"){window.location.replace("./wiki-vi.html"+window.location.search+window.location.hash);}})();</script>
 <title>Flatland — Wiki Vivant &amp; Encyclopédie — Simulation de Monde par Long Phan</title>
 <meta name="description" content="Wiki vivant officiel et encyclopédie du système pour Flatland : simulation 2D autonome de vie artificielle par Long Phan (long@minhnhan.in).">
 <meta name="keywords" content="Flatland, World Simulation, Wiki, Guide, Presets, Simulation Mechanics, Long Phan, long@minhnhan.in, Artificial Life">

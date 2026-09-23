@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2XdYTRqXi3eC/GN9BOtQ5V5WBpUc7N4zhpUBSE8gz2o='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://world.minhnhan.in wss://world.minhnhan.in http://localhost:8000 ws://localhost:8000 http://127.0.0.1:8000 ws://127.0.0.1:8000; frame-ancestors 'none'; object-src 'none'; base-uri 'self';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-wWeRZT/f7b6yT4HaWKbc0DJlOxxzX6NMdbnSvVQwlGc='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://world.minhnhan.in wss://world.minhnhan.in http://localhost:8000 ws://localhost:8000 http://127.0.0.1:8000 ws://127.0.0.1:8000; object-src 'none'; base-uri 'self';">
 <title>Flatland Health Dashboard</title>
 <style>
   :root { color-scheme: dark; }
@@ -521,8 +521,16 @@
   var hoverIdx = -1;
   var hoverChart = null; // 'g' or 'gp'
 
+  function safeStorageGet(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  }
+
+  function safeStorageSet(key, value) {
+    try { localStorage.setItem(key, value); } catch (e) {}
+  }
+
   // Time range state
-  var currentRange = localStorage.getItem("fl_health_range") || "1h";
+  var currentRange = safeStorageGet("fl_health_range") || "1h";
 
   function updateExternalLinks() {
     if (isDemo) {
@@ -546,13 +554,53 @@
 
 
 
-  function esc(s) {
-    return String(s != null ? s : "—")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#39;");
+  function finiteNumber(value, fallback) {
+    var parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : fallback;
+  }
+
+  function formatNumber(value, digits, fallback) {
+    var parsed = finiteNumber(value, NaN);
+    return Number.isFinite(parsed) ? parsed.toFixed(digits) : fallback;
+  }
+
+  function formatInteger(value, fallback) {
+    var parsed = finiteNumber(value, NaN);
+    return Number.isFinite(parsed) ? parsed.toLocaleString() : fallback;
+  }
+
+  function makeElement(tag, className, text) {
+    var element = document.createElement(tag);
+    if (className) element.className = className;
+    if (text !== undefined && text !== null) element.textContent = String(text);
+    return element;
+  }
+
+  function renderPill(element, label, className) {
+    element.className = "pill " + className;
+    element.textContent = "";
+    element.appendChild(makeElement("span", "pill-dot"));
+    element.appendChild(document.createTextNode(label));
+  }
+
+  function renderCardGrid(id, items) {
+    var container = document.getElementById(id);
+    container.textContent = "";
+    items.forEach(function (item) {
+      var card = makeElement("div", "card");
+      var key = makeElement("div", "k");
+      key.appendChild(makeElement("span", "", item.k));
+      if (item.badge) {
+        key.appendChild(makeElement("span", "pill " + item.badge.className, item.badge.text));
+      }
+      card.appendChild(key);
+
+      var value = makeElement("div", "v", item.v);
+      if (item.unit) value.appendChild(makeElement("small", "", item.unit));
+      card.appendChild(value);
+      if (item.sub) card.appendChild(makeElement("div", "subtext", item.sub));
+      container.appendChild(card);
+    });
   }
 
   function fmtTime(epochSec, spanSeconds) {
@@ -584,7 +632,7 @@
         var r = b.getAttribute("data-range");
         if (r === currentRange) return;
         currentRange = r;
-        localStorage.setItem("fl_health_range", r);
+        safeStorageSet("fl_health_range", r);
         btns.forEach(function (x) { x.classList.remove("active"); });
         b.classList.add("active");
         poll();
@@ -594,25 +642,27 @@
 
   function renderHeaderAndMeta() {
     var st = getStatusInfo();
-    var pill = document.getElementById("pill");
-    pill.innerHTML = '<span class="pill-dot"></span>' + st.label;
-    pill.className = "pill " + st.cls;
+    renderPill(document.getElementById("pill"), st.label, st.cls);
 
     if (cur) {
-      var worldInfo = "tick " + (cur.tick != null ? cur.tick.toLocaleString() : "—") +
-        " · speed " + (cur.speed_target != null ? cur.speed_target : "—") + " TPS" +
+      var worldInfo = "tick " + formatInteger(cur.tick, "—") +
+        " · speed " + formatNumber(cur.speed_target, 0, "—") + " TPS" +
         " · preset: " + (cur.preset || "default");
       document.getElementById("subtitle").textContent = worldInfo;
 
+      var sessionTicks = finiteNumber(cur.session_ticks, 0);
       document.getElementById("uptime-label").textContent =
-        "Uptime: " + (cur.uptime || "—") + (cur.session_ticks ? " (" + cur.session_ticks.toLocaleString() + " ticks)" : "");
+        "Uptime: " + (cur.uptime || "—") + (sessionTicks ? " (" + sessionTicks.toLocaleString() + " ticks)" : "");
 
-      var climate = "Day " + (cur.day || 1) + " · " + (cur.season || "spring");
+      var day = finiteNumber(cur.day, 1);
+      var climate = "Day " + day + " · " + (cur.season || "spring");
       if (cur.weather) climate += " · " + cur.weather;
       if (cur.age) climate += " · " + cur.age;
       document.getElementById("climate-label").textContent = climate;
 
-      var pidText = "PID " + (cur.pid || "—") + " · World #" + (cur.world_id != null ? cur.world_id : "0");
+      var pid = finiteNumber(cur.pid, NaN);
+      var worldId = finiteNumber(cur.world_id, 0);
+      var pidText = "PID " + (Number.isFinite(pid) ? pid : "—") + " · World #" + worldId;
       document.getElementById("footer-meta").textContent = pidText;
     }
   }
@@ -620,137 +670,141 @@
   function renderCards() {
     if (!cur) return;
 
-    // Perf cards
     var perfItems = [
       {
         k: "Actual TPS",
-        v: cur.actual_tps != null ? cur.actual_tps.toFixed(1) : "—",
-        sub: "target " + (cur.speed_target != null ? cur.speed_target : "—") + " TPS"
+        v: formatNumber(cur.actual_tps, 1, "—"),
+        sub: "target " + formatNumber(cur.speed_target, 0, "—") + " TPS"
       },
       {
         k: "Tick Duration",
-        v: cur.avg_tick_ms != null ? cur.avg_tick_ms.toFixed(1) : "—",
+        v: formatNumber(cur.avg_tick_ms, 1, "—"),
         unit: "ms",
-        sub: "max " + (cur.max_tick_ms != null ? cur.max_tick_ms.toFixed(1) : "—") + " ms"
+        sub: "max " + formatNumber(cur.max_tick_ms, 1, "—") + " ms"
       },
       {
         k: "Frame Budget",
-        v: cur.interval_ms != null ? cur.interval_ms.toFixed(1) : "—",
+        v: formatNumber(cur.interval_ms, 1, "—"),
         unit: "ms",
-        sub: (cur.total_overruns != null ? cur.total_overruns : 0) + " total overruns"
+        sub: formatInteger(cur.total_overruns, "0") + " total overruns"
       },
       {
         k: "Process Memory",
-        v: cur.memory_mb != null ? cur.memory_mb.toFixed(1) : "—",
+        v: formatNumber(cur.memory_mb, 1, "—"),
         unit: "MB",
-        sub: (cur.threads || 1) + " active threads"
+        sub: formatInteger(cur.threads, "1") + " active threads"
       },
       {
         k: "Tick Failures",
-        v: cur.tick_failures != null ? cur.tick_failures : 0,
+        v: formatInteger(cur.tick_failures, "0"),
         sub: cur.ok ? "engine healthy" : "check error log"
       }
     ];
+    renderCardGrid("cards-perf", perfItems);
 
-    document.getElementById("cards-perf").innerHTML = perfItems.map(function (it) {
-      return '<div class="card"><div class="k"><span>' + esc(it.k) + '</span></div>' +
-        '<div class="v">' + esc(it.v) + (it.unit ? ' <small>' + esc(it.unit) + '</small>' : '') + '</div>' +
-        (it.sub ? '<div class="subtext">' + esc(it.sub) + '</div>' : '') + '</div>';
-    }).join("");
-
-    // Eco cards
+    var creatures = finiteNumber(cur.creatures, NaN);
+    var food = finiteNumber(cur.food_count, NaN);
+    var foodPerCreature = Number.isFinite(creatures) && creatures > 0 && Number.isFinite(food)
+      ? (food / creatures).toFixed(2) + " food/creature"
+      : "plants count";
     var ecoItems = [
       {
         k: "Population",
-        v: cur.creatures != null ? cur.creatures.toLocaleString() : "—",
-        sub: (cur.deaths != null ? cur.deaths.toLocaleString() : "0") + " total deaths"
+        v: formatInteger(cur.creatures, "—"),
+        sub: formatInteger(cur.deaths, "0") + " total deaths"
       },
       {
         k: "Food Available",
-        v: cur.food_count != null ? cur.food_count.toLocaleString() : "—",
-        sub: cur.creatures ? (cur.food_count / Math.max(1, cur.creatures)).toFixed(2) + " food/creature" : "plants count"
+        v: formatInteger(cur.food_count, "—"),
+        sub: foodPerCreature
       },
       {
         k: "Settlements",
-        v: cur.houses_count != null ? cur.houses_count.toLocaleString() : "—",
+        v: formatInteger(cur.houses_count, "—"),
         unit: "houses",
-        sub: (cur.clans_count != null ? cur.clans_count : 0) + " active clans"
+        sub: formatInteger(cur.clans_count, "0") + " active clans"
+      },
+      {
+        k: "Infected",
+        v: formatInteger(cur.infected_count, "0"),
+        sub: finiteNumber(cur.infected_count, 0) > 0 ? "epidemic active" : "no pathogen spread"
       },
       {
         k: "Simulation Age",
         v: cur.age || "Classic",
-        sub: "Day " + (cur.day || 1) + " (" + (cur.season || "spring") + ")"
+        sub: "Day " + finiteNumber(cur.day, 1) + " (" + (cur.season || "spring") + ")"
       }
     ];
+    renderCardGrid("cards-eco", ecoItems);
 
-    document.getElementById("cards-eco").innerHTML = ecoItems.map(function (it) {
-      return '<div class="card"><div class="k"><span>' + esc(it.k) + '</span></div>' +
-        '<div class="v">' + esc(it.v) + (it.unit ? ' <small>' + esc(it.unit) + '</small>' : '') + '</div>' +
-        (it.sub ? '<div class="subtext">' + esc(it.sub) + '</div>' : '') + '</div>';
-    }).join("");
-
-    // Castes strip
     var castesBox = document.getElementById("castes-strip");
     if (cur.castes && Object.keys(cur.castes).length > 0) {
       castesBox.style.display = "flex";
-      var totalCastes = cur.creatures || 1;
-      var chips = Object.keys(cur.castes).sort().map(function (caste) {
-        var cnt = cur.castes[caste];
-        var pct = Math.round((cnt / totalCastes) * 100);
-        return '<div class="caste-chip"><strong>' + esc(caste) + '</strong>: ' +
-               cnt + ' <span style="color:#8b949e">(' + pct + '%)</span></div>';
+      castesBox.textContent = "";
+      var label = makeElement("span", "", "Castes:");
+      label.style.fontSize = "11px";
+      label.style.color = "#8b949e";
+      label.style.textTransform = "uppercase";
+      label.style.fontWeight = "600";
+      label.style.marginRight = "4px";
+      castesBox.appendChild(label);
+
+      var totalCastes = Math.max(1, finiteNumber(cur.creatures, 1));
+      Object.keys(cur.castes).sort().forEach(function (caste) {
+        var count = finiteNumber(cur.castes[caste], 0);
+        var percent = Math.round((count / totalCastes) * 100);
+        var chip = makeElement("div", "caste-chip");
+        chip.appendChild(makeElement("strong", "", caste));
+        chip.appendChild(document.createTextNode(": " + count + " "));
+        var percentNode = makeElement("span", "", "(" + percent + "%)");
+        percentNode.style.color = "#8b949e";
+        chip.appendChild(percentNode);
+        castesBox.appendChild(chip);
       });
-      castesBox.innerHTML = '<span style="font-size:11px; color:#8b949e; text-transform:uppercase; font-weight:600; margin-right:4px;">Castes:</span>' + chips.join("");
     } else {
       castesBox.style.display = "none";
     }
 
-    // Reg cards
-    var sgLabel = cur.safeguard_active
-      ? '<span class="pill ok">Active (T' + (cur.safeguard_tier || 1) + ')</span>'
-      : '<span class="pill idle">Off</span>';
-    var scLabel = cur.softcap_active
-      ? '<span class="pill bad">Active</span>'
-      : '<span class="pill idle">Off</span>';
-
+    var infected = finiteNumber(cur.infected_count, 0);
+    var safeguardTier = finiteNumber(cur.safeguard_tier, 1);
+    var safeguardEta = finiteNumber(cur.safeguard_eta, NaN);
+    var softcapXi = finiteNumber(cur.softcap_xi, NaN);
     var regItems = [
       {
         k: "Safeguard (Green)",
         v: cur.safeguard_active ? "ACTIVE" : "OFF",
-        pillHtml: sgLabel,
-        sub: cur.safeguard_active ? ("Recovery η=" + (cur.safeguard_eta != null ? cur.safeguard_eta : "—")) : "spawns normal"
+        badge: cur.safeguard_active
+          ? { className: "ok", text: "Active (T" + safeguardTier + ")" }
+          : { className: "idle", text: "Off" },
+        sub: cur.safeguard_active ? "Recovery η=" + (Number.isFinite(safeguardEta) ? safeguardEta : "—") : "spawns normal"
       },
       {
         k: "Softcap (Red)",
         v: cur.softcap_active ? "ACTIVE" : "OFF",
-        pillHtml: scLabel,
-        sub: cur.softcap_active ? ("Density ξ=" + (cur.softcap_xi != null ? cur.softcap_xi : "—")) : "density normal"
+        badge: cur.softcap_active
+          ? { className: "bad", text: "Active" }
+          : { className: "idle", text: "Off" },
+        sub: cur.softcap_active ? "Density ξ=" + (Number.isFinite(softcapXi) ? softcapXi : "—") : "density normal"
       },
       {
         k: "Infected Creatures",
-        v: cur.infected_count != null ? cur.infected_count : 0,
-        sub: (cur.infected_count > 0 ? "epidemic active" : "no pathogen spread")
+        v: formatInteger(cur.infected_count, "0"),
+        sub: infected > 0 ? "epidemic active" : "no pathogen spread"
       },
       {
         k: "WebSocket Clients",
-        v: cur.clients != null ? cur.clients : 0,
-        sub: (cur.db_pending != null ? cur.db_pending : 0) + " DB ops pending"
+        v: formatInteger(cur.clients, "0"),
+        sub: formatInteger(cur.db_pending, "0") + " DB ops pending"
       }
     ];
+    renderCardGrid("cards-reg", regItems);
 
-    document.getElementById("cards-reg").innerHTML = regItems.map(function (it) {
-      return '<div class="card"><div class="k"><span>' + esc(it.k) + '</span>' + (it.pillHtml || "") + '</div>' +
-        '<div class="v">' + esc(it.v) + '</div>' +
-        (it.sub ? '<div class="subtext">' + esc(it.sub) + '</div>' : '') + '</div>';
-    }).join("");
-
-    // Error alert
-    var e = document.getElementById("err");
+    var error = document.getElementById("err");
     if (cur.last_tick_error) {
-      e.style.display = "block";
-      e.textContent = "Last engine error: " + cur.last_tick_error;
+      error.style.display = "block";
+      error.textContent = "Last engine error: " + cur.last_tick_error;
     } else {
-      e.style.display = "none";
+      error.style.display = "none";
     }
   }
 
@@ -1145,30 +1199,44 @@
   }
 
   function renderBars() {
-    var el = document.getElementById("bars");
+    var container = document.getElementById("bars");
+    container.textContent = "";
     if (!cur || !cur.subsystems_avg_ms) {
-      el.innerHTML = "<span style='color:#8b949e'>No subsystem profiling telemetry yet</span>";
+      var empty = makeElement("span", "", "No subsystem profiling telemetry yet");
+      empty.style.color = "#8b949e";
+      container.appendChild(empty);
       return;
     }
     var last = cur.subsystems_ms || {}, avg = cur.subsystems_avg_ms || {};
     var keys = Object.keys(avg).sort();
     if (!keys.length) {
-      el.innerHTML = "<span style='color:#8b949e'>No subsystem profiling telemetry yet</span>";
+      var noData = makeElement("span", "", "No subsystem profiling telemetry yet");
+      noData.style.color = "#8b949e";
+      container.appendChild(noData);
       return;
     }
-    var mx = 1;
-    keys.forEach(function (k) { mx = Math.max(mx, avg[k] || 0, last[k] || 0); });
+    var max = 1;
+    keys.forEach(function (key) {
+      max = Math.max(max, finiteNumber(last[key], 0), finiteNumber(avg[key], 0));
+    });
 
-    el.innerHTML = keys.map(function (k) {
-      var v = last[k] || 0, a = avg[k] || 0;
-      var pct = Math.min(100, (a / mx) * 100);
-      var barColor = a > 20 ? "#ff7b72" : (a > 8 ? "#e3b341" : "#58a6ff");
-      return '<div class="row">' +
-        '<span>' + esc(k) + '</span>' +
-        '<div class="track"><div class="fill" style="width:' + pct.toFixed(1) + '%; background:' + barColor + '"></div></div>' +
-        '<span class="num">' + v.toFixed(2) + ' / ' + a.toFixed(2) + ' ms</span>' +
-        '</div>';
-    }).join("");
+    keys.forEach(function (key) {
+      var lastValue = finiteNumber(last[key], 0);
+      var avgValue = finiteNumber(avg[key], 0);
+      var percent = Math.max(0, Math.min(100, (avgValue / max) * 100));
+      var barColor = avgValue > 20 ? "#ff7b72" : (avgValue > 8 ? "#e3b341" : "#58a6ff");
+
+      var row = makeElement("div", "row");
+      row.appendChild(makeElement("span", "", key));
+      var track = makeElement("div", "track");
+      var fill = makeElement("div", "fill");
+      fill.style.width = percent.toFixed(1) + "%";
+      fill.style.background = barColor;
+      track.appendChild(fill);
+      row.appendChild(track);
+      row.appendChild(makeElement("span", "num", lastValue.toFixed(2) + " / " + avgValue.toFixed(2) + " ms"));
+      container.appendChild(row);
+    });
   }
 
   function renderAll() {
@@ -1205,9 +1273,7 @@
         var el = document.getElementById("err");
         el.style.display = "block";
         el.textContent = "Failed to fetch engine health: " + err.message;
-        var pill = document.getElementById("pill");
-        pill.innerHTML = '<span class="pill-dot"></span>OFFLINE';
-        pill.className = "pill bad";
+        renderPill(document.getElementById("pill"), "OFFLINE", "bad");
       });
   }
 

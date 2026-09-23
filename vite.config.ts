@@ -56,9 +56,6 @@ const proxyConfig = {
   '/healthz': { target: 'http://localhost:8000', changeOrigin: true, timeout: 5000 },
   '/wiki': { target: 'http://localhost:8000', changeOrigin: true, timeout: 5000 },
   '/guide': { target: 'http://localhost:8000', changeOrigin: true, timeout: 5000 },
-  '/docs': { target: 'http://localhost:8000', changeOrigin: true, timeout: 5000 },
-  '/openapi.json': { target: 'http://localhost:8000', changeOrigin: true, timeout: 5000 },
-  '/redoc': { target: 'http://localhost:8000', changeOrigin: true, timeout: 5000 },
 }
 
 export default defineConfig(({ mode }) => {
@@ -120,7 +117,6 @@ export default defineConfig(({ mode }) => {
       {
         name: 'flatland-health-transform',
         closeBundle() {
-          if (!cleanApiUrl) return
           const b64 = Buffer.from(cleanApiUrl).toString('base64')
           const targets = [
             path.resolve(__dirname, 'dist/health.html'),
@@ -146,13 +142,13 @@ export default defineConfig(({ mode }) => {
   server: {
     host: '127.0.0.1',
     port: 5173,
-    cors: true,
+    cors: false,
     proxy: proxyConfig,
   },
   preview: {
     host: '127.0.0.1',
     port: 5173,
-    cors: true,
+    cors: false,
     proxy: proxyConfig,
   },
     build: {
