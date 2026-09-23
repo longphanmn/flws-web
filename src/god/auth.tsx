@@ -1,7 +1,7 @@
 /** God passkey client-side flow.
-
+ 
 First visit (no credential on the server): a dialog asks to CREATE a passkey.
-Afterwards: the key lives in localStorage and is attached automatically;
+Afterwards: the key lives in sessionStorage and is attached automatically;
 a 401 clears it and asks to enter it again. REST uses the X-God-Key header,
 WebSocket control messages carry it in the `key` field.
 */
@@ -29,7 +29,7 @@ function emit() {
 
 export function getCachedKey(): string | null {
   try {
-    return localStorage.getItem(STORAGE_KEY)
+    return sessionStorage.getItem(STORAGE_KEY)
   } catch {
     return null
   }
@@ -37,7 +37,8 @@ export function getCachedKey(): string | null {
 
 function rememberKey(key: string) {
   try {
-    localStorage.setItem(STORAGE_KEY, key)
+    sessionStorage.setItem(STORAGE_KEY, key)
+    localStorage.removeItem(STORAGE_KEY)
   } catch {
     /* private mode etc. — session-only use */
   }
@@ -45,6 +46,7 @@ function rememberKey(key: string) {
 
 export function forgetKey() {
   try {
+    sessionStorage.removeItem(STORAGE_KEY)
     localStorage.removeItem(STORAGE_KEY)
   } catch {
     /* ignore */

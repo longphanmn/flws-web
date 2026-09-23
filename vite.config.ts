@@ -2,6 +2,7 @@ import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import fs from 'node:fs'
 import path from 'node:path'
+import crypto from 'node:crypto'
 
 // Serves public/health.html at the clean /health URL (dev only; nginx.conf
 // has the equivalent rule for docker/prod). Registered before Vite's SPA
@@ -128,7 +129,14 @@ export default defineConfig(({ mode }) => {
           for (const target of targets) {
             if (fs.existsSync(target)) {
               let content = fs.readFileSync(target, 'utf-8')
-              content = content.replace('__API_URL_PLACEHOLDER__', b64)
+              if (content.includes('__API_URL_PLACEHOLDER__')) {
+                content = content.replace('__API_URL_PLACEHOLDER__', b64)
+                const scriptMatch = content.match(/<script>([\s\S]*?)<\/script>/)
+                if (scriptMatch) {
+                  const newHash = crypto.createHash('sha256').update(scriptMatch[1]).digest('base64')
+                  content = content.replace(/sha256-[A-Za-z0-9+/=]+/, `sha256-${newHash}`)
+                }
+              }
               fs.writeFileSync(target, content, 'utf-8')
             }
           }
@@ -136,17 +144,14 @@ export default defineConfig(({ mode }) => {
       },
     ],
   server: {
-    host: '0.0.0.0',
+    host: '127.0.0.1',
     port: 5173,
-    // production is reached via reverse proxy → :5173, allow all for Edge/Safari
-    allowedHosts: true,
     cors: true,
     proxy: proxyConfig,
   },
   preview: {
-    host: '0.0.0.0',
+    host: '127.0.0.1',
     port: 5173,
-    allowedHosts: true,
     cors: true,
     proxy: proxyConfig,
   },

@@ -454,7 +454,7 @@
       "geminiPlaceholder": "Nhập khóa API Google Gemini (AIzaSy...)",
       "openaiPlaceholder": "Nhập khóa API OpenAI (sk-...)",
       "clear": "Xóa",
-      "clientOnlyNote": "🔒 Chỉ lưu trên máy khách: Khóa của bạn chỉ lưu trong localStorage của trình duyệt và gọi API trực tiếp. KHÔNG BAO GIỜ gửi về máy chủ của chúng tôi.",
+      "clientOnlyNote": "🔒 Chỉ lưu trên máy khách: Khóa của bạn chỉ lưu trong sessionStorage của trình duyệt và gọi API trực tiếp. KHÔNG BAO GIỜ gửi về máy chủ của chúng tôi.",
       "composing": "⏳ Đang sáng tác câu chuyện sử thi...",
       "generateBtn": "✨ Tạo truyện bằng AI",
       "apiKeyRequired": "Vui lòng nhập khóa API trước.",

@@ -9,9 +9,52 @@ const isGitHubPages = typeof window !== 'undefined' && window.location.hostname.
 const isDemoBuild = typeof __VITE_IS_DEMO__ !== 'undefined' ? Boolean(__VITE_IS_DEMO__) : false
 const isDemoEnvironment = isGitHubPages || isDemoBuild
 
+export const ALLOWED_BACKEND_ORIGINS = [
+  'https://world.minhnhan.in',
+  'http://localhost:8000',
+  'http://127.0.0.1:8000',
+] as const
+
+export const ALLOWED_WS_ORIGINS = [
+  'wss://world.minhnhan.in',
+  'ws://localhost:8000',
+  'ws://127.0.0.1:8000',
+] as const
+
+export function sanitizeBackendUrl(rawUrl: string | null | undefined): string | null {
+  if (!rawUrl) return null
+  try {
+    const parsed = new URL(rawUrl)
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return null
+    if (ALLOWED_BACKEND_ORIGINS.includes(parsed.origin as any)) {
+      return parsed.origin
+    }
+  } catch {
+    return null
+  }
+  return null
+}
+
+export function sanitizeWsUrl(rawUrl: string | null | undefined): string | null {
+  if (!rawUrl) return null
+  try {
+    const parsed = new URL(rawUrl)
+    if (parsed.protocol !== 'ws:' && parsed.protocol !== 'wss:') return null
+    if (ALLOWED_WS_ORIGINS.includes(parsed.origin as any)) {
+      const path = parsed.pathname === '' || parsed.pathname === '/' ? '/ws' : parsed.pathname
+      if (path === '/ws') {
+        return `${parsed.origin}/ws`
+      }
+    }
+  } catch {
+    return null
+  }
+  return null
+}
+
 const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null
-const paramBackend = params?.get('backend') || null
-const paramWs = params?.get('ws') || null
+const paramBackend = sanitizeBackendUrl(params?.get('backend'))
+const paramWs = sanitizeWsUrl(params?.get('ws'))
 
 function decodeEnvUrl(val: unknown): string {
   if (typeof val !== 'string' || !val) return ''

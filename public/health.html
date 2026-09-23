@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2XdYTRqXi3eC/GN9BOtQ5V5WBpUc7N4zhpUBSE8gz2o='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://world.minhnhan.in wss://world.minhnhan.in http://localhost:8000 ws://localhost:8000 http://127.0.0.1:8000 ws://127.0.0.1:8000; frame-ancestors 'none'; object-src 'none'; base-uri 'self';">
 <title>Flatland Health Dashboard</title>
 <style>
   :root { color-scheme: dark; }
@@ -496,8 +497,20 @@
       if (_dec.indexOf("http") === 0) DEFAULT_REMOTE_API = _dec;
     } catch (e) {}
   }
+  var ALLOWED_BACKENDS = ["https://world.minhnhan.in", "http://localhost:8000", "http://127.0.0.1:8000"];
+  function sanitizeBackendUrl(raw) {
+    if (!raw) return null;
+    try {
+      var u = new URL(raw);
+      if (ALLOWED_BACKENDS.indexOf(u.origin) !== -1) {
+        return u.origin;
+      }
+    } catch (e) {}
+    return null;
+  }
   var urlParams = new URLSearchParams(window.location.search);
-  var paramBackend = urlParams.get("backend") || urlParams.get("api");
+  var rawBackend = urlParams.get("backend") || urlParams.get("api");
+  var paramBackend = sanitizeBackendUrl(rawBackend);
   var API_BASE = (paramBackend || (isDemo ? DEFAULT_REMOTE_API : "")).replace(/\/+$/, "");
 
   var g = document.getElementById("g");
@@ -536,7 +549,10 @@
   function esc(s) {
     return String(s != null ? s : "—")
       .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;");
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
   }
 
   function fmtTime(epochSec, spanSeconds) {
@@ -895,12 +911,57 @@
         tip.style.display = "block";
         tip.style.left = (ev.clientX + 14) + "px";
         tip.style.top = (ev.clientY + 10) + "px";
-        tip.innerHTML =
-          "<strong>" + fmtTime(m.t, spanSec) + (m.partial ? " (current)" : "") + "</strong><br>" +
-          "Avg: <b>" + m.avg_ms + " ms</b> · Max: <b>" + m.max_ms + " ms</b><br>" +
-          "TPS: <b>" + (m.tps != null ? m.tps : "—") + "</b> · Ticks: <b>" + m.n + "</b><br>" +
-          "Overruns: <b style='color:" + (m.overruns > 0 ? "#ff7b72" : "#7ee787") + "'>" + m.overruns + "</b><br>" +
-          "Creatures: <b>" + m.avg_pop + "</b>" + (m.avg_food != null ? " · Food: <b>" + m.avg_food + "</b>" : "");
+        while (tip.firstChild) tip.removeChild(tip.firstChild);
+        var titleEl = document.createElement("strong");
+        titleEl.textContent = fmtTime(m.t, spanSec) + (m.partial ? " (current)" : "");
+        tip.appendChild(titleEl);
+        tip.appendChild(document.createElement("br"));
+
+        var line1 = document.createElement("span");
+        line1.appendChild(document.createTextNode("Avg: "));
+        var bAvg = document.createElement("b");
+        bAvg.textContent = m.avg_ms + " ms";
+        line1.appendChild(bAvg);
+        line1.appendChild(document.createTextNode(" · Max: "));
+        var bMax = document.createElement("b");
+        bMax.textContent = m.max_ms + " ms";
+        line1.appendChild(bMax);
+        tip.appendChild(line1);
+        tip.appendChild(document.createElement("br"));
+
+        var line2 = document.createElement("span");
+        line2.appendChild(document.createTextNode("TPS: "));
+        var bTps = document.createElement("b");
+        bTps.textContent = m.tps != null ? m.tps : "—";
+        line2.appendChild(bTps);
+        line2.appendChild(document.createTextNode(" · Ticks: "));
+        var bTicks = document.createElement("b");
+        bTicks.textContent = m.n != null ? m.n : "—";
+        line2.appendChild(bTicks);
+        tip.appendChild(line2);
+        tip.appendChild(document.createElement("br"));
+
+        var line3 = document.createElement("span");
+        line3.appendChild(document.createTextNode("Overruns: "));
+        var bOver = document.createElement("b");
+        bOver.style.color = (m.overruns > 0 ? "#ff7b72" : "#7ee787");
+        bOver.textContent = m.overruns != null ? m.overruns : "0";
+        line3.appendChild(bOver);
+        tip.appendChild(line3);
+        tip.appendChild(document.createElement("br"));
+
+        var line4 = document.createElement("span");
+        line4.appendChild(document.createTextNode("Creatures: "));
+        var bPop = document.createElement("b");
+        bPop.textContent = m.avg_pop != null ? m.avg_pop : "—";
+        line4.appendChild(bPop);
+        if (m.avg_food != null) {
+          line4.appendChild(document.createTextNode(" · Food: "));
+          var bFood = document.createElement("b");
+          bFood.textContent = m.avg_food;
+          line4.appendChild(bFood);
+        }
+        tip.appendChild(line4);
       }
       drawTickGraph();
       drawEcosystemGraph();
@@ -1034,11 +1095,39 @@
         tip.style.display = "block";
         tip.style.left = (ev.clientX + 14) + "px";
         tip.style.top = (ev.clientY + 10) + "px";
-        tip.innerHTML =
-          "<strong>" + fmtTime(m.t, spanSec) + (m.partial ? " (current)" : "") + "</strong><br>" +
-          "Population: <b style='color:#3fb950'>" + m.avg_pop + "</b><br>" +
-          "Food / Plants: <b style='color:#e3b341'>" + (m.avg_food != null ? m.avg_food : "—") + "</b><br>" +
-          (m.avg_food != null && m.avg_pop > 0 ? "Ratio: <b>" + (m.avg_food / m.avg_pop).toFixed(2) + " food/creature</b>" : "");
+        while (tip.firstChild) tip.removeChild(tip.firstChild);
+        var titleEl = document.createElement("strong");
+        titleEl.textContent = fmtTime(m.t, spanSec) + (m.partial ? " (current)" : "");
+        tip.appendChild(titleEl);
+        tip.appendChild(document.createElement("br"));
+
+        var line1 = document.createElement("span");
+        line1.appendChild(document.createTextNode("Population: "));
+        var bPop = document.createElement("b");
+        bPop.style.color = "#3fb950";
+        bPop.textContent = m.avg_pop != null ? m.avg_pop : "—";
+        line1.appendChild(bPop);
+        tip.appendChild(line1);
+        tip.appendChild(document.createElement("br"));
+
+        var line2 = document.createElement("span");
+        line2.appendChild(document.createTextNode("Food / Plants: "));
+        var bFood = document.createElement("b");
+        bFood.style.color = "#e3b341";
+        bFood.textContent = m.avg_food != null ? m.avg_food : "—";
+        line2.appendChild(bFood);
+        tip.appendChild(line2);
+
+        if (m.avg_food != null && m.avg_pop > 0) {
+          tip.appendChild(document.createElement("br"));
+          var line3 = document.createElement("span");
+          line3.appendChild(document.createTextNode("Ratio: "));
+          var bRatio = document.createElement("b");
+          var ratioVal = (Number(m.avg_food) / Number(m.avg_pop)).toFixed(2);
+          bRatio.textContent = ratioVal + " food/creature";
+          line3.appendChild(bRatio);
+          tip.appendChild(line3);
+        }
       }
       drawTickGraph();
       drawEcosystemGraph();

@@ -3,9 +3,9 @@
   "private": true,
   "version": "0.1.6",
   "license": "MIT",
-  "author": "Long Phan <long@minhnhan.in>",
+  "author": "Flatland Project <https://github.com/longphanmn/flws-web>",
   "maintainers": [
-    "Long Phan <long@minhnhan.in>"
+    "Flatland Project <https://github.com/longphanmn/flws-web>"
   ],
   "type": "module",
   "scripts": {

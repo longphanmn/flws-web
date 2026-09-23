@@ -282,7 +282,7 @@ curl ${location.origin}/api/history?limit=5 | jq`}</code></pre>
 
         <div style={{ marginTop: 16, paddingTop: 12, borderTop: '1px solid #21262d', fontSize: 11, color: '#8b949e', lineHeight: 1.5 }}>
           {t('wiki.footerLive', { laws: data?.laws.length ?? 0, routes: data?.routes.length ?? 0, presets: Object.keys(data?.presets ?? {}).length })} · <a href={apiUrl('/wiki')} target="_blank" rel="noreferrer">/wiki HTML ↗</a> · <a href={apiUrl('/api/wiki')} target="_blank" rel="noreferrer">/api/wiki JSON ↗</a> · <a href={apiUrl('/health')} target="_blank" rel="noreferrer">/health ↗</a>
-          <br />{t('wiki.developedBy')} <strong>Long Phan</strong> — <a href="mailto:long@minhnhan.in">long@minhnhan.in</a> · Demo: <a href={getFrontendUrl()} target="_blank" rel="noopener noreferrer">Demo ↗</a> · Landing: <a href={getLandingUrl()} target="_blank" rel="noopener noreferrer">Landing ↗</a>
+          <br />{t('wiki.developedBy')} <strong>Flatland Project</strong> — <a href="https://github.com/longphanmn/flws-web" target="_blank" rel="noopener noreferrer">GitHub</a> · Demo: <a href={getFrontendUrl()} target="_blank" rel="noopener noreferrer">Demo ↗</a> · Landing: <a href={getLandingUrl()} target="_blank" rel="noopener noreferrer">Landing ↗</a>
           <br /><span style={{ opacity: 0.85 }}>{t('wiki.inspiration')}</span>
         </div>
       </div>

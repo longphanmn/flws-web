@@ -454,7 +454,7 @@
       "geminiPlaceholder": "Enter Google Gemini API key (AIzaSy...)",
       "openaiPlaceholder": "Enter OpenAI API key (sk-...)",
       "clear": "Clear",
-      "clientOnlyNote": "🔒 Client-side only: Your key is stored exclusively in your browser's localStorage and calls the API directly. It is NEVER sent to our server.",
+      "clientOnlyNote": "🔒 Client-side only: Your key is stored exclusively in your browser's sessionStorage and calls the API directly. It is NEVER sent to our server.",
       "composing": "⏳ Composing Chronicle Narrative...",
       "generateBtn": "✨ Generate Story with AI",
       "apiKeyRequired": "Please provide your API key first.",

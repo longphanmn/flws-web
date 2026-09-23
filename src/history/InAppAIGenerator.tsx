@@ -23,9 +23,9 @@ export default function InAppAIGenerator({
     return (localStorage.getItem('flatland_ai_provider') as Provider) || 'gemini'
   })
   const [apiKey, setApiKey] = useState<string>(() => {
-    return localStorage.getItem('flatland_ai_key') || ''
+    return sessionStorage.getItem('flatland_ai_key') || ''
   })
-  const [showKeyConfig, setShowKeyConfig] = useState<boolean>(() => !localStorage.getItem('flatland_ai_key'))
+  const [showKeyConfig, setShowKeyConfig] = useState<boolean>(() => !sessionStorage.getItem('flatland_ai_key'))
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [generatedStory, setGeneratedStory] = useState<string>('')
@@ -40,7 +40,12 @@ export default function InAppAIGenerator({
   const saveApiKey = (key: string) => {
     setApiKey(key)
     try {
-      localStorage.setItem('flatland_ai_key', key.trim())
+      if (key.trim()) {
+        sessionStorage.setItem('flatland_ai_key', key.trim())
+      } else {
+        sessionStorage.removeItem('flatland_ai_key')
+      }
+      localStorage.removeItem('flatland_ai_key')
     } catch {}
   }
 
@@ -67,10 +72,13 @@ export default function InAppAIGenerator({
     try {
       if (provider === 'gemini') {
         const model = 'gemini-1.5-flash'
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${trimmedKey}`
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`
         const res = await fetch(url, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': trimmedKey,
+          },
           body: JSON.stringify({
             contents: [{ parts: [{ text: finalPrompt }] }],
             generationConfig: {
@@ -294,7 +302,7 @@ export default function InAppAIGenerator({
             </div>
 
             <span style={{ fontSize: 10.5, color: '#6e7681' }}>
-              {t('history.aiGenerator.clientOnlyNote') || "🔒 Client-side only: Your key is stored exclusively in your browser's localStorage and calls the API directly. It is NEVER sent to our server."}
+              {t('history.aiGenerator.clientOnlyNote') || "🔒 Client-side only: Your key is stored exclusively in your browser's sessionStorage and calls the API directly. It is NEVER sent to our server."}
             </span>
           </div>
         )}

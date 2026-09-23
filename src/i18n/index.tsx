@@ -38,9 +38,19 @@ function resolve(path: string, dict: any): string {
   return typeof cur === 'string' ? cur : path
 }
 
+export function escapeHtml(val: unknown): string {
+  if (val == null) return ''
+  return String(val)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
 function interpolate(str: string, vars?: Record<string, any>): string {
   if (!vars) return str
-  return str.replace(/\{\{(\w+)\}\}/g, (_, k) => (vars[k] != null ? String(vars[k]) : `{{${k}}}`))
+  return str.replace(/\{\{(\w+)\}\}/g, (_, k) => (vars[k] != null ? escapeHtml(vars[k]) : `{{${k}}}`))
 }
 
 interface I18nCtx {
