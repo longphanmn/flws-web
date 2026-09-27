@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-zozIe0C1DNdkJx9g9zI6Wwtv0b9CWYeTQNTe67yiFy0='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://world.minhnhan.in wss://world.minhnhan.in http://localhost:8000 ws://localhost:8000 http://127.0.0.1:8000 ws://127.0.0.1:8000; object-src 'none'; base-uri 'self';">
 <title>Flatland Health Dashboard</title>
 <style>
   :root { color-scheme: dark; }
@@ -362,6 +363,64 @@
     color: #ff7b72;
     font-size: 13px;
   }
+
+  /* God-key gate: replaces the eternal "waiting" state when /healthz cannot
+     return privileged per-minute metrics without an X-God-Key header. */
+  #key-gate {
+    background: #161b22;
+    border: 1px solid #9e6a03;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin: 12px 0 16px;
+    display: none;
+  }
+  #key-gate h2 {
+    margin: 0 0 4px;
+    font-size: 14px;
+    font-weight: 650;
+    color: #e3b341;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  #key-gate p {
+    margin: 0 0 10px;
+    font-size: 12px;
+    color: #8b949e;
+    line-height: 1.45;
+  }
+  #key-gate form {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  #key-gate input {
+    flex: 1 1 240px;
+    min-width: 200px;
+    background: #010409;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    padding: 8px 10px;
+    color: #c9d1d9;
+    font-size: 14px;
+  }
+  #key-gate input:focus {
+    outline: none;
+    border-color: #d29922;
+    box-shadow: 0 0 0 1px #d29922;
+  }
+  #key-gate button {
+    min-height: 36px;
+    padding: 6px 14px;
+    font-weight: 600;
+  }
+  #key-gate .gate-error {
+    margin: 8px 0 0;
+    font-size: 12px;
+    color: #f85149;
+    line-height: 1.4;
+    display: none;
+  }
 </style>
 </head>
 <body>
@@ -383,6 +442,17 @@
 
 <main>
   <div class="err" id="err"></div>
+
+  <!-- God-key gate: shown when no valid X-God-Key is available -->
+  <div id="key-gate">
+    <h2>God key required — paste to view metrics</h2>
+    <p>Per-minute engine metrics are privileged. Paste the God key used in the main app; it is stored in this tab's session storage under the same key the app uses.</p>
+    <form id="key-gate-form" autocomplete="off">
+      <input id="key-gate-input" type="password" autocomplete="off" spellcheck="false" placeholder="Paste God key…">
+      <button id="key-gate-submit" class="btn btn-primary" type="submit">Unlock</button>
+    </form>
+    <p class="gate-error" id="key-gate-error"></p>
+  </div>
 
   <!-- Time Range Switcher -->
   <div class="range-bar">
@@ -487,17 +557,29 @@
   } catch (e) {}
 
   var isDemo = window.location.hostname.endsWith("github.io") || window.location.pathname.indexOf("/demo") !== -1;
-  var DEFAULT_REMOTE_API = "__API_URL_PLACEHOLDER__";
+  var DEFAULT_REMOTE_API = "";
   if (DEFAULT_REMOTE_API.indexOf("__") !== -1) {
-    DEFAULT_REMOTE_API = isDemo ? "https://world.minhnhan.in" : "";
+    DEFAULT_REMOTE_API = "";
   } else if (typeof window !== "undefined" && window.atob && /^[A-Za-z0-9+/=]+$/.test(DEFAULT_REMOTE_API) && DEFAULT_REMOTE_API.length % 4 === 0) {
     try {
       var _dec = window.atob(DEFAULT_REMOTE_API);
       if (_dec.indexOf("http") === 0) DEFAULT_REMOTE_API = _dec;
     } catch (e) {}
   }
+  var ALLOWED_BACKENDS = ["https://world.minhnhan.in", "http://localhost:8000", "http://127.0.0.1:8000"];
+  function sanitizeBackendUrl(raw) {
+    if (!raw) return null;
+    try {
+      var u = new URL(raw);
+      if (ALLOWED_BACKENDS.indexOf(u.origin) !== -1) {
+        return u.origin;
+      }
+    } catch (e) {}
+    return null;
+  }
   var urlParams = new URLSearchParams(window.location.search);
-  var paramBackend = urlParams.get("backend") || urlParams.get("api");
+  var rawBackend = urlParams.get("backend") || urlParams.get("api");
+  var paramBackend = sanitizeBackendUrl(rawBackend);
   var API_BASE = (paramBackend || (isDemo ? DEFAULT_REMOTE_API : "")).replace(/\/+$/, "");
 
   var g = document.getElementById("g");
@@ -508,8 +590,64 @@
   var hoverIdx = -1;
   var hoverChart = null; // 'g' or 'gp'
 
+  function safeStorageGet(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  }
+
+  function safeStorageSet(key, value) {
+    try { localStorage.setItem(key, value); } catch (e) {}
+  }
+
+  // --- God key: same storage convention as src/god/auth.tsx. --------------
+  // The main app keeps the passkey in sessionStorage under "flatworld-god-key"
+  // and migrates stale copies out of localStorage. /healthz only returns full
+  // per-minute metrics to a request carrying a valid X-God-Key header, so the
+  // page reuses the exact same key/scope and picks up an app-entered key where
+  // storage scopes allow (same origin + tab for sessionStorage).
+  var GOD_KEY_STORAGE = "flatworld-god-key";
+
+  function readStoredGodKey() {
+    try {
+      var k = window.sessionStorage.getItem(GOD_KEY_STORAGE);
+      if (k) return k;
+      var legacy = window.localStorage.getItem(GOD_KEY_STORAGE);
+      if (legacy) {
+        try { window.sessionStorage.setItem(GOD_KEY_STORAGE, legacy); } catch (e) {}
+        try { window.localStorage.removeItem(GOD_KEY_STORAGE); } catch (e) {}
+        return legacy;
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  function storeGodKey(key) {
+    try { window.sessionStorage.setItem(GOD_KEY_STORAGE, key); } catch (e) {}
+    try { window.localStorage.removeItem(GOD_KEY_STORAGE); } catch (e) {}
+  }
+
+  function clearGodKey() {
+    try { window.sessionStorage.removeItem(GOD_KEY_STORAGE); } catch (e) {}
+    try { window.localStorage.removeItem(GOD_KEY_STORAGE); } catch (e) {}
+  }
+
+  // Privileged /healthz payloads carry per-minute history; the unprivileged
+  // fallback is only {ok, status, uptime_seconds, uptime}. Detect the reduced
+  // shape so a rejected key re-prompts instead of spinning forever.
+  function hasPrivilegedMetrics(data) {
+    return !!data && (
+      Object.prototype.hasOwnProperty.call(data, "session_minutes_total") ||
+      Object.prototype.hasOwnProperty.call(data, "interval_ms") ||
+      Object.prototype.hasOwnProperty.call(data, "creatures") ||
+      Array.isArray(data.history)
+    );
+  }
+
+  var godKey = readStoredGodKey();
+  var pollTimer = null;
+  var pollInFlight = false;
+
   // Time range state
-  var currentRange = localStorage.getItem("fl_health_range") || "1h";
+  var currentRange = safeStorageGet("fl_health_range") || "1h";
 
   function updateExternalLinks() {
     if (isDemo) {
@@ -533,10 +671,53 @@
 
 
 
-  function esc(s) {
-    return String(s != null ? s : "—")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;");
+  function finiteNumber(value, fallback) {
+    var parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : fallback;
+  }
+
+  function formatNumber(value, digits, fallback) {
+    var parsed = finiteNumber(value, NaN);
+    return Number.isFinite(parsed) ? parsed.toFixed(digits) : fallback;
+  }
+
+  function formatInteger(value, fallback) {
+    var parsed = finiteNumber(value, NaN);
+    return Number.isFinite(parsed) ? parsed.toLocaleString() : fallback;
+  }
+
+  function makeElement(tag, className, text) {
+    var element = document.createElement(tag);
+    if (className) element.className = className;
+    if (text !== undefined && text !== null) element.textContent = String(text);
+    return element;
+  }
+
+  function renderPill(element, label, className) {
+    element.className = "pill " + className;
+    element.textContent = "";
+    element.appendChild(makeElement("span", "pill-dot"));
+    element.appendChild(document.createTextNode(label));
+  }
+
+  function renderCardGrid(id, items) {
+    var container = document.getElementById(id);
+    container.textContent = "";
+    items.forEach(function (item) {
+      var card = makeElement("div", "card");
+      var key = makeElement("div", "k");
+      key.appendChild(makeElement("span", "", item.k));
+      if (item.badge) {
+        key.appendChild(makeElement("span", "pill " + item.badge.className, item.badge.text));
+      }
+      card.appendChild(key);
+
+      var value = makeElement("div", "v", item.v);
+      if (item.unit) value.appendChild(makeElement("small", "", item.unit));
+      card.appendChild(value);
+      if (item.sub) card.appendChild(makeElement("div", "subtext", item.sub));
+      container.appendChild(card);
+    });
   }
 
   function fmtTime(epochSec, spanSeconds) {
@@ -568,7 +749,7 @@
         var r = b.getAttribute("data-range");
         if (r === currentRange) return;
         currentRange = r;
-        localStorage.setItem("fl_health_range", r);
+        safeStorageSet("fl_health_range", r);
         btns.forEach(function (x) { x.classList.remove("active"); });
         b.classList.add("active");
         poll();
@@ -578,25 +759,27 @@
 
   function renderHeaderAndMeta() {
     var st = getStatusInfo();
-    var pill = document.getElementById("pill");
-    pill.innerHTML = '<span class="pill-dot"></span>' + st.label;
-    pill.className = "pill " + st.cls;
+    renderPill(document.getElementById("pill"), st.label, st.cls);
 
     if (cur) {
-      var worldInfo = "tick " + (cur.tick != null ? cur.tick.toLocaleString() : "—") +
-        " · speed " + (cur.speed_target != null ? cur.speed_target : "—") + " TPS" +
+      var worldInfo = "tick " + formatInteger(cur.tick, "—") +
+        " · speed " + formatNumber(cur.speed_target, 0, "—") + " TPS" +
         " · preset: " + (cur.preset || "default");
       document.getElementById("subtitle").textContent = worldInfo;
 
+      var sessionTicks = finiteNumber(cur.session_ticks, 0);
       document.getElementById("uptime-label").textContent =
-        "Uptime: " + (cur.uptime || "—") + (cur.session_ticks ? " (" + cur.session_ticks.toLocaleString() + " ticks)" : "");
+        "Uptime: " + (cur.uptime || "—") + (sessionTicks ? " (" + sessionTicks.toLocaleString() + " ticks)" : "");
 
-      var climate = "Day " + (cur.day || 1) + " · " + (cur.season || "spring");
+      var day = finiteNumber(cur.day, 1);
+      var climate = "Day " + day + " · " + (cur.season || "spring");
       if (cur.weather) climate += " · " + cur.weather;
       if (cur.age) climate += " · " + cur.age;
       document.getElementById("climate-label").textContent = climate;
 
-      var pidText = "PID " + (cur.pid || "—") + " · World #" + (cur.world_id != null ? cur.world_id : "0");
+      var pid = finiteNumber(cur.pid, NaN);
+      var worldId = finiteNumber(cur.world_id, 0);
+      var pidText = "PID " + (Number.isFinite(pid) ? pid : "—") + " · World #" + worldId;
       document.getElementById("footer-meta").textContent = pidText;
     }
   }
@@ -604,137 +787,141 @@
   function renderCards() {
     if (!cur) return;
 
-    // Perf cards
     var perfItems = [
       {
         k: "Actual TPS",
-        v: cur.actual_tps != null ? cur.actual_tps.toFixed(1) : "—",
-        sub: "target " + (cur.speed_target != null ? cur.speed_target : "—") + " TPS"
+        v: formatNumber(cur.actual_tps, 1, "—"),
+        sub: "target " + formatNumber(cur.speed_target, 0, "—") + " TPS"
       },
       {
         k: "Tick Duration",
-        v: cur.avg_tick_ms != null ? cur.avg_tick_ms.toFixed(1) : "—",
+        v: formatNumber(cur.avg_tick_ms, 1, "—"),
         unit: "ms",
-        sub: "max " + (cur.max_tick_ms != null ? cur.max_tick_ms.toFixed(1) : "—") + " ms"
+        sub: "max " + formatNumber(cur.max_tick_ms, 1, "—") + " ms"
       },
       {
         k: "Frame Budget",
-        v: cur.interval_ms != null ? cur.interval_ms.toFixed(1) : "—",
+        v: formatNumber(cur.interval_ms, 1, "—"),
         unit: "ms",
-        sub: (cur.total_overruns != null ? cur.total_overruns : 0) + " total overruns"
+        sub: formatInteger(cur.total_overruns, "0") + " total overruns"
       },
       {
         k: "Process Memory",
-        v: cur.memory_mb != null ? cur.memory_mb.toFixed(1) : "—",
+        v: formatNumber(cur.memory_mb, 1, "—"),
         unit: "MB",
-        sub: (cur.threads || 1) + " active threads"
+        sub: formatInteger(cur.threads, "1") + " active threads"
       },
       {
         k: "Tick Failures",
-        v: cur.tick_failures != null ? cur.tick_failures : 0,
+        v: formatInteger(cur.tick_failures, "0"),
         sub: cur.ok ? "engine healthy" : "check error log"
       }
     ];
+    renderCardGrid("cards-perf", perfItems);
 
-    document.getElementById("cards-perf").innerHTML = perfItems.map(function (it) {
-      return '<div class="card"><div class="k"><span>' + esc(it.k) + '</span></div>' +
-        '<div class="v">' + esc(it.v) + (it.unit ? ' <small>' + esc(it.unit) + '</small>' : '') + '</div>' +
-        (it.sub ? '<div class="subtext">' + esc(it.sub) + '</div>' : '') + '</div>';
-    }).join("");
-
-    // Eco cards
+    var creatures = finiteNumber(cur.creatures, NaN);
+    var food = finiteNumber(cur.food_count, NaN);
+    var foodPerCreature = Number.isFinite(creatures) && creatures > 0 && Number.isFinite(food)
+      ? (food / creatures).toFixed(2) + " food/creature"
+      : "plants count";
     var ecoItems = [
       {
         k: "Population",
-        v: cur.creatures != null ? cur.creatures.toLocaleString() : "—",
-        sub: (cur.deaths != null ? cur.deaths.toLocaleString() : "0") + " total deaths"
+        v: formatInteger(cur.creatures, "—"),
+        sub: formatInteger(cur.deaths, "0") + " total deaths"
       },
       {
         k: "Food Available",
-        v: cur.food_count != null ? cur.food_count.toLocaleString() : "—",
-        sub: cur.creatures ? (cur.food_count / Math.max(1, cur.creatures)).toFixed(2) + " food/creature" : "plants count"
+        v: formatInteger(cur.food_count, "—"),
+        sub: foodPerCreature
       },
       {
         k: "Settlements",
-        v: cur.houses_count != null ? cur.houses_count.toLocaleString() : "—",
+        v: formatInteger(cur.houses_count, "—"),
         unit: "houses",
-        sub: (cur.clans_count != null ? cur.clans_count : 0) + " active clans"
+        sub: formatInteger(cur.clans_count, "0") + " active clans"
+      },
+      {
+        k: "Infected",
+        v: formatInteger(cur.infected_count, "0"),
+        sub: finiteNumber(cur.infected_count, 0) > 0 ? "epidemic active" : "no pathogen spread"
       },
       {
         k: "Simulation Age",
         v: cur.age || "Classic",
-        sub: "Day " + (cur.day || 1) + " (" + (cur.season || "spring") + ")"
+        sub: "Day " + finiteNumber(cur.day, 1) + " (" + (cur.season || "spring") + ")"
       }
     ];
+    renderCardGrid("cards-eco", ecoItems);
 
-    document.getElementById("cards-eco").innerHTML = ecoItems.map(function (it) {
-      return '<div class="card"><div class="k"><span>' + esc(it.k) + '</span></div>' +
-        '<div class="v">' + esc(it.v) + (it.unit ? ' <small>' + esc(it.unit) + '</small>' : '') + '</div>' +
-        (it.sub ? '<div class="subtext">' + esc(it.sub) + '</div>' : '') + '</div>';
-    }).join("");
-
-    // Castes strip
     var castesBox = document.getElementById("castes-strip");
     if (cur.castes && Object.keys(cur.castes).length > 0) {
       castesBox.style.display = "flex";
-      var totalCastes = cur.creatures || 1;
-      var chips = Object.keys(cur.castes).sort().map(function (caste) {
-        var cnt = cur.castes[caste];
-        var pct = Math.round((cnt / totalCastes) * 100);
-        return '<div class="caste-chip"><strong>' + esc(caste) + '</strong>: ' +
-               cnt + ' <span style="color:#8b949e">(' + pct + '%)</span></div>';
+      castesBox.textContent = "";
+      var label = makeElement("span", "", "Castes:");
+      label.style.fontSize = "11px";
+      label.style.color = "#8b949e";
+      label.style.textTransform = "uppercase";
+      label.style.fontWeight = "600";
+      label.style.marginRight = "4px";
+      castesBox.appendChild(label);
+
+      var totalCastes = Math.max(1, finiteNumber(cur.creatures, 1));
+      Object.keys(cur.castes).sort().forEach(function (caste) {
+        var count = finiteNumber(cur.castes[caste], 0);
+        var percent = Math.round((count / totalCastes) * 100);
+        var chip = makeElement("div", "caste-chip");
+        chip.appendChild(makeElement("strong", "", caste));
+        chip.appendChild(document.createTextNode(": " + count + " "));
+        var percentNode = makeElement("span", "", "(" + percent + "%)");
+        percentNode.style.color = "#8b949e";
+        chip.appendChild(percentNode);
+        castesBox.appendChild(chip);
       });
-      castesBox.innerHTML = '<span style="font-size:11px; color:#8b949e; text-transform:uppercase; font-weight:600; margin-right:4px;">Castes:</span>' + chips.join("");
     } else {
       castesBox.style.display = "none";
     }
 
-    // Reg cards
-    var sgLabel = cur.safeguard_active
-      ? '<span class="pill ok">Active (T' + (cur.safeguard_tier || 1) + ')</span>'
-      : '<span class="pill idle">Off</span>';
-    var scLabel = cur.softcap_active
-      ? '<span class="pill bad">Active</span>'
-      : '<span class="pill idle">Off</span>';
-
+    var infected = finiteNumber(cur.infected_count, 0);
+    var safeguardTier = finiteNumber(cur.safeguard_tier, 1);
+    var safeguardEta = finiteNumber(cur.safeguard_eta, NaN);
+    var softcapXi = finiteNumber(cur.softcap_xi, NaN);
     var regItems = [
       {
         k: "Safeguard (Green)",
         v: cur.safeguard_active ? "ACTIVE" : "OFF",
-        pillHtml: sgLabel,
-        sub: cur.safeguard_active ? ("Recovery η=" + (cur.safeguard_eta != null ? cur.safeguard_eta : "—")) : "spawns normal"
+        badge: cur.safeguard_active
+          ? { className: "ok", text: "Active (T" + safeguardTier + ")" }
+          : { className: "idle", text: "Off" },
+        sub: cur.safeguard_active ? "Recovery η=" + (Number.isFinite(safeguardEta) ? safeguardEta : "—") : "spawns normal"
       },
       {
         k: "Softcap (Red)",
         v: cur.softcap_active ? "ACTIVE" : "OFF",
-        pillHtml: scLabel,
-        sub: cur.softcap_active ? ("Density ξ=" + (cur.softcap_xi != null ? cur.softcap_xi : "—")) : "density normal"
+        badge: cur.softcap_active
+          ? { className: "bad", text: "Active" }
+          : { className: "idle", text: "Off" },
+        sub: cur.softcap_active ? "Density ξ=" + (Number.isFinite(softcapXi) ? softcapXi : "—") : "density normal"
       },
       {
         k: "Infected Creatures",
-        v: cur.infected_count != null ? cur.infected_count : 0,
-        sub: (cur.infected_count > 0 ? "epidemic active" : "no pathogen spread")
+        v: formatInteger(cur.infected_count, "0"),
+        sub: infected > 0 ? "epidemic active" : "no pathogen spread"
       },
       {
         k: "WebSocket Clients",
-        v: cur.clients != null ? cur.clients : 0,
-        sub: (cur.db_pending != null ? cur.db_pending : 0) + " DB ops pending"
+        v: formatInteger(cur.clients, "0"),
+        sub: formatInteger(cur.db_pending, "0") + " DB ops pending"
       }
     ];
+    renderCardGrid("cards-reg", regItems);
 
-    document.getElementById("cards-reg").innerHTML = regItems.map(function (it) {
-      return '<div class="card"><div class="k"><span>' + esc(it.k) + '</span>' + (it.pillHtml || "") + '</div>' +
-        '<div class="v">' + esc(it.v) + '</div>' +
-        (it.sub ? '<div class="subtext">' + esc(it.sub) + '</div>' : '') + '</div>';
-    }).join("");
-
-    // Error alert
-    var e = document.getElementById("err");
+    var error = document.getElementById("err");
     if (cur.last_tick_error) {
-      e.style.display = "block";
-      e.textContent = "Last engine error: " + cur.last_tick_error;
+      error.style.display = "block";
+      error.textContent = "Last engine error: " + cur.last_tick_error;
     } else {
-      e.style.display = "none";
+      error.style.display = "none";
     }
   }
 
@@ -895,12 +1082,57 @@
         tip.style.display = "block";
         tip.style.left = (ev.clientX + 14) + "px";
         tip.style.top = (ev.clientY + 10) + "px";
-        tip.innerHTML =
-          "<strong>" + fmtTime(m.t, spanSec) + (m.partial ? " (current)" : "") + "</strong><br>" +
-          "Avg: <b>" + m.avg_ms + " ms</b> · Max: <b>" + m.max_ms + " ms</b><br>" +
-          "TPS: <b>" + (m.tps != null ? m.tps : "—") + "</b> · Ticks: <b>" + m.n + "</b><br>" +
-          "Overruns: <b style='color:" + (m.overruns > 0 ? "#ff7b72" : "#7ee787") + "'>" + m.overruns + "</b><br>" +
-          "Creatures: <b>" + m.avg_pop + "</b>" + (m.avg_food != null ? " · Food: <b>" + m.avg_food + "</b>" : "");
+        while (tip.firstChild) tip.removeChild(tip.firstChild);
+        var titleEl = document.createElement("strong");
+        titleEl.textContent = fmtTime(m.t, spanSec) + (m.partial ? " (current)" : "");
+        tip.appendChild(titleEl);
+        tip.appendChild(document.createElement("br"));
+
+        var line1 = document.createElement("span");
+        line1.appendChild(document.createTextNode("Avg: "));
+        var bAvg = document.createElement("b");
+        bAvg.textContent = m.avg_ms + " ms";
+        line1.appendChild(bAvg);
+        line1.appendChild(document.createTextNode(" · Max: "));
+        var bMax = document.createElement("b");
+        bMax.textContent = m.max_ms + " ms";
+        line1.appendChild(bMax);
+        tip.appendChild(line1);
+        tip.appendChild(document.createElement("br"));
+
+        var line2 = document.createElement("span");
+        line2.appendChild(document.createTextNode("TPS: "));
+        var bTps = document.createElement("b");
+        bTps.textContent = m.tps != null ? m.tps : "—";
+        line2.appendChild(bTps);
+        line2.appendChild(document.createTextNode(" · Ticks: "));
+        var bTicks = document.createElement("b");
+        bTicks.textContent = m.n != null ? m.n : "—";
+        line2.appendChild(bTicks);
+        tip.appendChild(line2);
+        tip.appendChild(document.createElement("br"));
+
+        var line3 = document.createElement("span");
+        line3.appendChild(document.createTextNode("Overruns: "));
+        var bOver = document.createElement("b");
+        bOver.style.color = (m.overruns > 0 ? "#ff7b72" : "#7ee787");
+        bOver.textContent = m.overruns != null ? m.overruns : "0";
+        line3.appendChild(bOver);
+        tip.appendChild(line3);
+        tip.appendChild(document.createElement("br"));
+
+        var line4 = document.createElement("span");
+        line4.appendChild(document.createTextNode("Creatures: "));
+        var bPop = document.createElement("b");
+        bPop.textContent = m.avg_pop != null ? m.avg_pop : "—";
+        line4.appendChild(bPop);
+        if (m.avg_food != null) {
+          line4.appendChild(document.createTextNode(" · Food: "));
+          var bFood = document.createElement("b");
+          bFood.textContent = m.avg_food;
+          line4.appendChild(bFood);
+        }
+        tip.appendChild(line4);
       }
       drawTickGraph();
       drawEcosystemGraph();
@@ -1034,11 +1266,39 @@
         tip.style.display = "block";
         tip.style.left = (ev.clientX + 14) + "px";
         tip.style.top = (ev.clientY + 10) + "px";
-        tip.innerHTML =
-          "<strong>" + fmtTime(m.t, spanSec) + (m.partial ? " (current)" : "") + "</strong><br>" +
-          "Population: <b style='color:#3fb950'>" + m.avg_pop + "</b><br>" +
-          "Food / Plants: <b style='color:#e3b341'>" + (m.avg_food != null ? m.avg_food : "—") + "</b><br>" +
-          (m.avg_food != null && m.avg_pop > 0 ? "Ratio: <b>" + (m.avg_food / m.avg_pop).toFixed(2) + " food/creature</b>" : "");
+        while (tip.firstChild) tip.removeChild(tip.firstChild);
+        var titleEl = document.createElement("strong");
+        titleEl.textContent = fmtTime(m.t, spanSec) + (m.partial ? " (current)" : "");
+        tip.appendChild(titleEl);
+        tip.appendChild(document.createElement("br"));
+
+        var line1 = document.createElement("span");
+        line1.appendChild(document.createTextNode("Population: "));
+        var bPop = document.createElement("b");
+        bPop.style.color = "#3fb950";
+        bPop.textContent = m.avg_pop != null ? m.avg_pop : "—";
+        line1.appendChild(bPop);
+        tip.appendChild(line1);
+        tip.appendChild(document.createElement("br"));
+
+        var line2 = document.createElement("span");
+        line2.appendChild(document.createTextNode("Food / Plants: "));
+        var bFood = document.createElement("b");
+        bFood.style.color = "#e3b341";
+        bFood.textContent = m.avg_food != null ? m.avg_food : "—";
+        line2.appendChild(bFood);
+        tip.appendChild(line2);
+
+        if (m.avg_food != null && m.avg_pop > 0) {
+          tip.appendChild(document.createElement("br"));
+          var line3 = document.createElement("span");
+          line3.appendChild(document.createTextNode("Ratio: "));
+          var bRatio = document.createElement("b");
+          var ratioVal = (Number(m.avg_food) / Number(m.avg_pop)).toFixed(2);
+          bRatio.textContent = ratioVal + " food/creature";
+          line3.appendChild(bRatio);
+          tip.appendChild(line3);
+        }
       }
       drawTickGraph();
       drawEcosystemGraph();
@@ -1056,30 +1316,44 @@
   }
 
   function renderBars() {
-    var el = document.getElementById("bars");
+    var container = document.getElementById("bars");
+    container.textContent = "";
     if (!cur || !cur.subsystems_avg_ms) {
-      el.innerHTML = "<span style='color:#8b949e'>No subsystem profiling telemetry yet</span>";
+      var empty = makeElement("span", "", "No subsystem profiling telemetry yet");
+      empty.style.color = "#8b949e";
+      container.appendChild(empty);
       return;
     }
     var last = cur.subsystems_ms || {}, avg = cur.subsystems_avg_ms || {};
     var keys = Object.keys(avg).sort();
     if (!keys.length) {
-      el.innerHTML = "<span style='color:#8b949e'>No subsystem profiling telemetry yet</span>";
+      var noData = makeElement("span", "", "No subsystem profiling telemetry yet");
+      noData.style.color = "#8b949e";
+      container.appendChild(noData);
       return;
     }
-    var mx = 1;
-    keys.forEach(function (k) { mx = Math.max(mx, avg[k] || 0, last[k] || 0); });
+    var max = 1;
+    keys.forEach(function (key) {
+      max = Math.max(max, finiteNumber(last[key], 0), finiteNumber(avg[key], 0));
+    });
 
-    el.innerHTML = keys.map(function (k) {
-      var v = last[k] || 0, a = avg[k] || 0;
-      var pct = Math.min(100, (a / mx) * 100);
-      var barColor = a > 20 ? "#ff7b72" : (a > 8 ? "#e3b341" : "#58a6ff");
-      return '<div class="row">' +
-        '<span>' + esc(k) + '</span>' +
-        '<div class="track"><div class="fill" style="width:' + pct.toFixed(1) + '%; background:' + barColor + '"></div></div>' +
-        '<span class="num">' + v.toFixed(2) + ' / ' + a.toFixed(2) + ' ms</span>' +
-        '</div>';
-    }).join("");
+    keys.forEach(function (key) {
+      var lastValue = finiteNumber(last[key], 0);
+      var avgValue = finiteNumber(avg[key], 0);
+      var percent = Math.max(0, Math.min(100, (avgValue / max) * 100));
+      var barColor = avgValue > 20 ? "#ff7b72" : (avgValue > 8 ? "#e3b341" : "#58a6ff");
+
+      var row = makeElement("div", "row");
+      row.appendChild(makeElement("span", "", key));
+      var track = makeElement("div", "track");
+      var fill = makeElement("div", "fill");
+      fill.style.width = percent.toFixed(1) + "%";
+      fill.style.background = barColor;
+      track.appendChild(fill);
+      row.appendChild(track);
+      row.appendChild(makeElement("span", "num", lastValue.toFixed(2) + " / " + avgValue.toFixed(2) + " ms"));
+      container.appendChild(row);
+    });
   }
 
   function renderAll() {
@@ -1090,36 +1364,151 @@
     renderBars();
   }
 
-  function poll() {
+  function showKeyGate(message) {
+    var gate = document.getElementById("key-gate");
+    if (!gate) return;
+    gate.style.display = "block";
+    var errEl = document.getElementById("key-gate-error");
+    if (typeof message === "string") {
+      errEl.textContent = message;
+      errEl.style.display = "block";
+    } else if (message === null) {
+      errEl.textContent = "";
+      errEl.style.display = "none";
+    }
+    renderPill(document.getElementById("pill"), "LOCKED", "warn");
+    document.getElementById("subtitle").textContent = "god key required for metrics";
+    var input = document.getElementById("key-gate-input");
+    if (input) { try { input.focus(); } catch (e) {} }
+  }
+
+  function hideKeyGate() {
+    var gate = document.getElementById("key-gate");
+    if (gate) gate.style.display = "none";
+  }
+
+  function buildHealthUrl() {
     var url = (API_BASE ? API_BASE : "") + "/healthz";
     if (currentRange) {
       url += "?range=" + encodeURIComponent(currentRange);
     }
-    fetch(url, { headers: { Accept: "application/json" }, cache: "no-store" })
-      .then(function (r) {
-        if (!r.ok) throw new Error("HTTP " + r.status);
-        return r.json();
-      })
+    return url;
+  }
+
+  function ensurePolling() {
+    if (pollTimer) return;
+    pollTimer = setInterval(poll, 5000);
+  }
+
+  function stopPolling() {
+    if (pollTimer) {
+      clearInterval(pollTimer);
+      pollTimer = null;
+    }
+  }
+
+  function invalidKey() {
+    godKey = null;
+    clearGodKey();
+    stopPolling();
+    showKeyGate("Invalid God key — paste a valid key to view metrics.");
+  }
+
+  function applyApiBaseLinks() {
+    if (!API_BASE) return;
+    var rawLink = document.querySelector('a[href*="/healthz"]');
+    if (rawLink) rawLink.href = API_BASE + "/healthz" + (currentRange ? "?range=" + encodeURIComponent(currentRange) : "");
+    var teleLink = document.querySelector('a[href*="/api/perf/telemetry"]');
+    if (teleLink) teleLink.href = API_BASE + "/api/perf/telemetry";
+    var docsLink = document.querySelector('a[href*="/docs"]');
+    if (docsLink) docsLink.href = API_BASE + "/docs";
+  }
+
+  function requestHealth(key) {
+    return fetch(buildHealthUrl(), {
+      headers: { Accept: "application/json", "X-God-Key": key },
+      cache: "no-store"
+    }).then(function (r) {
+      if (r.status === 401 || r.status === 403) return null;
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    });
+  }
+
+  function poll() {
+    if (!godKey) {
+      stopPolling();
+      showKeyGate();
+      return;
+    }
+    if (pollInFlight) return;
+    pollInFlight = true;
+    requestHealth(godKey)
       .then(function (data) {
-        cur = data;
-        renderAll();
-        if (API_BASE) {
-          var rawLink = document.querySelector('a[href*="/healthz"]');
-          if (rawLink) rawLink.href = API_BASE + "/healthz" + (currentRange ? "?range=" + encodeURIComponent(currentRange) : "");
-          var teleLink = document.querySelector('a[href*="/api/perf/telemetry"]');
-          if (teleLink) teleLink.href = API_BASE + "/api/perf/telemetry";
-          var docsLink = document.querySelector('a[href*="/docs"]');
-          if (docsLink) docsLink.href = API_BASE + "/docs";
+        if (!hasPrivilegedMetrics(data)) {
+          invalidKey();
+          return;
         }
+        cur = data;
+        hideKeyGate();
+        renderAll();
+        ensurePolling();
+        applyApiBaseLinks();
       })
       .catch(function (err) {
         var el = document.getElementById("err");
         el.style.display = "block";
-        el.textContent = "Failed to fetch engine health: " + err.message;
-        var pill = document.getElementById("pill");
-        pill.innerHTML = '<span class="pill-dot"></span>OFFLINE';
-        pill.className = "pill bad";
+        el.textContent = "Failed to fetch engine health: " + (err && err.message ? err.message : err);
+        renderPill(document.getElementById("pill"), "OFFLINE", "bad");
+      })
+      .then(function () { pollInFlight = false; });
+  }
+
+  function submitGodKey() {
+    var input = document.getElementById("key-gate-input");
+    var candidate = input ? (input.value || "").trim() : "";
+    if (!candidate) return;
+    var errEl = document.getElementById("key-gate-error");
+    var btn = document.getElementById("key-gate-submit");
+    errEl.style.display = "none";
+    if (btn) btn.disabled = true;
+    requestHealth(candidate)
+      .then(function (data) {
+        if (btn) btn.disabled = false;
+        if (hasPrivilegedMetrics(data)) {
+          godKey = candidate;
+          storeGodKey(candidate);
+          if (input) input.value = "";
+          cur = data;
+          hideKeyGate();
+          renderAll();
+          ensurePolling();
+          applyApiBaseLinks();
+        } else {
+          godKey = null;
+          clearGodKey();
+          if (input) {
+            input.value = "";
+            try { input.focus(); } catch (e) {}
+          }
+          errEl.textContent = "Invalid God key — check the key and try again.";
+          errEl.style.display = "block";
+          renderPill(document.getElementById("pill"), "LOCKED", "warn");
+        }
+      })
+      .catch(function (err) {
+        if (btn) btn.disabled = false;
+        errEl.textContent = "Could not validate key: " + (err && err.message ? err.message : err);
+        errEl.style.display = "block";
       });
+  }
+
+  var gateForm = document.getElementById("key-gate-form");
+  if (gateForm) {
+    gateForm.onsubmit = function (e) {
+      e.preventDefault();
+      submitGodKey();
+    };
   }
 
   document.getElementById("btn-refresh").onclick = function () {
@@ -1134,8 +1523,12 @@
   });
 
   initRangeButtons();
-  poll();
-  setInterval(poll, 5000);
+  if (godKey) {
+    poll();
+    ensurePolling();
+  } else {
+    showKeyGate(null);
+  }
 })();
 </script>
 </body>

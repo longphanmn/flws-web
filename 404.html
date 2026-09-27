@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- GitHub Pages cannot send HTTP headers, so this meta-CSP is best-effort there; nginx (prod) delivers the full header including frame-ancestors 'none'. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-6rupQTILXID60QeOhyelVeWvFLLWNeAU2K64WPoXk24=' 'sha256-4QynFDob4uTf9/x9tqhUDPBuXNixfIAdWd5hRzkw73g='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://world.minhnhan.in wss://world.minhnhan.in http://localhost:8000 ws://localhost:8000 http://127.0.0.1:8000 ws://127.0.0.1:8000 https://generativelanguage.googleapis.com https://api.openai.com; object-src 'none'; base-uri 'self';" />
   <title>Redirecting — Flatland</title>
   <style>
     body {
