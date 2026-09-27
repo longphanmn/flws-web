@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-wWeRZT/f7b6yT4HaWKbc0DJlOxxzX6NMdbnSvVQwlGc='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://world.minhnhan.in wss://world.minhnhan.in http://localhost:8000 ws://localhost:8000 http://127.0.0.1:8000 ws://127.0.0.1:8000; object-src 'none'; base-uri 'self';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-LynV1eAzbbR2n7En9kYQCyNhqJB/TUaFqPN7WDyuIOI='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://world.minhnhan.in wss://world.minhnhan.in http://localhost:8000 ws://localhost:8000 http://127.0.0.1:8000 ws://127.0.0.1:8000; object-src 'none'; base-uri 'self';">
 <title>Flatland Health Dashboard</title>
 <style>
   :root { color-scheme: dark; }
@@ -363,6 +363,64 @@
     color: #ff7b72;
     font-size: 13px;
   }
+
+  /* God-key gate: replaces the eternal "waiting" state when /healthz cannot
+     return privileged per-minute metrics without an X-God-Key header. */
+  #key-gate {
+    background: #161b22;
+    border: 1px solid #9e6a03;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin: 12px 0 16px;
+    display: none;
+  }
+  #key-gate h2 {
+    margin: 0 0 4px;
+    font-size: 14px;
+    font-weight: 650;
+    color: #e3b341;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  #key-gate p {
+    margin: 0 0 10px;
+    font-size: 12px;
+    color: #8b949e;
+    line-height: 1.45;
+  }
+  #key-gate form {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  #key-gate input {
+    flex: 1 1 240px;
+    min-width: 200px;
+    background: #010409;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    padding: 8px 10px;
+    color: #c9d1d9;
+    font-size: 14px;
+  }
+  #key-gate input:focus {
+    outline: none;
+    border-color: #d29922;
+    box-shadow: 0 0 0 1px #d29922;
+  }
+  #key-gate button {
+    min-height: 36px;
+    padding: 6px 14px;
+    font-weight: 600;
+  }
+  #key-gate .gate-error {
+    margin: 8px 0 0;
+    font-size: 12px;
+    color: #f85149;
+    line-height: 1.4;
+    display: none;
+  }
 </style>
 </head>
 <body>
@@ -384,6 +442,17 @@
 
 <main>
   <div class="err" id="err"></div>
+
+  <!-- God-key gate: shown when no valid X-God-Key is available -->
+  <div id="key-gate">
+    <h2>God key required — paste to view metrics</h2>
+    <p>Per-minute engine metrics are privileged. Paste the God key used in the main app; it is stored in this tab's session storage under the same key the app uses.</p>
+    <form id="key-gate-form" autocomplete="off">
+      <input id="key-gate-input" type="password" autocomplete="off" spellcheck="false" placeholder="Paste God key…">
+      <button id="key-gate-submit" class="btn btn-primary" type="submit">Unlock</button>
+    </form>
+    <p class="gate-error" id="key-gate-error"></p>
+  </div>
 
   <!-- Time Range Switcher -->
   <div class="range-bar">
@@ -528,6 +597,54 @@
   function safeStorageSet(key, value) {
     try { localStorage.setItem(key, value); } catch (e) {}
   }
+
+  // --- God key: same storage convention as src/god/auth.tsx. --------------
+  // The main app keeps the passkey in sessionStorage under "flatworld-god-key"
+  // and migrates stale copies out of localStorage. /healthz only returns full
+  // per-minute metrics to a request carrying a valid X-God-Key header, so the
+  // page reuses the exact same key/scope and picks up an app-entered key where
+  // storage scopes allow (same origin + tab for sessionStorage).
+  var GOD_KEY_STORAGE = "flatworld-god-key";
+
+  function readStoredGodKey() {
+    try {
+      var k = window.sessionStorage.getItem(GOD_KEY_STORAGE);
+      if (k) return k;
+      var legacy = window.localStorage.getItem(GOD_KEY_STORAGE);
+      if (legacy) {
+        try { window.sessionStorage.setItem(GOD_KEY_STORAGE, legacy); } catch (e) {}
+        try { window.localStorage.removeItem(GOD_KEY_STORAGE); } catch (e) {}
+        return legacy;
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  function storeGodKey(key) {
+    try { window.sessionStorage.setItem(GOD_KEY_STORAGE, key); } catch (e) {}
+    try { window.localStorage.removeItem(GOD_KEY_STORAGE); } catch (e) {}
+  }
+
+  function clearGodKey() {
+    try { window.sessionStorage.removeItem(GOD_KEY_STORAGE); } catch (e) {}
+    try { window.localStorage.removeItem(GOD_KEY_STORAGE); } catch (e) {}
+  }
+
+  // Privileged /healthz payloads carry per-minute history; the unprivileged
+  // fallback is only {ok, status, uptime_seconds, uptime}. Detect the reduced
+  // shape so a rejected key re-prompts instead of spinning forever.
+  function hasPrivilegedMetrics(data) {
+    return !!data && (
+      Object.prototype.hasOwnProperty.call(data, "session_minutes_total") ||
+      Object.prototype.hasOwnProperty.call(data, "interval_ms") ||
+      Object.prototype.hasOwnProperty.call(data, "creatures") ||
+      Array.isArray(data.history)
+    );
+  }
+
+  var godKey = readStoredGodKey();
+  var pollTimer = null;
+  var pollInFlight = false;
 
   // Time range state
   var currentRange = safeStorageGet("fl_health_range") || "1h";
@@ -1247,34 +1364,151 @@
     renderBars();
   }
 
-  function poll() {
+  function showKeyGate(message) {
+    var gate = document.getElementById("key-gate");
+    if (!gate) return;
+    gate.style.display = "block";
+    var errEl = document.getElementById("key-gate-error");
+    if (typeof message === "string") {
+      errEl.textContent = message;
+      errEl.style.display = "block";
+    } else if (message === null) {
+      errEl.textContent = "";
+      errEl.style.display = "none";
+    }
+    renderPill(document.getElementById("pill"), "LOCKED", "warn");
+    document.getElementById("subtitle").textContent = "god key required for metrics";
+    var input = document.getElementById("key-gate-input");
+    if (input) { try { input.focus(); } catch (e) {} }
+  }
+
+  function hideKeyGate() {
+    var gate = document.getElementById("key-gate");
+    if (gate) gate.style.display = "none";
+  }
+
+  function buildHealthUrl() {
     var url = (API_BASE ? API_BASE : "") + "/healthz";
     if (currentRange) {
       url += "?range=" + encodeURIComponent(currentRange);
     }
-    fetch(url, { headers: { Accept: "application/json" }, cache: "no-store" })
-      .then(function (r) {
-        if (!r.ok) throw new Error("HTTP " + r.status);
-        return r.json();
-      })
+    return url;
+  }
+
+  function ensurePolling() {
+    if (pollTimer) return;
+    pollTimer = setInterval(poll, 5000);
+  }
+
+  function stopPolling() {
+    if (pollTimer) {
+      clearInterval(pollTimer);
+      pollTimer = null;
+    }
+  }
+
+  function invalidKey() {
+    godKey = null;
+    clearGodKey();
+    stopPolling();
+    showKeyGate("Invalid God key — paste a valid key to view metrics.");
+  }
+
+  function applyApiBaseLinks() {
+    if (!API_BASE) return;
+    var rawLink = document.querySelector('a[href*="/healthz"]');
+    if (rawLink) rawLink.href = API_BASE + "/healthz" + (currentRange ? "?range=" + encodeURIComponent(currentRange) : "");
+    var teleLink = document.querySelector('a[href*="/api/perf/telemetry"]');
+    if (teleLink) teleLink.href = API_BASE + "/api/perf/telemetry";
+    var docsLink = document.querySelector('a[href*="/docs"]');
+    if (docsLink) docsLink.href = API_BASE + "/docs";
+  }
+
+  function requestHealth(key) {
+    return fetch(buildHealthUrl(), {
+      headers: { Accept: "application/json", "X-God-Key": key },
+      cache: "no-store"
+    }).then(function (r) {
+      if (r.status === 401 || r.status === 403) return null;
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    });
+  }
+
+  function poll() {
+    if (!godKey) {
+      stopPolling();
+      showKeyGate();
+      return;
+    }
+    if (pollInFlight) return;
+    pollInFlight = true;
+    requestHealth(godKey)
       .then(function (data) {
-        cur = data;
-        renderAll();
-        if (API_BASE) {
-          var rawLink = document.querySelector('a[href*="/healthz"]');
-          if (rawLink) rawLink.href = API_BASE + "/healthz" + (currentRange ? "?range=" + encodeURIComponent(currentRange) : "");
-          var teleLink = document.querySelector('a[href*="/api/perf/telemetry"]');
-          if (teleLink) teleLink.href = API_BASE + "/api/perf/telemetry";
-          var docsLink = document.querySelector('a[href*="/docs"]');
-          if (docsLink) docsLink.href = API_BASE + "/docs";
+        if (!hasPrivilegedMetrics(data)) {
+          invalidKey();
+          return;
         }
+        cur = data;
+        hideKeyGate();
+        renderAll();
+        ensurePolling();
+        applyApiBaseLinks();
       })
       .catch(function (err) {
         var el = document.getElementById("err");
         el.style.display = "block";
-        el.textContent = "Failed to fetch engine health: " + err.message;
+        el.textContent = "Failed to fetch engine health: " + (err && err.message ? err.message : err);
         renderPill(document.getElementById("pill"), "OFFLINE", "bad");
+      })
+      .then(function () { pollInFlight = false; });
+  }
+
+  function submitGodKey() {
+    var input = document.getElementById("key-gate-input");
+    var candidate = input ? (input.value || "").trim() : "";
+    if (!candidate) return;
+    var errEl = document.getElementById("key-gate-error");
+    var btn = document.getElementById("key-gate-submit");
+    errEl.style.display = "none";
+    if (btn) btn.disabled = true;
+    requestHealth(candidate)
+      .then(function (data) {
+        if (btn) btn.disabled = false;
+        if (hasPrivilegedMetrics(data)) {
+          godKey = candidate;
+          storeGodKey(candidate);
+          if (input) input.value = "";
+          cur = data;
+          hideKeyGate();
+          renderAll();
+          ensurePolling();
+          applyApiBaseLinks();
+        } else {
+          godKey = null;
+          clearGodKey();
+          if (input) {
+            input.value = "";
+            try { input.focus(); } catch (e) {}
+          }
+          errEl.textContent = "Invalid God key — check the key and try again.";
+          errEl.style.display = "block";
+          renderPill(document.getElementById("pill"), "LOCKED", "warn");
+        }
+      })
+      .catch(function (err) {
+        if (btn) btn.disabled = false;
+        errEl.textContent = "Could not validate key: " + (err && err.message ? err.message : err);
+        errEl.style.display = "block";
       });
+  }
+
+  var gateForm = document.getElementById("key-gate-form");
+  if (gateForm) {
+    gateForm.onsubmit = function (e) {
+      e.preventDefault();
+      submitGodKey();
+    };
   }
 
   document.getElementById("btn-refresh").onclick = function () {
@@ -1289,8 +1523,12 @@
   });
 
   initRangeButtons();
-  poll();
-  setInterval(poll, 5000);
+  if (godKey) {
+    poll();
+    ensurePolling();
+  } else {
+    showKeyGate(null);
+  }
 })();
 </script>
 </body>
