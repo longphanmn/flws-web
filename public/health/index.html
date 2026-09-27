@@ -580,7 +580,7 @@
   var urlParams = new URLSearchParams(window.location.search);
   var rawBackend = urlParams.get("backend") || urlParams.get("api");
   var paramBackend = sanitizeBackendUrl(rawBackend);
-  var API_BASE = (paramBackend || (isDemo ? DEFAULT_REMOTE_API : "")).replace(/\/+$/, "");
+  var API_BASE = (paramBackend || (isDemo ? (DEFAULT_REMOTE_API || "https://world.minhnhan.in") : "")).replace(/\/+$/, "");
 
   var g = document.getElementById("g");
   var gp = document.getElementById("gp");
