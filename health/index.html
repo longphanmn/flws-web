@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-zozIe0C1DNdkJx9g9zI6Wwtv0b9CWYeTQNTe67yiFy0='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://world.minhnhan.in wss://world.minhnhan.in http://localhost:8000 ws://localhost:8000 http://127.0.0.1:8000 ws://127.0.0.1:8000; object-src 'none'; base-uri 'self';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-uwBQ3PqLwlDmg14WjH1r2hkq9UkgucS1dQBR5EVnIac='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://world.minhnhan.in wss://world.minhnhan.in http://localhost:8000 ws://localhost:8000 http://127.0.0.1:8000 ws://127.0.0.1:8000; object-src 'none'; base-uri 'self';">
 <title>Flatland Health Dashboard</title>
 <style>
   :root { color-scheme: dark; }
@@ -580,7 +580,7 @@
   var urlParams = new URLSearchParams(window.location.search);
   var rawBackend = urlParams.get("backend") || urlParams.get("api");
   var paramBackend = sanitizeBackendUrl(rawBackend);
-  var API_BASE = (paramBackend || (isDemo ? DEFAULT_REMOTE_API : "")).replace(/\/+$/, "");
+  var API_BASE = (paramBackend || (isDemo ? (DEFAULT_REMOTE_API || "https://world.minhnhan.in") : "")).replace(/\/+$/, "");
 
   var g = document.getElementById("g");
   var gp = document.getElementById("gp");
