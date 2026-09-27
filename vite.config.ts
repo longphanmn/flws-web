@@ -141,12 +141,14 @@ export default defineConfig(({ mode }) => {
     ],
   server: {
     host: '127.0.0.1',
+    allowedHosts: ['world.minhnhan.in', '.minhnhan.in'],
     port: 5173,
     cors: false,
     proxy: proxyConfig,
   },
   preview: {
     host: '127.0.0.1',
+    allowedHosts: ['world.minhnhan.in', '.minhnhan.in'],
     port: 5173,
     cors: false,
     proxy: proxyConfig,
