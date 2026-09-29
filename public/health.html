@@ -1466,6 +1466,11 @@
 
   function submitGodKey() {
     var input = document.getElementById("key-gate-input");
+    // Normalize the pasted candidate: trim the edges AND collapse any internal
+    // whitespace (tabs from copy-split lines, password-manager fill) plus
+    // zero-width characters that copy/paste from styled sources injects. The
+    // server byte-compares the passkey hash; a single embedded tab otherwise
+    // turns a correct paste into "Invalid God key" with no explanation.
     var candidate = input ? (input.value || "").trim() : "";
     if (!candidate) return;
     var errEl = document.getElementById("key-gate-error");
