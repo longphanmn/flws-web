@@ -53,8 +53,8 @@ let failCount = 0;
   healthzCalls = [];
   page.on('request', (r) => { if (r.url().includes('/healthz')) healthzCalls.push({ withKey: !!r.headers()['x-god-key'], t: 'B' }); });
   await page.goto(BASE + '/health', { waitUntil: 'networkidle0', timeout: 60000 });
-  await page.type('#key-input', VALID_KEY);
-  await page.click('#key-submit');
+  await page.type('#key-gate-input', VALID_KEY);
+  await page.click('#key-gate-submit');
   let ok = await page.waitForFunction(() => {
       const g = document.getElementById('key-gate');
       return g && getComputedStyle(g).display === 'none';
@@ -70,13 +70,30 @@ let failCount = 0;
   // valid key and unlock (the honest corruption model; see scratch_edit.txt).
   page = await browser.newPage();
   await page.goto(BASE + '/health', { waitUntil: 'networkidle0', timeout: 60000 });
-  await page.evaluate(() => { document.getElementById('key-input').value = 'test\t-paste-never-real'; });
-  await page.click('#key-submit');
+  await page.evaluate(() => { document.getElementById('key-gate-input').value = 'test\t-paste-never-real'; });
+  await page.click('#key-gate-submit');
   ok = await page.waitForFunction(() => {
       const g = document.getElementById('key-gate');
       return g && getComputedStyle(g).display === 'none';
     }, { timeout: 15000 }).then(() => true).catch(() => false);
   assert(ok, 'D2.paste with embedded internal tab normalizes to valid key');
+
+  // D3) THE REPORTED BUG: a 403 from the origin is not a wrong passkey. The server answers 403 for the
+  // sentinel key 'blocked-host', which models a host filter refusing the request (world.minhnhan.in).
+  // The page must say what happened -- status and endpoint -- and must NOT say "Invalid God key".
+  page = await browser.newPage();
+  await page.goto(BASE + '/health', { waitUntil: 'networkidle0', timeout: 60000 });
+  await page.type('#key-gate-input', 'blocked-host');
+  await page.click('#key-gate-submit');
+  const blockedText = await page.waitForFunction(() => {
+      const e = document.getElementById('key-gate-error');
+      return e && getComputedStyle(e).display !== 'none' ? e.textContent.trim() : null;
+    }, { timeout: 8000 }).then(h => h.jsonValue()).catch(() => null);
+  assert(!!blockedText && /403/.test(blockedText), 'D3.403 names the HTTP status', blockedText);
+  assert(!!blockedText && !/invalid god key/i.test(blockedText), 'D3.403 does NOT claim an invalid key', blockedText);
+  // The endpoint is named as the page resolved it -- a same-origin build requests "/healthz", a demo
+  // build requests the absolute world.minhnhan.in URL. Either way the path must appear.
+  assert(!!blockedText && /\/healthz/.test(blockedText), 'D3.403 names the endpoint it tried', blockedText);
 
   // ---- C: paste a WRONG key exactly once -----------------------------------
   page = await browser.newPage();
@@ -85,21 +102,21 @@ let failCount = 0;
   const seenInvalid = [];
   await page.goto(BASE + '/health', { waitUntil: 'networkidle0', timeout: 60000 });
   const sample = () => page.evaluate(() => {
-    const e = document.getElementById('key-error');
+    const e = document.getElementById('key-gate-error');
     return e && getComputedStyle(e).display !== 'none' ? e.textContent.trim() : null;
   }).then(t => { if (t) seenInvalid.push(t); });
   let samplerRunning = true;
   let lastText = null;
   const transitions = [];
   (async () => { while (samplerRunning) { await page.evaluate(() => {
-        const e = document.getElementById('key-error');
+        const e = document.getElementById('key-gate-error');
         return e && getComputedStyle(e).display !== 'none' ? e.textContent.trim() : null;
       }).then(t => { if (t !== null && t !== lastText) { seenInvalid.push(t); lastText = t; } }); await new Promise(r => setTimeout(r, 400)); } })();
-  await page.type('#key-input', 'wrong-key-on-purpose-' + Date.now());
-  await page.click('#key-submit');
+  await page.type('#key-gate-input', 'wrong-key-on-purpose-' + Date.now());
+  await page.click('#key-gate-submit');
   // First opportunity: an error is visible after rejecting.
   ok = await page.waitForFunction(() => {
-      const e = document.getElementById('key-error');
+      const e = document.getElementById('key-gate-error');
       return e && getComputedStyle(e).display !== 'none' && /invalid/i.test(e.textContent);
     }, { timeout: 5000 }).then(() => true).catch(() => false);
   assert(ok, 'C.paste rejected mentions invalid key once (first-sight message)');
@@ -110,9 +127,9 @@ let failCount = 0;
   const literature = lastText;
   assert(transitions.length === 0 || (seenInvalid.length <= 2 && literature && !/[—-] paste (it|the)/.test(literature.repeat(3)) !== false), 'C.no invalid-key message ROTATION/LOOP', JSON.stringify(seenInvalid));
   // Prompt remains usable: type a valid key now, it must unlock (acceptance #2).
-  await page.evaluate(() => { const i = document.getElementById('key-input'); i.value = ''; });
-  await page.type('#key-input', VALID_KEY);
-  await page.click('#key-submit');
+  await page.evaluate(() => { const i = document.getElementById('key-gate-input'); i.value = ''; });
+  await page.type('#key-gate-input', VALID_KEY);
+  await page.click('#key-gate-submit');
   ok = await page.waitForFunction(() => {
       const g = document.getElementById('key-gate');
       return g && getComputedStyle(g).display === 'none';
