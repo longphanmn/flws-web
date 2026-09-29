@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-LynV1eAzbbR2n7En9kYQCyNhqJB/TUaFqPN7WDyuIOI='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://world.minhnhan.in wss://world.minhnhan.in http://localhost:8000 ws://localhost:8000 http://127.0.0.1:8000 ws://127.0.0.1:8000; object-src 'none'; base-uri 'self';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-0RJXIXNmGhkRYGglPiZGn9uxXViz6gLpNgExAf7veF8='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://world.minhnhan.in wss://world.minhnhan.in http://localhost:8000 ws://localhost:8000 http://127.0.0.1:8000 ws://127.0.0.1:8000; object-src 'none'; base-uri 'self';">
 <title>Flatland Health Dashboard</title>
 <style>
   :root { color-scheme: dark; }
@@ -1424,13 +1424,27 @@
     if (docsLink) docsLink.href = API_BASE + "/docs";
   }
 
+  // The URL the last health request used, so a failure can name the endpoint it could not reach
+  // instead of leaving the reader to guess which base this page resolved.
+  var lastHealthUrl = "";
+
   function requestHealth(key) {
-    return fetch(buildHealthUrl(), {
+    lastHealthUrl = buildHealthUrl();
+    return fetch(lastHealthUrl, {
       headers: { Accept: "application/json", "X-God-Key": key },
       cache: "no-store"
     }).then(function (r) {
-      if (r.status === 401 || r.status === 403) return null;
-      if (!r.ok) throw new Error("HTTP " + r.status);
+      // ONLY a 401 is a verdict on the key: the server refused the key it was given.
+      // A 403 is NOT. It is what a proxy or a host filter answers, and returning null for it here is
+      // what made a host-blocked origin (world.minhnhan.in) render as "Invalid God key" for a key
+      // that was in fact correct -- the failure Long reported.
+      if (r.status === 401) return null;
+      if (!r.ok) {
+        throw new Error("HTTP " + r.status + " from " + lastHealthUrl +
+          (r.status === 403
+            ? " -- the origin refused this request (host not allowed); this is not a passkey problem"
+            : ""));
+      }
       return r.json();
     });
   }
@@ -1466,7 +1480,11 @@
 
   function submitGodKey() {
     var input = document.getElementById("key-gate-input");
-    var candidate = input ? (input.value || "").trim() : "";
+    // Normalize the pasted candidate: strip ALL whitespace (including the tabs a copy across split
+    // lines injects) and the zero-width characters styled sources add -- not just the edges. The server
+    // byte-compares the passkey hash, so one embedded tab turns a correct paste into "Invalid God key"
+    // with no explanation.
+    var candidate = input ? (input.value || "").replace(/[\s\u200b-\u200d\ufeff]+/g, "") : "";
     if (!candidate) return;
     var errEl = document.getElementById("key-gate-error");
     var btn = document.getElementById("key-gate-submit");
@@ -1498,7 +1516,10 @@
       })
       .catch(function (err) {
         if (btn) btn.disabled = false;
-        errEl.textContent = "Could not validate key: " + (err && err.message ? err.message : err);
+        // A rejected fetch is not a verdict on the key either: say what failed, and where it tried.
+        var detail = err && err.message ? err.message : String(err);
+        errEl.textContent = "Could not reach the metrics API: " + detail +
+          (lastHealthUrl && detail.indexOf(lastHealthUrl) === -1 ? " (tried " + lastHealthUrl + ")" : "");
         errEl.style.display = "block";
       });
   }
